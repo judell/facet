@@ -4,7 +4,7 @@ Use remotely:
 
 - [user](http://jonudell.net/h/user.html?user=judell)
 - [group](http://jonudell.net/h/group.html)
-- [tag](http://jonudell.net/h/tag.html)
+- [tag](http://jonudell.net/h/tag.html?tag=nextprez)
 - [any](http://jonudell.net/h/any.html)
 
 Or clone and use locally

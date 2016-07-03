@@ -1,0 +1,82 @@
+<!doctype html>
+<head>
+<title></title>
+<style>
+body { font-family: verdana; margin: .5in;}
+li { margin-bottom: 8px }
+.small { font-size: smaller }
+.green { color:green }
+</style>
+</head>
+<body>
+
+<iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
+
+<div>
+<p>
+This demo displays Hypothesis activity for a tag.
+</p>
+
+<p>
+<input id="tag"/> <br><span class="small">(a Hypothesis tag)</span>
+</p>
+<p>
+<input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
+</p>
+
+<p>
+<input type="button" onclick="_search()" value="search"></input>
+</p>
+</div>
+
+<div id="export_ux"></div>
+
+<hr>
+<p>
+See also activity by <a href="user.html">user</a>, <a href="group.html">group</a>, <a href="any.html">any</a>.
+</p>
+
+<div id="doc"></div>
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script><script src="xss.min.js"></script>
+<script src="export.js"></script>
+<script src="showdown.js"></script>
+<script src="utils.js"></script>
+
+<script>
+
+var tag = gup('tag');
+if ( tag != '' )
+  document.getElementById('tag').value = tag;
+
+var token = gup('token');
+if ( token != '' )
+  document.getElementById('token').value = token
+
+function _export() {
+  load(0, [], []);
+}
+
+function _search() {
+  tag = document.getElementById('tag').value;
+  token = document.getElementById('token').value;
+  var href=location.href = 'tag.html?tag=' + tag + '&token=' + token;
+  location.href = href;
+}
+
+
+var iframe_url = 'iframe.html?search='+ tag + '&facet=tag&token=' + token;
+document.getElementById('iframe').setAttribute('src', iframe_url);
+
+document.getElementById('token').value = token;
+
+document.title = 'Hypothesis activity for the query tag=' + tag;
+
+add_export_ux();
+add_doc();
+
+</script>
+
+
+</body>
+</html>

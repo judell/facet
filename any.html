@@ -1,0 +1,80 @@
+<!doctype html>
+<head>
+<title></title>
+<style>
+body { font-family: verdana; margin: .5in;}
+li { margin-bottom: 8px }
+.small { font-size: smaller }
+.green { color:green }
+</style>
+</head>
+<body>
+
+<iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
+
+<div>
+<p>
+This demo displays Hypothesis activity for any facet
+</p>
+<p>
+<input id="any"></input> <br> <span class="small">(user, URL, tag. annotation quote or body)</span>
+</p>
+<p>
+<input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
+</p>
+<p>
+<input type="button" onclick="_search()" value="search"></input>
+</p>
+</div>
+
+<div id="export_ux"></div>
+
+<hr>
+<p>
+See also activity by <a href="user.html">user</a>, <a href="group.html">group</a>, <a href="tag.html">tag</a>.
+</p>
+
+<div id="doc"></div>
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script><script src="xss.min.js"></script>
+<script src="export.js"></script>
+<script src="showdown.js"></script>
+<script src="utils.js"></script>
+
+<script>
+
+var any = gup('any');
+if ( any != '' )
+  document.getElementById('any').value = any;
+
+var token = gup('token');
+if ( token != '' )
+  document.getElementById('token').value = token
+
+function _export() {
+  load(0, [], []);
+}
+
+function _search() {
+  any = document.getElementById('any').value;
+  token = document.getElementById('token').value;
+  var href=location.href = 'any.html?any=' + any + '&token=' + token;
+  location.href = href;
+}
+
+
+var iframe_url = 'iframe.html?search='+ any + '&facet=any&token=' + token;
+document.getElementById('iframe').setAttribute('src', iframe_url);
+
+document.getElementById('token').value = token;
+
+document.title = 'Hypothesis activity for the query any=' + any;
+
+add_export_ux();
+add_doc();
+
+</script>
+
+
+</body>
+</html>

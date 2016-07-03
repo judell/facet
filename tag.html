@@ -49,9 +49,7 @@ var tag = gup('tag');
 if ( tag != '' )
   document.getElementById('tag').value = tag;
 
-var token = gup('token');
-if ( token != '' )
-  document.getElementById('token').value = token
+var token = getLocalStorageItem('h_token');
 
 function _export() {
   load(0, [], []);
@@ -60,7 +58,8 @@ function _export() {
 function _search() {
   tag = document.getElementById('tag').value;
   token = document.getElementById('token').value;
-  var href=location.href = 'tag.html?tag=' + tag + '&token=' + token;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'tag.html?tag=' + tag;
   location.href = href;
 }
 

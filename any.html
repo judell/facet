@@ -47,9 +47,7 @@ var any = gup('any');
 if ( any != '' )
   document.getElementById('any').value = any;
 
-var token = gup('token');
-if ( token != '' )
-  document.getElementById('token').value = token
+var token = getLocalStorageItem('h_token');
 
 function _export() {
   load(0, [], []);
@@ -58,7 +56,8 @@ function _export() {
 function _search() {
   any = document.getElementById('any').value;
   token = document.getElementById('token').value;
-  var href=location.href = 'any.html?any=' + any + '&token=' + token;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'any.html?any=' + any;
   location.href = href;
 }
 

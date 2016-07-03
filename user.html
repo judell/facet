@@ -47,9 +47,7 @@ var user = gup('user');
 if ( user != '' )
   document.getElementById('user').value = user;
 
-var token = gup('token');
-if ( token != '' )
-  document.getElementById('token').value = token
+var token = getLocalStorageItem('h_token');
 
 function _export() {
   load(0, [], []);
@@ -58,7 +56,8 @@ function _export() {
 function _search() {
   user = document.getElementById('user').value;
   token = document.getElementById('token').value;
-  var href=location.href = 'user.html?user=' + user + '&token=' + token;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'user.html?user=' + user;
   location.href = href;
 }
 

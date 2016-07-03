@@ -1,4 +1,14 @@
 ## View and export Hypothesis annotations
 
-+ Uses [js-xss](https://github.com/leizongmin/js-xss/)
-+ Uses [showdown](https://github.com/showdownjs/showdown)
+Use remotely:
+
+- [user](http://jonudell.net/h/user.html?user=judell)
+- [group](http://jonudell.net/h/group.html)
+- [tag](http://jonudell.net/h/tag.html)
+- [any](http://jonudell.net/h/any.html)
+
+Or clone and use locally
+
+Uses [js-xss](https://github.com/leizongmin/js-xss/)
+
+Uses [showdown](https://github.com/showdownjs/showdown)

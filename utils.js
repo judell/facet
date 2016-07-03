@@ -120,7 +120,7 @@ function load(offset, rows, replies) {
 	try	{ tag = $('#tag')[0].value; } catch (e) {}
 	try	{ group = $('#group')[0].value; } catch (e) {}
     if ( ! user && ! token && ! tag && ! group )
-		limit = 400;
+		limit = 200;
 	_query = query.replace('__OFFSET__',offset);
 	if ( tag )
 		_query += '&tags=' + tag;

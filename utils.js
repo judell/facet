@@ -80,15 +80,17 @@ function process_thread_html(annos, id, level, replies, displayed_in_thread) {
 		};
 		html = filterXSS(html, options);
 		var tags = '';
-        if (anno.tags.length )
-			tags = '<div class="tags">' + 
+        if (anno.tags.length ) {
+          var links = anno.tags.map(function(x) { return '<a target="_tag" href="tag.html?tag=' + x.replace('#','') + '">' + x + '</a>' } )			
+		  tags = '<div class="tags">' + 
 					'<span class="tag-item">' + 
-					anno.tags.join('</span><span class="tag-item">') + 
+					links.join('</span><span class="tag-item">') + 
 					'</span></div>';
+		  }
 		var template = '<div style="padding:10px;margin-left:_MARGIN_px">' + 
 						'<span class="user"><a target="_user" href="user.html?user=' + anno['user'] + '">' + anno['user'] + '</a></span>' + ' ' + 
 						'<span class="timestamp">' + dt_str + '</span>' + 
-                        '<span style="font-size:smaller"><a target="_new" href="https://hyp.is/' + anno.id + '"> ' + anno.id + '</a></span>' + 
+                        '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' + 
 						'<div class="annotation-quote">'  + anno.quote + '</div>' + 
                         tags + 
 						'<div>'  + html + '</div>' + 

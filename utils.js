@@ -116,13 +116,11 @@ function process_thread_html(annos, id, level, replies, displayed_in_thread) {
 }
 
 function load(offset, rows, replies) {
-	var limit = 2000;
+	var limit = 400;
     try { user = $('#user')[0].value; } catch (e) {}
 	try { token = $('#token')[0].value; } catch (e) {}
 	try	{ tag = $('#tag')[0].value; } catch (e) {}
 	try	{ group = $('#group')[0].value; } catch (e) {}
-    if ( ! user && ! token && ! tag && ! group )
-		limit = 200;
 	_query = query.replace('__OFFSET__',offset);
 	if ( tag )
 		_query += '&tags=' + tag;
@@ -169,6 +167,8 @@ function gather(rows) {
 		var url = annotation['url'];             // remember these things
 		var updated = annotation['updated'];     
 		var title = annotation['title'];
+		if (! title)
+			title = url;
         if ( url in urls ) {                     // add/update this url's info
             urls[url] += 1;
 			ids[url].push(id);

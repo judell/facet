@@ -2,6 +2,7 @@ var user = '';
 var token = '';
 var tag = '';
 var group = '';
+var any = '';
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true';
 
 function process(rows, replies) {
@@ -121,14 +122,16 @@ function load(offset, rows, replies) {
 	try { token = $('#token')[0].value; } catch (e) {}
 	try	{ tag = $('#tag')[0].value; } catch (e) {}
 	try	{ group = $('#group')[0].value; } catch (e) {}
+	try	{ any = $('#any')[0].value; } catch (e) {}
 	_query = query.replace('__OFFSET__',offset);
 	if ( tag )
 		_query += '&tags=' + tag;
-
 	if ( user )
 		_query += '&user=' + user;
 	if ( group  )
 		_query += '&group=' + group;
+	if ( any  )
+		_query += '&any=' + any;
 	$.ajax({
          url: _query,
          type: "GET",

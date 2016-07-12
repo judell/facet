@@ -12,10 +12,12 @@ li { margin-bottom: 8px }
 
 <iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
 
-<div>
 <p>
-This demo displays Hypothesis activity for any facet
+<a href="user.html">user</a> &#8226; <a href="group.html">group</a> &#8226; <a href="tag.html">tag</a> &#8226; <b>any</b>
 </p>
+<hr>
+
+<div>
 <p>
 <input id="any"></input> <br> <span class="small">(user, URL, tag. annotation quote or body)</span>
 </p>
@@ -28,11 +30,6 @@ This demo displays Hypothesis activity for any facet
 </div>
 
 <div id="export_ux"></div>
-
-<hr>
-<p>
-See also activity by <a href="user.html">user</a>, <a href="group.html">group</a>, <a href="tag.html">tag</a>.
-</p>
 
 <div id="doc"></div>
 
@@ -70,7 +67,7 @@ document.getElementById('token').value = token;
 document.title = 'Hypothesis activity for the query any=' + any;
 
 add_export_ux();
-add_doc();
+//add_doc();
 
 </script>
 

@@ -12,11 +12,12 @@ li { margin-bottom: 8px }
 
 <iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
 
-<div>
 <p>
-This demo displays Hypothesis activity for a tag.
+<a href="user.html">user</a> &#8226; <a href="group.html">group</a> &#8226; <b>tag</b> &#8226; <a href="any.html">any</a>
 </p>
+<hr>
 
+<div>
 <p>
 <input id="tag"/> <br><span class="small">(a Hypothesis tag)</span>
 </p>
@@ -30,11 +31,6 @@ This demo displays Hypothesis activity for a tag.
 </div>
 
 <div id="export_ux"></div>
-
-<hr>
-<p>
-See also activity by <a href="user.html">user</a>, <a href="group.html">group</a>, <a href="any.html">any</a>.
-</p>
 
 <div id="doc"></div>
 
@@ -72,7 +68,7 @@ document.getElementById('token').value = token;
 document.title = 'Hypothesis activity for the query tag=' + tag;
 
 add_export_ux();
-add_doc();
+//add_doc();
 
 </script>
 

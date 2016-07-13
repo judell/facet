@@ -1,4 +1,5 @@
 var user = '';
+var url = '';
 var token = '';
 var tag = '';
 var group = '';
@@ -123,6 +124,7 @@ function load(offset, rows, replies) {
 	try	{ tag = $('#tag')[0].value; } catch (e) {}
 	try	{ group = $('#group')[0].value; } catch (e) {}
 	try	{ any = $('#any')[0].value; } catch (e) {}
+	try	{ url = $('#url')[0].value; } catch (e) {}
 	_query = query.replace('__OFFSET__',offset);
 	if ( tag )
 		_query += '&tags=' + tag;
@@ -132,6 +134,8 @@ function load(offset, rows, replies) {
 		_query += '&group=' + group;
 	if ( any  )
 		_query += '&any=' + any;
+	if ( url  )
+		_query += '&uri=' + url;
 	$.ajax({
          url: _query,
          type: "GET",
@@ -168,6 +172,7 @@ function gather(rows) {
 		var id = annotation['id'];
 		annos[id] = annotation;                  // save it by id
 		var url = annotation['url'];             // remember these things
+		url = url.replace(/\/$/, "");            // strip trailing slash
 		var updated = annotation['updated'];     
 		var title = annotation['title'];
 		if (! title)

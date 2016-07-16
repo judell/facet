@@ -5,6 +5,7 @@ var tag = '';
 var group = '';
 var any = '';
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true';
+var displayed_in_thread = [];
 
 function process(rows, replies) {
   var gathered = gather(rows);
@@ -60,7 +61,7 @@ function process_urls_html(element, gathered, replies) {
   }
 
 
-function process_thread_html(annos, id, level, replies, displayed_in_thread) {
+function process_thread_html(annos, id, level, replies) {
 	if ( displayed_in_thread.indexOf(id) == -1 ) {
 		var margin = level * 20
 		var anno = annos[id];
@@ -113,7 +114,7 @@ function process_thread_html(annos, id, level, replies, displayed_in_thread) {
 
 	if ( children.length ) {
 		for (var i=0; i<children.length; i++ )
-			process_thread_html(annos, children[i], level+1, replies, displayed_in_thread);
+			process_thread_html(annos, children[i], level+1, replies);
 		}
 }
 

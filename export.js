@@ -1,4 +1,3 @@
-displayed_in_thread = [];
 var count = 0;
 var output = '';
 

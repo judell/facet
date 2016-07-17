@@ -18,7 +18,7 @@ function process(rows, replies) {
         html += '</head>';
         html += '<body>';
         html += '<h1>Hypothesis activity for ' + _query.match(/&([^&]+$)/)[1] + '</h1>';
-        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) { var element = document.getElementById(dom_id); var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.annotation\'); if (display == \'none\' || display == \'\' ) { element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\'; } else { element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\'; } }</script></body></html>';
+        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.annotation\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
         download(html, 'html');
         rows = [];
     }

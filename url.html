@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<title></title>
+<style>
+body { font-family: verdana; margin: .5in;}
+li { margin-bottom: 8px }
+.small { font-size: smaller }
+.green { color:green }
+</style>
+</head>
+<body>
+
+<iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
+
+<p>
+<a href="user.html">user</a> &#8226; <a href="group.html">group</a> &#8226; <b>url</b> &#8226; <a href="tag.html">tag</a> &#8226; <a href="any.html">any</a>
+</p>
+<hr>
+
+<div>
+<p>
+<input id="url"></input> <br> <span class="small">(URL of an annotated document)</span>
+</p>
+<p>
+<input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
+</p>
+<p>
+<input type="button" onclick="_search()" value="search"></input>
+</p>
+</div>
+
+<div id="export_ux"></div>
+
+<div id="doc"></div>
+
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script><script src="xss.min.js"></script>
+<script src="export.js"></script>
+<script src="showdown.js"></script>
+<script src="utils.js"></script>
+
+<script>
+
+var url = gup('url');
+if ( url != '' )
+  document.getElementById('url').value = url;
+
+var token = getLocalStorageItem('h_token');
+
+function _export() {
+  load(0, [], []);
+}
+
+function _search() {
+  url = document.getElementById('url').value;
+  token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'url.html?url=' + url;
+  location.href = href;
+}
+
+
+var iframe_url = 'iframe.html?search='+ url + '&facet=uri&token=' + token;
+document.getElementById('iframe').setAttribute('src', iframe_url);
+
+document.getElementById('token').value = token;
+
+document.title = 'Hypothesis activity for the query uri=' + url;
+
+add_export_ux();
+//add_doc();
+
+</script>
+
+
+</body>
+</html>

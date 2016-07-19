@@ -14,7 +14,7 @@ function process(rows, replies) {
     if ($('#format_html').is(":checked")) {
         process_urls_html('exported_html', gathered, replies);
         var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query group=' + group + '8gk9i7VV</title>';
-       html += '<style>body { margin:.75in; font-family:verdana; word-break:break-word; } a.toggle, a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
+        html += '<style>body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.toggle, a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
         html += '</head>';
         html += '<body>';
         html += '<h1>Hypothesis activity for ' + _query.match(/&([^&]+$)/)[1] + '</h1>';
@@ -51,8 +51,8 @@ function process_urls_html(element, gathered, replies) {
         var s_count = '<span class="anno-count">' + count.toString() + '</span>';
         var elt = $('#' + element);
         var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
-        elt.append('<p><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + titles[url] + '</a>' + ' ' + count_html + '</p>');
-
+        elt.append('<div><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + titles[url] + '</a>' + ' ' + count_html);
+        elt.append('<div class="url">' + url + '</div>');
         elt.append('<div class="annotations" id="' + dom_id + '"/>');
         var ids_for_url = ids[url];
         for (var j = 0; j < ids_for_url.length; j++) {
@@ -89,7 +89,7 @@ function process_thread_html(annos, id, level, replies) {
         html = filterXSS(html, options);
         var tags = '';
         if (anno.tags.length) {
-            var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?tag=' + x.replace('#', '') + '">' + x + '</a>' });
+            var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + x + '</a>' });
             tags = '<div class="tags">' +
                       '<span class="tag-item">' +
                       links.join('</span><span class="tag-item">') +
@@ -127,17 +127,30 @@ function do_really_search(rows) {
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         var anno = parse_annotation(row);
+
+try {      
         show_annotation(anno);
+    }
+catch (e) 
+    {
+console.log(e.message, anno);
+    }
+
+
     }
 }
 
 function wrap_search_term(s) {
-    var re = new RegExp( search, 'i');
-    var m = s.match(re);
-    if ( m ) 
-        return s.replace(m[0], '<span class="search_term">' + m[0] + '</span>');
-    else
-        return s;
+    if (s) {
+        var re = new RegExp( search, 'i');
+        var m = s.match(re);
+        if ( m ) {
+            return s.replace(m[0], '<span class="search_term">' + m[0] + '</span>');
+        }
+        else {
+            return s;
+        }
+	}
 }
 
 
@@ -147,13 +160,22 @@ function show_annotation(anno) {
     var user = anno.user.replace('acct:','').replace('@hypothes.is','')
     user = wrap_search_term(user);
     var url = wrap_search_term(anno.url);
-    var quote = wrap_search_term(anno.quote);
+    var quote = '';
+    if (anno.quote)
+        quote = wrap_search_term(anno.quote);
     var title = wrap_search_term(anno.title);
     var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
     var converter = new Showdown.converter();
-    var text = anno['text'] == null ? '' : anno['text'];
-    text = wrap_search_term(text);
-    var html = converter.makeHtml(text);
+    var text = wrap_search_term(anno.text);
+    var html = '';
+    if (text) {
+        html = converter.makeHtml(text);
+        html = filterXSS(html, options);
+        html = wrap_search_term(html);
+        if ( html == 'undefined' ) {
+            html = '';
+        }
+    }
     var options = {
         whiteList: {
             a: ['href', 'title'],
@@ -165,11 +187,9 @@ function show_annotation(anno) {
         stripIgnoreTag: true,
         stripIgnoreTagBody: ['script']
     };
-    html = filterXSS(html, options);
-    html = wrap_search_term(html);
     var tags = '';
     if (anno.tags.length) {
-        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?tag=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
         tags = '<div class="tags">' +
                   '<span class="tag-item">' +
                   links.join('</span><span class="tag-item">') +
@@ -295,8 +315,7 @@ function parse_annotation(row) {
             }
         }
     }
-    var text = row.hasOwnProperty('text') ? row['text'] : '';
-    text = text == null ? '' : text;
+    var text = row.hasOwnProperty('text') ? row.text : '';
     var tags = [];
     try {
         title = row.document.title;

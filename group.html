@@ -58,6 +58,7 @@ function _export() {
 
 function _search() {
   group = document.getElementById('group').value;
+  token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'group.html?mode=iframe&search=' + group;
   location.href = href;
@@ -65,6 +66,7 @@ function _search() {
 
 function _really_search() {
   var group = document.getElementById('group').value;
+  token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'group.html?mode=search&facet=group' + '&search=' + group;
   location.href = href;

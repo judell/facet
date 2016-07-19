@@ -71,8 +71,8 @@ function _really_search() {
 }
 
 
-var url = panel + '.html?search='+ any + '&facet=any';
-document.getElementById('iframe').setAttribute('src', url);
+var iframe_url = panel + '.html?search='+ any + '&facet=any';
+document.getElementById('iframe').setAttribute('src', iframe_url);
 
 document.getElementById('token').value = token;
 

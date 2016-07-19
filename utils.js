@@ -96,7 +96,7 @@ function process_thread_html(annos, id, level, replies) {
                       '</span></div>';
         }
         var template = '<div style="padding:10px;margin-left:_MARGIN_px">' +
-                        '<span class="user"><a target="_user" href="user.html?user=' + anno['user'] + '">' + anno['user'] + '</a></span>' + ' ' +
+                        '<span class="user"><a target="_user" href="user.html?search=' + anno.user + '">' + anno['user'] + '</a></span>' + ' ' +
                         '<span class="timestamp">' + dt_str + '</span>' +
                         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
                         '<div class="annotation-quote">' + anno.quote + '</div>' +
@@ -175,7 +175,7 @@ function show_annotation(anno) {
                   '</span></div>';
     }
     var template = '<div style="background-color:rgba(235, 230, 224, 0.21);padding:10px;margin-bottom:10px; margin-left:_MARGIN_px;background-color:">' +
-                    '<span class="user"><a target="_user" href="user.html?user=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
+                    '<span class="user"><a target="_user" href="user.html?search=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
                     '<span class="timestamp">' + dt_str + '</span>' +
 					'<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
                     '<div class="uri">' + url + '</div>' +
@@ -189,12 +189,12 @@ function show_annotation(anno) {
 
 function load(offset, rows, replies) {
     var limit = 400;
-    try { user = $('#user')[0].value; } catch (e) { }
+    try { user = $('#user')[0].value; } catch (e) { user = ''; }
     try { token = $('#token')[0].value; } catch (e) { }
-    try { tag = $('#tag')[0].value; } catch (e) { }
-    try { group = $('#group')[0].value; } catch (e) { }
-    try { any = $('#any')[0].value; } catch (e) { }
-    try { url = $('#url')[0].value; } catch (e) { }
+    try { tag = $('#tag')[0].value; } catch (e) { tag = ''; }
+    try { group = $('#group')[0].value; } catch (e) { group = ''; }
+    try { any = $('#any')[0].value; } catch (e) { any = ''; }
+    try { url = $('#url')[0].value; } catch (e) { url = ''; }
     _query = query.replace('__OFFSET__', offset);
     if (tag)
         _query += '&tags=' + tag;

@@ -26,7 +26,8 @@ li { margin-bottom: 8px }
 <input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
 </p>
 <p>
-<input type="button" onclick="_search()" value="search"></input>
+<input type="button" onclick="_search()" value="activity"></input>
+A
 </p>
 </div>
 
@@ -41,11 +42,13 @@ li { margin-bottom: 8px }
 
 <script>
 
-var user = gup('user');
+var panel = get_mode();
+
+var user = gup('search');
 if ( user != '' )
   document.getElementById('user').value = user;
 
-var token = getLocalStorageItem('h_token');
+token = getLocalStorageItem('h_token');
 
 function _export() {
   load(0, [], []);
@@ -55,13 +58,20 @@ function _search() {
   user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
-  var href=location.href = 'user.html?user=' + user;
+  var href=location.href = 'user.html?mode=iframe&search=' + user;
   location.href = href;
 }
 
+function _really_search() {
+  var user = document.getElementById('user').value;
+  token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'user.html?mode=search&facet=user' + '&search=' + user;
+  location.href = href;
+}
 
-var iframe_url = 'iframe.html?search='+ user + '&facet=user&token=' + token;
-document.getElementById('iframe').setAttribute('src', iframe_url);
+var url = panel + '.html?search='+ user + '&facet=user';
+document.getElementById('iframe').setAttribute('src', url);
 
 document.getElementById('token').value = token;
 

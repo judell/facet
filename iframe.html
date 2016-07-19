@@ -31,8 +31,9 @@ span.anno-count:before { content:"+" }
 
 <script>
 
+token = localStorage.getItem('h_token');
+
 var search = gup('search');
-var token = gup('token')
 var facet = gup('facet');
 
 document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet + '=' + search;

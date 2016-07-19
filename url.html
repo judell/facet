@@ -26,7 +26,8 @@ li { margin-bottom: 8px }
 <input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
 </p>
 <p>
-<input type="button" onclick="_search()" value="search"></input>
+<input type="button" onclick="_search()" value="activity"></input>
+<input type="button" onclick="_really_search()" value="search"></input>
 </p>
 </div>
 
@@ -41,7 +42,9 @@ li { margin-bottom: 8px }
 
 <script>
 
-var url = gup('url');
+var panel = get_mode();
+
+var url = gup('search');
 if ( url != '' )
   document.getElementById('url').value = url;
 
@@ -55,13 +58,21 @@ function _search() {
   url = document.getElementById('url').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
-  var href=location.href = 'url.html?url=' + url;
+  var href=location.href = 'url.html?mode=iframe&search=' + url;
   location.href = href;
 }
 
 
-var iframe_url = 'iframe.html?search='+ url + '&facet=uri&token=' + token;
-document.getElementById('iframe').setAttribute('src', iframe_url);
+function _really_search() {
+  var url = document.getElementById('url').value;
+  token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'url.html?mode=search&facet=uri' + '&search=' + url;
+  location.href = href;
+}
+
+var url = panel + '.html?search='+ url + '&facet=uri';
+document.getElementById('iframe').setAttribute('src', url);
 
 document.getElementById('token').value = token;
 

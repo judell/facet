@@ -14,7 +14,7 @@ function process(rows, replies) {
     if ($('#format_html').is(":checked")) {
         process_urls_html('exported_html', gathered, replies);
         var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query group=' + group + '8gk9i7VV</title>';
-        html += '<style>body { margin:.75in; font-family:verdana; word-break:break-word; } a.toggle, a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
+       html += '<style>body { margin:.75in; font-family:verdana; word-break:break-word; } a.toggle, a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
         html += '</head>';
         html += '<body>';
         html += '<h1>Hypothesis activity for ' + _query.match(/&([^&]+$)/)[1] + '</h1>';
@@ -122,6 +122,70 @@ function process_thread_html(annos, id, level, replies) {
             process_thread_html(annos, children[i], level + 1, replies);
     }
 }
+
+function do_really_search(rows) {
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var anno = parse_annotation(row);
+        show_annotation(anno);
+    }
+}
+
+function wrap_search_term(s) {
+    var re = new RegExp( search, 'i');
+    var m = s.match(re);
+    if ( m ) 
+        return s.replace(m[0], '<span class="search_term">' + m[0] + '</span>');
+    else
+        return s;
+}
+
+
+function show_annotation(anno) {
+    var margin = 20;
+    var dt = new Date(anno.updated);
+    var user = anno.user.replace('acct:','').replace('@hypothes.is','')
+    user = wrap_search_term(user);
+    var url = wrap_search_term(anno.url);
+    var quote = wrap_search_term(anno.quote);
+    var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+    var converter = new Showdown.converter();
+    var text = anno['text'] == null ? '' : anno['text'];
+    text = wrap_search_term(text);
+    var html = converter.makeHtml(text);
+    var options = {
+        whiteList: {
+            a: ['href', 'title'],
+            img: ['alt', 'src'],
+            p: [],
+            blockquote: [],
+            span: ['title', 'class']
+        },
+        stripIgnoreTag: true,
+        stripIgnoreTagBody: ['script']
+    };
+    html = filterXSS(html, options);
+    html = wrap_search_term(html);
+    var tags = '';
+    if (anno.tags.length) {
+        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?tag=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+        tags = '<div class="tags">' +
+                  '<span class="tag-item">' +
+                  links.join('</span><span class="tag-item">') +
+                  '</span></div>';
+    }
+    var template = '<div style="background-color:rgba(235, 230, 224, 0.21);padding:10px;margin-bottom:10px; margin-left:_MARGIN_px;background-color:">' +
+                    '<span class="user"><a target="_user" href="user.html?user=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
+                    '<span class="timestamp">' + dt_str + '</span>' +
+					'<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
+                    '<div class="uri">' + url + '</div>' +
+                    '<div class="annotation-quote">' + quote + '</div>' +
+                    tags +
+                    '<div>' + html + '</div>' +
+                    '</div>';
+    output += template.toString();
+}
+
 
 function load(offset, rows, replies) {
     var limit = 400;
@@ -314,4 +378,13 @@ function download(text, type) {
     a.download = 'hypothesis.' + type;
     document.body.appendChild(a);
     a.click();
+}
+
+function get_mode() {
+    var mode = gup('mode');
+    if ( mode == '' || mode == 'iframe' )
+      panel = 'iframe';
+    else
+      panel = 'search';
+    return panel;
 }

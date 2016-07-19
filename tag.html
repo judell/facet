@@ -27,7 +27,8 @@ li { margin-bottom: 8px }
 </p>
 
 <p>
-<input type="button" onclick="_search()" value="search"></input>
+<input type="button" onclick="_search()" value="activity"></input>
+<input type="button" onclick="_really_search()" value="search"></input>
 </p>
 </div>
 
@@ -42,27 +43,36 @@ li { margin-bottom: 8px }
 
 <script>
 
-var tag = gup('tag');
+var panel = get_mode();
+
+var tag = gup('search');
 if ( tag != '' )
   document.getElementById('tag').value = tag;
 
-var token = getLocalStorageItem('h_token');
+token = getLocalStorageItem('h_token');
 
 function _export() {
   load(0, [], []);
 }
 
 function _search() {
-  tag = document.getElementById('tag').value;
+  var tag = document.getElementById('tag').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
-  var href=location.href = 'tag.html?tag=' + tag;
+  var href=location.href = 'tag.html?mode=iframe&search=' + tag;
   location.href = href;
 }
 
+function _really_search() {
+  tag = document.getElementById('tag').value;
+  token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href=location.href = 'tag.html?mode=search&facet=tag' + '&search=' + tag;
+  location.href = href;
+}
 
-var iframe_url = 'iframe.html?search='+ tag + '&facet=tag&token=' + token;
-document.getElementById('iframe').setAttribute('src', iframe_url);
+var url = panel + '.html?search='+ tag + '&facet=tag';
+document.getElementById('iframe').setAttribute('src', url);
 
 document.getElementById('token').value = token;
 

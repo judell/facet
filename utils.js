@@ -148,6 +148,7 @@ function show_annotation(anno) {
     user = wrap_search_term(user);
     var url = wrap_search_term(anno.url);
     var quote = wrap_search_term(anno.quote);
+    var title = wrap_search_term(anno.title);
     var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
     var converter = new Showdown.converter();
     var text = anno['text'] == null ? '' : anno['text'];
@@ -179,6 +180,7 @@ function show_annotation(anno) {
                     '<span class="timestamp">' + dt_str + '</span>' +
 					'<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
                     '<div class="uri">' + url + '</div>' +
+                    '<div class="title">' + title + '</div>' +
                     '<div class="annotation-quote">' + quote + '</div>' +
                     tags +
                     '<div>' + html + '</div>' +
@@ -239,12 +241,12 @@ function gather(rows) {
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         var annotation = parse_annotation(row);  // parse the annotation
-        var id = annotation['id'];
+        var id = annotation.id;
         annos[id] = annotation;                  // save it by id
-        var url = annotation['url'];             // remember these things
+        var url = annotation.url;             // remember these things
         url = url.replace(/\/$/, "");            // strip trailing slash
-        var updated = annotation['updated'];
-        var title = annotation['title'];
+        var updated = annotation.updated;
+        var title = annotation.title;
         if (!title)
             title = url;
         if (url in urls) {                     // add/update this url's info
@@ -297,9 +299,11 @@ function parse_annotation(row) {
     text = text == null ? '' : text;
     var tags = [];
     try {
-        title = row['document']['title'];
+        title = row.document.title;
+        if ( typeof(title) == 'object' )
+            title = title[0];
         refs[id] = refs;
-        tags = row['tags'];
+        tags = row.tags;
     }
     catch (e) {
         console.log(e);

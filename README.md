@@ -7,7 +7,7 @@ Use remotely:
 - [tag](http://jonudell.net/h/tag.html?search=nextprez)
 - [any](http://jonudell.net/h/any.html?search=Jeremy)
 
-Or clone and use locally
+Or clone and use locally:
 
 Uses [js-xss](https://github.com/leizongmin/js-xss/)
 

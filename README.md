@@ -2,10 +2,10 @@
 
 Use remotely:
 
-- [user](http://jonudell.net/h/user.html?user=judell)
+- [user](http://jonudell.net/h/user.html?search=judell)
 - [group](http://jonudell.net/h/group.html)
-- [tag](http://jonudell.net/h/tag.html?tag=nextprez)
-- [any](http://jonudell.net/h/any.html)
+- [tag](http://jonudell.net/h/tag.html?search=nextprez)
+- [any](http://jonudell.net/h/any.html?search=Jeremy)
 
 Or clone and use locally
 

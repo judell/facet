@@ -145,8 +145,8 @@ console.log(e.message, anno);
 }
 
 function wrap_search_term(s) {
-    if ( ! s) 
-        return '';
+    if ( ! s || typeof(search) == 'undefined' )
+        return s;
     var re = new RegExp( search, 'i');
     var m = s.match(re);
     if ( m )

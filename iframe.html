@@ -19,12 +19,13 @@ img { width: 90%; margin: 8px }
 .anno-count { } 
 span.anno-count:before { content:"+" } 
 .tags { line-height: 2 }
+.checkbox { display:none }
 </style>
 </head>
 <body>
 
-<a class="collapse_all" title="collapse all" href="javascript:collapse_all()">-</a>
-<a class="expand_all" title="expand all" href="javascript:expand_all()">+</a>
+<a id="collapser" style="display:none" class="collapse_all" title="collapse all" href="javascript:collapse_all()">-</a>
+<a id="expander" class="expand_all" title="expand all" href="javascript:expand_all()">+</a>
 
 <div id="widget">
 <h2 id="title"></h2>
@@ -38,6 +39,8 @@ span.anno-count:before { content:"+" }
 
 <script>
 function expand_all() {
+  document.getElementById('expander').style.display='none';
+  document.getElementById('collapser').style.display='inline';
   var annos = document.querySelectorAll('.annotation');
   for (var i=0; i<annos.length; i++) 
     annos[i].style.display = 'block';
@@ -46,6 +49,8 @@ function expand_all() {
     annos[i].style.display = 'block';
 }
 function collapse_all() {
+  document.getElementById('expander').style.display='inline';
+  document.getElementById('collapser').style.display='none';
   var annos = document.querySelectorAll('.annotation');
   for (var i=0; i<annos.length; i++) 
     annos[i].style.display = 'none';

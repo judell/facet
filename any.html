@@ -41,21 +41,23 @@ li { margin-bottom: 8px }
 <script src="utils.js"></script>
 
 <script>
-
 var panel = get_mode();
 
 var any = gup('search');
 if ( any != '' )
   document.getElementById('any').value = any;
 
-var token = getLocalStorageItem('h_token');
+init_selections();
 
-function _export() {
-  load(0, [], []);
+function _select() {
+  start_selections();
+  location.href = 'any.html?mode=iframe&search=' + any + '&selections=yes';
 }
 
+var token = getLocalStorageItem('h_token');
+
 function _search() {
-  var any = document.getElementById('any').value;
+  any = document.getElementById('any').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'any.html?mode=iframe&search=' + any;
@@ -72,6 +74,8 @@ function _really_search() {
 
 
 var iframe_url = panel + '.html?search='+ any + '&facet=any';
+if ( gup('selections') != '' ) 
+	iframe_url += '&selections=yes';
 document.getElementById('iframe').setAttribute('src', iframe_url);
 
 document.getElementById('token').value = token;

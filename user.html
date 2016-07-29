@@ -47,28 +47,16 @@ var user = gup('search');
 if ( user != '' )
   document.getElementById('user').value = user;
 
-if ( gup('selections') == '' ) {
-  localStorage.setItem('h_export_selections', JSON.stringify([]));
-  localStorage.setItem('h_is_selecting','false');
-  localStorage.setItem('h_is_exporting','false');
-  }
-
-token = getLocalStorageItem('h_token');
+init_selections();
 
 function _select() {
-  localStorage.setItem('h_is_selecting','true');
-  localStorage.setItem('h_is_exporting','false');
+  start_selections();
   location.href = 'user.html?mode=iframe&search=' + user + '&selections=yes';
 }
 
-function _export() {
-  localStorage.setItem('h_is_exporting','true');
-  localStorage.setItem('h_is_selecting','false');
-  load(0, [], []);
-}
+var token = getLocalStorageItem('h_token');
 
 function _search() {
-  localStorage.setItem('h_is_selecting','false');
   user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
@@ -77,18 +65,17 @@ function _search() {
 }
 
 function _really_search() {
-  localStorage.setItem('h_is_selecting','false');
-  var user = document.getElementById('user').value;
+  user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'user.html?mode=search&facet=user' + '&search=' + user;
   location.href = href;
 }
 
-var url = panel + '.html?search='+ user + '&facet=user';
+var iframe_url = panel + '.html?search='+ user + '&facet=user';
 if ( gup('selections') != '' ) 
-	url += '&selections=yes';
-document.getElementById('iframe').setAttribute('src', url);
+	iframe_url += '&selections=yes';
+document.getElementById('iframe').setAttribute('src', iframe_url);
 
 document.getElementById('token').value = token;
 

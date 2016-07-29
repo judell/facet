@@ -492,3 +492,23 @@ function is_exporting() {
     return localStorage.getItem('h_is_exporting')=='true';
 }
 
+function _export() {
+  localStorage.setItem('h_is_exporting','true');
+  localStorage.setItem('h_is_selecting','false');
+  load(0, [], []);
+}
+
+function init_selections() {
+    if ( gup('selections') == '' ) {
+        localStorage.setItem('h_export_selections', JSON.stringify([]));
+        localStorage.setItem('h_is_selecting','false');
+        localStorage.setItem('h_is_exporting','false');
+        }
+    }
+
+function start_selections() {
+  localStorage.setItem('h_is_selecting','true');
+  localStorage.setItem('h_is_exporting','false');
+  }
+
+

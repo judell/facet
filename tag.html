@@ -42,21 +42,23 @@ li { margin-bottom: 8px }
 <script src="utils.js"></script>
 
 <script>
-
 var panel = get_mode();
 
 var tag = gup('search');
 if ( tag != '' )
   document.getElementById('tag').value = tag;
 
-token = getLocalStorageItem('h_token');
+init_selections();
 
-function _export() {
-  load(0, [], []);
+function _select() {
+  start_selections();
+  location.href = 'tag.html?mode=iframe&search=' + tag + '&selections=yes';
 }
 
+var token = getLocalStorageItem('h_token');
+
 function _search() {
-  var tag = document.getElementById('tag').value;
+  tag = document.getElementById('tag').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'tag.html?mode=iframe&search=' + tag;
@@ -71,8 +73,10 @@ function _really_search() {
   location.href = href;
 }
 
-var url = panel + '.html?search='+ tag + '&facet=tag';
-document.getElementById('iframe').setAttribute('src', url);
+var iframe_url = panel + '.html?search='+ tag + '&facet=tag';
+if ( gup('selections') != '' ) 
+	iframe_url += '&selections=yes';
+document.getElementById('iframe').setAttribute('src', iframe_url);
 
 document.getElementById('token').value = token;
 

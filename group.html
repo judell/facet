@@ -43,18 +43,21 @@ li { margin-bottom: 8px }
 <script src="utils.js"></script>
 
 <script>
-
 var panel = get_mode();
 
 var group = gup('search');
 if ( group != '' )
   document.getElementById('group').value = group;
 
-token = getLocalStorageItem('h_token');
+init_selections();
 
-function _export() {
-  load(0, [], []);
+function _select() {
+  start_selections();
+  location.href = 'group.html?mode=iframe&search=' + group + '&selections=yes';
 }
+
+
+var token = getLocalStorageItem('h_token');
 
 function _search() {
   group = document.getElementById('group').value;
@@ -65,16 +68,18 @@ function _search() {
 }
 
 function _really_search() {
-  var group = document.getElementById('group').value;
+  group = document.getElementById('group').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href=location.href = 'group.html?mode=search&facet=group' + '&search=' + group;
   location.href = href;
 }
 
-var url = panel + '.html?search='+ group + '&facet=group';
-document.getElementById('iframe').setAttribute('src', url);
-
+var iframe_url = panel + '.html?search='+ group + '&facet=group';
+if ( gup('selections') != '' ) 
+	iframe_url += '&selections=yes';
+document.getElementById('iframe').setAttribute('src', iframe_url);
+ 
 document.getElementById('token').value = token;
 
 document.title = 'Hypothesis activity for the query group=' + group;

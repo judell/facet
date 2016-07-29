@@ -50,6 +50,10 @@ if ( user != '' )
 
 token = getLocalStorageItem('h_token');
 
+function _select() {
+  location.href = 'user.html?mode=iframe&search=' + user + '&selections=yes';
+}
+
 function _export() {
   load(0, [], []);
 }
@@ -58,7 +62,7 @@ function _search() {
   user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
-  var href=location.href = 'user.html?mode=iframe&search=' + user;
+  var href = 'user.html?mode=iframe&search=' + user;
   location.href = href;
 }
 
@@ -71,6 +75,8 @@ function _really_search() {
 }
 
 var url = panel + '.html?search='+ user + '&facet=user';
+if ( gup('selections') != '' ) 
+	url += '&selections=yes';
 document.getElementById('iframe').setAttribute('src', url);
 
 document.getElementById('token').value = token;

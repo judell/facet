@@ -8,6 +8,8 @@ a.toggle {font-weight: bold; }
 a.visit { color: #151414 } 
 a.expand_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
 a.collapse_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
+#selections { display:none }
+.checkbox { display:none }
 img { width: 90%; margin: 8px } 
 .user { font-weight:bold } 
 .search_term { background-color:antiquewhite }
@@ -19,7 +21,6 @@ img { width: 90%; margin: 8px }
 .anno-count { } 
 span.anno-count:before { content:"+" } 
 .tags { line-height: 2 }
-.checkbox { display:none }
 </style>
 </head>
 <body>
@@ -29,6 +30,8 @@ span.anno-count:before { content:"+" }
 
 <div id="widget">
 <h2 id="title"></h2>
+
+<p id="selections"></p>
 </div>
 
 
@@ -38,46 +41,105 @@ span.anno-count:before { content:"+" }
 <script src="utils.js"></script>
 
 <script>
+function save_ids(ids) {
+  localStorage.setItem('h_export_selections', JSON.stringify(ids) );
+}
+
+function get_ids() {
+    return JSON.parse(localStorage.getItem('h_export_selections'));
+}
+
+function all_or_none() {
+    if ( selections == '' ) return;
+    document.getElementById('selections').style.display = 'block';
+    var choice = getRVBN('selections');
+    var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    var ids = [];
+    if (choice == 'none') {
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+            checkboxes[i].style.display = 'inline';
+        }
+    }
+    else {
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].style.display = 'inline';
+            checkboxes[i].checked = true;
+            ids.push(i);
+        }
+    }
+    save_ids(ids);
+}
+
+function item_checked(id) {
+    var ids = get_ids();
+    var is_saved = ids.indexOf(id) != -1;
+    var checkbox = document.getElementById('c' + id);
+    var is_checked = checkbox.checked;
+    if ( ! is_checked && is_saved ) {
+       var index = ids.indexOf(id);
+       if ( index > -1 ) {
+           ids.splice(index, 1);
+           save_ids(ids);
+           console.log('unsave ' + id);
+           }
+       }
+    if ( is_checked && ! is_saved ) {
+       ids.push(id);
+       save_ids(ids);
+       console.log('save ' + id);
+       }
+}
+
+
+function getRVBN(rName) {
+    var radioButtons = document.getElementsByName(rName);
+    for (var i = 0; i < radioButtons.length; i++) {
+        if (radioButtons[i].checked)
+            return radioButtons[i].value;
+    }
+    return '';
+}
+
 function expand_all() {
-  document.getElementById('expander').style.display='none';
-  document.getElementById('collapser').style.display='inline';
-  var annos = document.querySelectorAll('.annotation');
-  for (var i=0; i<annos.length; i++) 
-    annos[i].style.display = 'block';
-  var annos = document.querySelectorAll('.annotations');
-  for (var i=0; i<annos.length; i++) 
-    annos[i].style.display = 'block';
+    document.getElementById('expander').style.display = 'none';
+    document.getElementById('collapser').style.display = 'inline';
+    var annos = document.querySelectorAll('.annotation');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'block';
+    var annos = document.querySelectorAll('.annotations');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'block';
 }
+
 function collapse_all() {
-  document.getElementById('expander').style.display='inline';
-  document.getElementById('collapser').style.display='none';
-  var annos = document.querySelectorAll('.annotation');
-  for (var i=0; i<annos.length; i++) 
-    annos[i].style.display = 'none';
-  var annos = document.querySelectorAll('.annotations');
-  for (var i=0; i<annos.length; i++) 
-    annos[i].style.display = 'none';
+    document.getElementById('expander').style.display = 'inline';
+    document.getElementById('collapser').style.display = 'none';
+    var annos = document.querySelectorAll('.annotation');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'none';
+    var annos = document.querySelectorAll('.annotations');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'none';
 }
-
-</script>
-
-<script>
 
 token = localStorage.getItem('h_token');
 
 var search = gup('search');
 var facet = gup('facet');
+var selections = gup('selections');
 
 document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet + '=' + search;
+document.getElementById('selections').innerHTML = '<input onchange="javascript:all_or_none()" name="selections" type="radio" checked value="all"> all <input onchange="all_or_none()" name="selections" type="radio" value="none"> none';
 
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true&' + facet + '=' + search;
 
 function process(rows, replies) {
-	var gathered = gather(rows);
-    process_urls_html( 'widget', gathered, replies );
-    }
+    var gathered = gather(rows);
+    process_urls_html('widget', gathered, replies);
+}
 
-load(0,[],[]);
+load(0, [], []);
 
 </script>
 </body>

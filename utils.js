@@ -46,12 +46,12 @@ function process_urls_html(element, gathered, replies) {
 
     for (var i = 0; i < reverse_chron_urls.length; i++) {
         var url = reverse_chron_urls[i][0];
-        var dom_id = '__' + i;
+        var dom_id = 'a' + i;
         var count = urls[url];
         var s_count = '<span class="anno-count">' + count.toString() + '</span>';
         var elt = $('#' + element);
         var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
-        elt.append('<div><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
+        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
         elt.append('<div class="url">' + wrap_search_term(url) + '</div>');
         elt.append('<div class="annotations" id="' + dom_id + '"/>');
         var ids_for_url = ids[url];
@@ -64,6 +64,9 @@ function process_urls_html(element, gathered, replies) {
         }
         elt.append('</div>');
     }
+
+    all_or_none();
+
 }
 
 function process_thread_html(annos, id, level, replies) {
@@ -389,7 +392,7 @@ function toggle(dom_id) {
 }
 
 function add_export_ux() {
-    document.getElementById('export_ux').innerHTML = '<hr>Export results to:<p><div><input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML<input id="format_csv" type="radio" name="format" value="CSV"> CSV<input id="format_text" type="radio" name="format" value="TEXT"> TEXT<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN</div><p><input type="button" onclick="_export()" value="export"></input></p><div id="exported_html" style="display:none"></div><div id="export_done"></div>';
+    document.getElementById('export_ux').innerHTML = '<hr>Export results to:<p><div><input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML<input id="format_csv" type="radio" name="format" value="CSV"> CSV<input id="format_text" type="radio" name="format" value="TEXT"> TEXT<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN</div><p><input type="button" onclick="_select()" value="select"></input> <input type="button" onclick="_export()" value="export"></input></p><div id="exported_html" style="display:none"></div><div id="export_done"></div>';
 }
 
 function add_doc() {
@@ -413,3 +416,4 @@ function get_mode() {
       panel = 'search';
     return panel;
 }
+

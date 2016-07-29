@@ -41,24 +41,34 @@ li { margin-bottom: 8px }
 <script src="utils.js"></script>
 
 <script>
-
 var panel = get_mode();
 
 var user = gup('search');
 if ( user != '' )
   document.getElementById('user').value = user;
 
+if ( gup('selections') == '' ) {
+  localStorage.setItem('h_export_selections', JSON.stringify([]));
+  localStorage.setItem('h_is_selecting','false');
+  localStorage.setItem('h_is_exporting','false');
+  }
+
 token = getLocalStorageItem('h_token');
 
 function _select() {
+  localStorage.setItem('h_is_selecting','true');
+  localStorage.setItem('h_is_exporting','false');
   location.href = 'user.html?mode=iframe&search=' + user + '&selections=yes';
 }
 
 function _export() {
+  localStorage.setItem('h_is_exporting','true');
+  localStorage.setItem('h_is_selecting','false');
   load(0, [], []);
 }
 
 function _search() {
+  localStorage.setItem('h_is_selecting','false');
   user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
@@ -67,6 +77,7 @@ function _search() {
 }
 
 function _really_search() {
+  localStorage.setItem('h_is_selecting','false');
   var user = document.getElementById('user').value;
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);

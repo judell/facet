@@ -14,7 +14,7 @@ function process(rows, replies) {
     if ($('#format_html').is(":checked")) {
         process_urls_html('exported_html', gathered, replies);
         var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query group=' + group + '8gk9i7VV</title>';
-        html += '<style>body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
+        html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
         html += '</head>';
         html += '<body>';
         html += '<h1>Hypothesis activity for ' + _query.match(/&([^&]+$)/)[1] + '</h1>';
@@ -45,6 +45,11 @@ function process_urls_html(element, gathered, replies) {
     var reverse_chron_urls = organize(url_updates);
 
     for (var i = 0; i < reverse_chron_urls.length; i++) {
+        if ( is_exporting() ) {
+            var selected_ids = get_ids();
+            if ( selected_ids.length>0 && selected_ids.indexOf(i) == -1 )
+                continue;
+            }
         var url = reverse_chron_urls[i][0];
         var dom_id = 'a' + i;
         var count = urls[url];
@@ -415,5 +420,75 @@ function get_mode() {
     else
       panel = 'search';
     return panel;
+}
+
+function save_ids(ids) {
+  localStorage.setItem('h_export_selections', JSON.stringify(ids) );
+}
+
+function get_ids() {
+    return JSON.parse(localStorage.getItem('h_export_selections'));
+}
+
+function all_or_none() {
+    if ( !is_selecting) return;
+    if ( is_selecting() && !is_exporting() ) {
+		document.getElementById('selections').style.display = 'block';
+		var choice = getRVBN('selections');
+		var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+		var ids = [];
+		if (choice == 'none') {
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].checked = false;
+				checkboxes[i].style.display = 'inline';
+			}
+		}
+		else {
+			for (var i = 0; i < checkboxes.length; i++) {
+				checkboxes[i].style.display = 'inline';
+				checkboxes[i].checked = true;
+				ids.push(i);
+			}
+		}
+		save_ids(ids);
+    }
+}
+
+function item_checked(id) {
+    var ids = get_ids();
+    var is_saved = ids.indexOf(id) != -1;
+    var checkbox = document.getElementById('c' + id);
+    var is_checked = checkbox.checked;
+    if ( ! is_checked && is_saved ) {
+       var index = ids.indexOf(id);
+       if ( index > -1 ) {
+           ids.splice(index, 1);
+           save_ids(ids);
+           console.log('unsave ' + id);
+           }
+       }
+    if ( is_checked && ! is_saved ) {
+       ids.push(id);
+       save_ids(ids);
+       console.log('save ' + id);
+       }
+}
+
+
+function getRVBN(rName) {
+    var radioButtons = document.getElementsByName(rName);
+    for (var i = 0; i < radioButtons.length; i++) {
+        if (radioButtons[i].checked)
+            return radioButtons[i].value;
+    }
+    return '';
+}
+
+function is_selecting() {
+    return localStorage.getItem('h_is_selecting')=='true';
+}
+
+function is_exporting() {
+    return localStorage.getItem('h_is_exporting')=='true';
 }
 

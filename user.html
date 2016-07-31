@@ -13,10 +13,7 @@ li { margin-bottom: 8px }
 
 <iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
 
-<p>
-<b>user</b> &#8226; <a href="group.html">group</a> &#8226; <a href="url.html">url</a> &#8226; <a href="tag.html">tag</a> &#8226; <a href="any.html">any</a>
-</p>
-<hr>
+<div id="menu"></div>
 
 <div>
 <p>
@@ -80,6 +77,8 @@ document.getElementById('iframe').setAttribute('src', iframe_url);
 document.getElementById('token').value = token;
 
 document.title = 'Hypothesis activity for the query user=' + user;
+
+add_menu(facet);
 
 add_export_ux();
 //add_doc();

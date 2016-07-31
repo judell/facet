@@ -511,4 +511,20 @@ function start_selections() {
   localStorage.setItem('h_is_exporting','false');
   }
 
+function menu(facet) {
+  var items = ['user', 'group', 'url', 'tag', 'any'];
+  var html_items = [];
+  for (var i=0; i<items.length; i++) {
+    if ( items[i] == facet ) {
+      html_items.push('<b>' + facet + '</b>');
+	  }
+	else {
+	  html_items.push('<a href="' + items[i] + '.html">' + items[i] + '</a');
+      }
+  }
+  return html_items.join('  &#8226; ');
+}
 
+function add_menu(facet) {
+  document.getElementById('menu').innerHTML = menu(facet);
+  }

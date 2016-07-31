@@ -519,7 +519,8 @@ function menu(facet) {
       html_items.push('<b>' + facet + '</b>');
 	  }
 	else {
-	  html_items.push('<a href="' + items[i] + '.html">' + items[i] + '</a');
+		
+	  html_items.push('<a href="' + items[i] + '.html">' + items[i] + '</a>');
       }
   }
   return html_items.join('  &#8226; ');

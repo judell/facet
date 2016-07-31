@@ -556,3 +556,11 @@ function add_form(facet) {
 function add_menu(facet) {
   document.getElementById('menu').innerHTML = menu(facet);
   }
+
+function _search() {
+  token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href = 'facet.html?mode=iframe&search=' + search_term;
+  location.href = href;
+}
+

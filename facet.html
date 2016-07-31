@@ -45,13 +45,6 @@ function _select() {
 
 var token = getLocalStorageItem('h_token');
 
-function _search() {
-  token = document.getElementById('token').value;
-  localStorage.setItem('h_token', token);
-  var href = 'facet.html?mode=iframe&search=' + search_term;
-  location.href = href;
-}
-
 function _really_search() {
   facet = document.getElementById(facet).value;
   token = document.getElementById('token').value;

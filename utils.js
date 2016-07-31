@@ -535,21 +535,30 @@ function heredoc(fn) {
 var form = function(){/*
 <div>
 <p>
-<input id="user"></input> <br><span class="small">(a Hypothesis username)</span>
+<input id="__FACET__"></input> <br><span class="small">__MSG1__</span>
 </p>
 <p>
-<input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
+<input size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
 </p>
 <p>
 <input type="button" onclick="_search()" value="documents"></input>
 <input type="button" onclick="_really_search()" value="annotations"></input>
 </p>
 </div>
-
 */};
 
 function add_form(facet) {
-  document.getElementById('form').innerHTML = heredoc(form);
+  var s = heredoc(form);
+  s = s.replace('__FACET__',facet);
+  switch (facet) {
+    case 'user':
+	  s = s.replace('__MSG1__', '(a Hypothesis username');
+	  s = s.replace('__MSG2__', '(for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)');
+	  break;
+	default:
+	    console.log('add_form unexpected facet ' + facet);	
+    }	  
+  document.getElementById('form').innerHTML = s;
   }
 
 
@@ -561,6 +570,14 @@ function _search() {
   token = document.getElementById('token').value;
   localStorage.setItem('h_token', token);
   var href = 'facet.html?mode=iframe&search=' + search_term;
+  location.href = href;
+}
+
+function _really_search(facet) {
+  var facet = document.getElementById(facet).value;
+  var token = document.getElementById('token').value;
+  localStorage.setItem('h_token', token);
+  var href=location.href = facet + 'html?mode=search&facet=' + facet + '&search=' + search_term;
   location.href = href;
 }
 

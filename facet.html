@@ -30,6 +30,7 @@ li { margin-bottom: 8px }
 var panel = get_mode();
 
 var facet = gup('facet');
+if ( facet == '' ) facet = 'user';
 add_form(facet);
 
 var search_term = gup('search');
@@ -45,13 +46,7 @@ function _select() {
 
 var token = getLocalStorageItem('h_token');
 
-function _really_search() {
-  facet = document.getElementById(facet).value;
-  token = document.getElementById('token').value;
-  localStorage.setItem('h_token', token);
-  var href=location.href = facet + 'html?mode=search&facet=' + facet + '&search=' + search_term;
-  location.href = href;
-}
+
 
 var iframe_url = panel + '.html?search='+ search_term + '&facet=' + facet;
 if ( gup('selections') != '' ) 

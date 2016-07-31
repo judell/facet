@@ -1,9 +1,5 @@
-var user = '';
-var url = '';
+var output = '';
 var token = '';
-var tag = '';
-var group = '';
-var any = '';
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true';
 var _query;
 var displayed_in_thread = [];
@@ -12,7 +8,7 @@ function process(rows, replies) {
     var gathered = gather(rows);
 
     if ($('#format_html').is(":checked")) {
-        process_urls_html('exported_html', gathered, replies);
+        document_view('exported_html', gathered, replies);
         var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query group=' + group + '8gk9i7VV</title>';
         html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
         html += '</head>';
@@ -36,7 +32,7 @@ function process(rows, replies) {
     }
 }
 
-function process_urls_html(element, gathered, replies) {
+function document_view(element, gathered, replies) {
     var url_updates = gathered.url_updates;
     var ids = gathered.ids;
     var titles = gathered.titles;
@@ -135,20 +131,11 @@ function process_thread_html(annos, id, level, replies) {
     }
 }
 
-function do_really_search(rows) {
+function annotation_view(rows) {
     for (var i = 0; i < rows.length; i++) {
         var row = rows[i];
         var anno = parse_annotation(row);
-
-try {      
         show_annotation(anno);
-    }
-catch (e) 
-    {
-console.log(e.message, anno);
-    }
-
-
     }
 }
 
@@ -221,23 +208,7 @@ function show_annotation(anno) {
 
 function load(offset, rows, replies) {
     var limit = 400;
-    try { user = $('#user')[0].value; } catch (e) { user = ''; }
-    try { token = $('#token')[0].value; } catch (e) { }
-    try { tag = $('#tag')[0].value; } catch (e) { tag = ''; }
-    try { group = $('#group')[0].value; } catch (e) { group = ''; }
-    try { any = $('#any')[0].value; } catch (e) { any = ''; }
-    try { url = $('#url')[0].value; } catch (e) { url = ''; }
     _query = query.replace('__OFFSET__', offset);
-    if (tag)
-        _query += '&tags=' + tag;
-    if (user)
-        _query += '&user=' + user;
-    if (group)
-        _query += '&group=' + group;
-    if (any)
-        _query += '&any=' + any;
-    if (url)
-        _query += '&uri=' + url;
     $.ajax({
         url: _query,
         type: "GET",
@@ -415,10 +386,9 @@ function download(text, type) {
 
 function get_mode() {
     var mode = gup('mode');
-    if ( mode == '' || mode == 'iframe' )
-      panel = 'iframe';
-    else
-      panel = 'search';
+	var panel = 'iframe';
+	if ( mode == 'search' )
+		panel = 'search';
     return panel;
 }
 
@@ -492,12 +462,6 @@ function is_exporting() {
     return localStorage.getItem('h_is_exporting')=='true';
 }
 
-function _export() {
-  localStorage.setItem('h_is_exporting','true');
-  localStorage.setItem('h_is_selecting','false');
-  load(0, [], []);
-}
-
 function init_selections() {
     if ( gup('selections') == '' ) {
         localStorage.setItem('h_export_selections', JSON.stringify([]));
@@ -512,7 +476,7 @@ function start_selections() {
   }
 
 function menu(facet) {
-  var items = ['user', 'group', 'url', 'tag', 'any'];
+  var items = ['user', 'group', 'uri', 'tag', 'any'];
   var html_items = [];
   for (var i=0; i<items.length; i++) {
     if ( items[i] == facet ) {
@@ -520,7 +484,7 @@ function menu(facet) {
 	  }
 	else {
 		
-	  html_items.push('<a href="' + items[i] + '.html">' + items[i] + '</a>');
+	  html_items.push('<a href="facet.html?facet=' + items[i] + '">' + items[i] + '</a>');
       }
   }
   return html_items.join('  &#8226; ');
@@ -535,30 +499,52 @@ function heredoc(fn) {
 var form = function(){/*
 <div>
 <p>
-<input id="__FACET__"></input> <br><span class="small">__MSG1__</span>
+<input value="" id="facet"></input> <br><span class="small">__MSG1__</span>
 </p>
 <p>
-<input size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
+<input value="" size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
 </p>
 <p>
-<input type="button" onclick="_search()" value="documents"></input>
-<input type="button" onclick="_really_search()" value="annotations"></input>
+<input type="button" onclick="_search('__FACET__', 'iframe')" value="documents"></input>
+<input type="button" onclick="_search('__FACET__', 'search')" value="annotations"></input>
 </p>
 </div>
 */};
 
-function add_form(facet) {
+function add_form(facet, mode) {
+  var token_msg_1 = '(for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)';
+  var token_msg_2 = 'your <a href="https://hypothes.is/profile/developer">API token</a>)';
+
   var s = heredoc(form);
-  s = s.replace('__FACET__',facet);
+  s = s.replace(/__FACET__/g, facet);
+  s = s.replace(/__MODE__/g, mode);
   switch (facet) {
     case 'user':
-	  s = s.replace('__MSG1__', '(a Hypothesis username');
-	  s = s.replace('__MSG2__', '(for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)');
+	  s = s.replace('__MSG1__', '(a Hypothesis username)');
+	  s = s.replace('__MSG2__', token_msg_1);
+	  break;
+	case 'group':
+	  s = s.replace('__MSG1__', '(a Hypothesis group ID from https://hypothes.is/groups/<span style="font-weight:bold">ID</span>)');
+	  s = s.replace('__MSG2__', token_msg_2);
+	  break;
+	case 'uri':
+	  s = s.replace('__MSG1__', '(URL of an annotated document)');
+	  s = s.replace('__MSG2__', token_msg_1);
+	  break;
+	case 'tag':
+	  s = s.replace('__MSG1__', '(a Hypothesis tag)');
+	  s = s.replace('__MSG2__', token_msg_1);
+	  break;
+	case 'any':
+	  s = s.replace('__MSG1__', '(user, URL, tag. annotation quote or body)');
+	  s = s.replace('__MSG2__', token_msg_1);
 	  break;
 	default:
 	    console.log('add_form unexpected facet ' + facet);	
     }	  
   document.getElementById('form').innerHTML = s;
+  var token = getLocalStorageItem('h_token');
+  document.getElementById('token').value = token;
   }
 
 
@@ -566,18 +552,57 @@ function add_menu(facet) {
   document.getElementById('menu').innerHTML = menu(facet);
   }
 
-function _search() {
-  token = document.getElementById('token').value;
-  localStorage.setItem('h_token', token);
-  var href = 'facet.html?mode=iframe&search=' + search_term;
+function _search(facet, mode) {
+  localStorage.setItem('h_token', document.getElementById('token').value);
+  token = localStorage.getItem('h_token');
+  var search = document.getElementById('facet').value;
+  var href = 'facet.html?facet=' + facet + '&mode=' + mode + '&search=' + search;
   location.href = href;
 }
 
-function _really_search(facet) {
-  var facet = document.getElementById(facet).value;
-  var token = document.getElementById('token').value;
-  localStorage.setItem('h_token', token);
-  var href=location.href = facet + 'html?mode=search&facet=' + facet + '&search=' + search_term;
-  location.href = href;
+function _export() {
+  localStorage.setItem('h_is_exporting','true');
+  localStorage.setItem('h_is_selecting','false');
+  load(0, [], []);
 }
+
+
+function _select() {
+  start_selections();
+  search = document.getElementById('facet').value;
+  location.href = 'facet.html?facet=' + facet + '&mode=' + mode + '&search=' + search + '&selections=yes';
+}
+
+
+function expand_all() {
+    document.getElementById('expander').style.display = 'none';
+    document.getElementById('collapser').style.display = 'inline';
+    var annos = document.querySelectorAll('.annotation');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'block';
+    var annos = document.querySelectorAll('.annotations');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'block';
+}
+
+function collapse_all() {
+    document.getElementById('expander').style.display = 'inline';
+    document.getElementById('collapser').style.display = 'none';
+    var annos = document.querySelectorAll('.annotation');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'none';
+    var annos = document.querySelectorAll('.annotations');
+    for (var i = 0; i < annos.length; i++)
+        annos[i].style.display = 'none';
+}
+
+function compare(a,b) {
+  if (a.updated > b.updated)
+    return -1;
+  else if (a.updated < b.updated)
+    return 1;
+  else 
+    return 0;
+}
+
 

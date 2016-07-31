@@ -22,61 +22,52 @@ span.anno-count:before { content:"+" }
 .tags { line-height: 2 }
 #selections { display: none }
 </style>
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script>
+<script src="xss.min.js"></script>
+<script src="showdown.js"></script>
+<script src="utils.js"></script>
 </head>
 <body>
 
 <a id="collapser" style="display:none" class="collapse_all" title="collapse all" href="javascript:collapse_all()">-</a>
 <a id="expander" class="expand_all" title="expand all" href="javascript:expand_all()">+</a>
 
-<div id="widget">
 <h2 id="title"></h2>
 
 <p id="selections"></p>
-</div>
 
-
-<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script>
-<script src="xss.min.js"></script>
-<script src="showdown.js"></script>
-<script src="utils.js"></script>
+<div id="widget"></div>
 
 <script>
-function expand_all() {
-    document.getElementById('expander').style.display = 'none';
-    document.getElementById('collapser').style.display = 'inline';
-    var annos = document.querySelectorAll('.annotation');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'block';
-    var annos = document.querySelectorAll('.annotations');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'block';
-}
-
-function collapse_all() {
-    document.getElementById('expander').style.display = 'inline';
-    document.getElementById('collapser').style.display = 'none';
-    var annos = document.querySelectorAll('.annotation');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'none';
-    var annos = document.querySelectorAll('.annotations');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'none';
-}
-
 token = localStorage.getItem('h_token');
 
 var search = gup('search');
 var facet = gup('facet');
+var mode = gup('mode');
 var selections = gup('selections');
 
 document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet + '=' + search;
 document.getElementById('selections').innerHTML = '<input onchange="javascript:all_or_none()" name="selections" type="radio" checked value="all"> all <input onchange="all_or_none()" name="selections" type="radio" value="none"> none';
 
-var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true&' + facet + '=' + search;
+var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&' + facet + '=' + search;
+
+if ( mode == 'iframe' )
+  query = query + '&_separate_replies=true';
 
 function process(rows, replies) {
-    var gathered = gather(rows);
-    process_urls_html('widget', gathered, replies);
+  switch (mode) {
+    case 'iframe': 
+      var gathered = gather(rows);
+      document_view('widget', gathered, replies);
+      break;
+    case 'search': 
+      rows = rows.sort(compare);
+      annotation_view(rows);
+      document.getElementById('widget').innerHTML = output;
+      break;
+    default:
+      console.log('iframe: process: unexpected mode ' + mode);
+    }
 }
 
 load(0, [], []);

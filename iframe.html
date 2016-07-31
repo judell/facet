@@ -21,6 +21,7 @@ img { width: 90%; margin: 8px }
 span.anno-count:before { content:"+" } 
 .tags { line-height: 2 }
 #selections { display: none }
+#expander { display: none }
 </style>
 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script>
 <script src="xss.min.js"></script>
@@ -46,21 +47,25 @@ var facet = gup('facet');
 var mode = gup('mode');
 var selections = gup('selections');
 
+if ( mode == 'documents' )
+  document.getElementById('expander').style.display = 'inline';
+
 document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet + '=' + search;
+
 document.getElementById('selections').innerHTML = '<input onchange="javascript:all_or_none()" name="selections" type="radio" checked value="all"> all <input onchange="all_or_none()" name="selections" type="radio" value="none"> none';
 
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&' + facet + '=' + search;
 
-if ( mode == 'iframe' )
+if ( mode == 'documents' )
   query = query + '&_separate_replies=true';
 
 function process(rows, replies) {
   switch (mode) {
-    case 'iframe': 
+    case 'documents': 
       var gathered = gather(rows);
       document_view('widget', gathered, replies);
       break;
-    case 'search': 
+    case 'annotations': 
       rows = rows.sort(compare);
       annotation_view(rows);
       document.getElementById('widget').innerHTML = output;

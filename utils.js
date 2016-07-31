@@ -3,208 +3,6 @@ var token = '';
 var query = '';
 var displayed_in_thread = [];
 
-function process(rows, replies) {
-    var gathered = gather(rows);
-
-    if ($('#format_html').is(":checked")) {
-        document_view('exported_html', gathered, replies);
-        var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query ' + facet + ' = ' + search + '</title>';
-        html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
-        html += '</head>';
-        html += '<body>';
-        html += '<h1>Hypothesis activity for the query ' + facet + ' = ' + search + '</h1>';
-        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.annotation\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
-        download(html, 'html');
-        rows = [];
-    }
-    else if ($('#format_csv').is(":checked")) {
-        to_csv(rows);
-    }
-    else if ($('#format_md').is(":checked")) {
-        to_markdown(rows);
-    }
-    else if ($('#format_text').is(":checked")) {
-        to_text(rows);
-    }
-    else {
-        console.log('?')
-    }
-}
-
-function document_view(element, gathered, replies) {
-    var url_updates = gathered.url_updates;
-    var ids = gathered.ids;
-    var titles = gathered.titles;
-    var annos = gathered.annos;
-    var urls = gathered.urls;
-    var reverse_chron_urls = organize(url_updates);
-
-    for (var i = 0; i < reverse_chron_urls.length; i++) {
-        if ( is_exporting() ) {
-            var selected_ids = get_ids();
-            if ( selected_ids.length>0 && selected_ids.indexOf(i) == -1 )
-                continue;
-            }
-        var url = reverse_chron_urls[i][0];
-        var dom_id = 'a' + i;
-        var count = urls[url];
-        var s_count = '<span class="anno-count">' + count.toString() + '</span>';
-        var elt = $('#' + element);
-        var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
-        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
-        elt.append('<div class="url">' + wrap_search_term(url) + '</div>');
-        elt.append('<div class="annotations" id="' + dom_id + '"/>');
-        var ids_for_url = ids[url];
-        for (var j = 0; j < ids_for_url.length; j++) {
-            var id = ids_for_url[j];
-            output = '';
-            process_thread_html(annos, id, 0, replies, []);
-            if (output != '')
-                $('#' + dom_id).append('<blockquote class="annotation">' + output + '</blockquote>')
-        }
-        elt.append('</div>');
-    }
-
-    all_or_none();
-
-}
-
-function process_thread_html(annos, id, level, replies) {
-    if (displayed_in_thread.indexOf(id) == -1) {
-        var margin = level * 20;
-        var anno = annos[id];
-        var dt = new Date(anno['updated']);
-        var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-        var converter = new Showdown.converter();
-        var text = anno['text'] == null ? '' : anno['text'];
-        var html = converter.makeHtml(text);
-        var options = {
-            whiteList: {
-                a: ['href', 'title'],
-                img: ['alt', 'src'],
-                p: [],
-                blockquote: [],
-                span: ['title', 'class']
-            },
-            stripIgnoreTag: true,
-            stripIgnoreTagBody: ['script']
-        };
-        html = filterXSS(html, options);
-        html = wrap_search_term(html);
-        var tags = '';
-        if (anno.tags.length) {
-            var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
-            tags = '<div class="tags">' +
-                      '<span class="tag-item">' +
-                      links.join('</span><span class="tag-item">') +
-                      '</span></div>';
-        }
-        html = wrap_search_term(html);
-        var user = anno.user;
-        var quote = wrap_search_term(anno.quote);
-        var template = '<div style="padding:10px;margin-left:_MARGIN_px">' +
-                        '<span class="user"><a target="_user" href="user.html?search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
-                        '<span class="timestamp">' + dt_str + '</span>' +
-                        '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
-                        '<div class="annotation-quote">' + quote + '</div>' +
-                        tags +
-                        '<div>' + html + '</div>' +
-                        '</div>';
-        output += template.replace('_MARGIN_', margin);
-        displayed_in_thread.push(id);
-    }
-
-    var children = replies.filter(function (row) {
-        return row.hasOwnProperty('references') && row['references'].indexOf(id) != -1;
-    });
-
-    children = children.map(function (row) {
-        return row['id'];
-    });
-
-    children.reverse();
-
-    if (children.length) {
-        for (var i = 0; i < children.length; i++)
-            process_thread_html(annos, children[i], level + 1, replies);
-    }
-}
-
-function annotation_view(rows) {
-    for (var i = 0; i < rows.length; i++) {
-        var row = rows[i];
-        var anno = parse_annotation(row);
-        show_annotation(anno);
-    }
-}
-
-function wrap_search_term(s) {
-    if ( ! s || typeof(search) == 'undefined' )
-        return s;
-    var re = new RegExp( search, 'i');
-    var m = s.match(re);
-    if ( m )
-        return s.replace(m[0], '<span class="search_term">' + m[0] + '</span>');
-    else 
-        return s;
-}
-
-
-function show_annotation(anno) {
-    var margin = 20;
-    var dt = new Date(anno.updated);
-    var user = anno.user.replace('acct:','').replace('@hypothes.is','')
-    user = wrap_search_term(user);
-    var url = wrap_search_term(anno.url);
-    var quote = '';
-    if (anno.quote)
-        quote = wrap_search_term(anno.quote);
-    var title = wrap_search_term(anno.title);
-    var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
-    var converter = new Showdown.converter();
-    var text = wrap_search_term(anno.text);
-    var html = '';
-    if (text) {
-        html = converter.makeHtml(text);
-        html = filterXSS(html, options);
-        html = wrap_search_term(html);
-        if ( ! html ) {
-            html = '';
-        }
-    }
-    var options = {
-        whiteList: {
-            a: ['href', 'title'],
-            img: ['alt', 'src'],
-            p: [],
-            blockquote: [],
-            span: ['title', 'class']
-        },
-        stripIgnoreTag: true,
-        stripIgnoreTagBody: ['script']
-    };
-    var tags = '';
-    if (anno.tags.length) {
-        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
-        tags = '<div class="tags">' +
-                  '<span class="tag-item">' +
-                  links.join('</span><span class="tag-item">') +
-                  '</span></div>';
-    }
-    var template = '<div style="background-color:rgba(235, 230, 224, 0.21);padding:10px;margin-bottom:10px; margin-left:_MARGIN_px;background-color:">' +
-                    '<span class="user"><a target="_user" href="user.html?search=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
-                    '<span class="timestamp">' + dt_str + '</span>' +
-					'<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
-                    '<div class="uri">' + url + '</div>' +
-                    '<div class="title">' + title + '</div>' +
-                    '<div class="annotation-quote">' + quote + '</div>' +
-                    tags +
-                    '<div>' + html + '</div>' +
-                    '</div>';
-    output += template.toString();
-}
-
-
 function load(offset, rows, replies) {
     var limit = 400;
     var _query = query.replace('__OFFSET__', offset);
@@ -271,6 +69,206 @@ function organize(url_updates) {
         reverse_chron_urls.push([url_update, url_updates[url_update]]);
     reverse_chron_urls.sort(function (a, b) { return new Date(b[1]) - new Date(a[1]) });
     return reverse_chron_urls;
+}
+
+function process(rows, replies) {
+    var gathered = gather(rows);
+
+    if ($('#format_html').is(":checked")) {
+        document_view('exported_html', gathered, replies);
+        var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query ' + facet + ' = ' + search + '</title>';
+        html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
+        html += '</head>';
+        html += '<body>';
+        html += '<h1>Hypothesis activity for the query ' + facet + ' = ' + search + '</h1>';
+        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.annotation\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
+        download(html, 'html');
+        rows = [];
+    }
+    else if ($('#format_csv').is(":checked")) {
+        to_csv(rows);
+    }
+    else if ($('#format_md').is(":checked")) {
+        to_markdown(rows);
+    }
+    else if ($('#format_text').is(":checked")) {
+        to_text(rows);
+    }
+    else {
+        console.log('?')
+    }
+}
+
+function document_view(element, gathered, replies) {
+    var url_updates = gathered.url_updates;
+    var ids = gathered.ids;
+    var titles = gathered.titles;
+    var annos = gathered.annos;
+    var urls = gathered.urls;
+    var reverse_chron_urls = organize(url_updates);
+
+    for (var i = 0; i < reverse_chron_urls.length; i++) {
+        if ( is_exporting() ) {
+            var selected_ids = get_ids();
+            if ( selected_ids.length>0 && selected_ids.indexOf(i) == -1 )
+                continue;
+            }
+        var url = reverse_chron_urls[i][0];
+        var dom_id = 'a' + i;
+        var count = urls[url];
+        var s_count = '<span class="anno-count">' + count.toString() + '</span>';
+        var elt = $('#' + element);
+        var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
+        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
+        elt.append('<div class="url">' + wrap_search_term(url) + '</div>');
+        elt.append('<div class="annotations" id="' + dom_id + '"/>');
+        var ids_for_url = ids[url];
+        for (var j = 0; j < ids_for_url.length; j++) {
+            var id = ids_for_url[j];
+            output = '';
+            show_thread(annos, id, 0, replies, []);
+            if (output != '')
+                $('#' + dom_id).append('<blockquote class="annotation">' + output + '</blockquote>')
+        }
+        elt.append('</div>');
+    }
+
+    all_or_none();
+
+}
+
+function show_thread(annos, id, level, replies) {
+    if (displayed_in_thread.indexOf(id) == -1) {
+        var margin = level * 20;
+        var anno = annos[id];
+        var dt = new Date(anno['updated']);
+        var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+        var converter = new Showdown.converter();
+        var text = anno['text'] == null ? '' : anno['text'];
+        var html = converter.makeHtml(text);
+        var options = {
+            whiteList: {
+                a: ['href', 'title'],
+                img: ['alt', 'src'],
+                p: [],
+                blockquote: [],
+                span: ['title', 'class']
+            },
+            stripIgnoreTag: true,
+            stripIgnoreTagBody: ['script']
+        };
+        html = filterXSS(html, options);
+        html = wrap_search_term(html);
+        var tags = '';
+        if (anno.tags.length) {
+            var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+            tags = '<div class="tags">' +
+                      '<span class="tag-item">' +
+                      links.join('</span><span class="tag-item">') +
+                      '</span></div>';
+        }
+        html = wrap_search_term(html);
+        var user = anno.user;
+        var quote = wrap_search_term(anno.quote);
+        var template = '<div style="padding:10px;margin-left:_MARGIN_px">' +
+                        '<span class="user"><a target="_user" href="user.html?search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
+                        '<span class="timestamp">' + dt_str + '</span>' +
+                        '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
+                        '<div class="annotation-quote">' + quote + '</div>' +
+                        tags +
+                        '<div>' + html + '</div>' +
+                        '</div>';
+        output += template.replace('_MARGIN_', margin);
+        displayed_in_thread.push(id);
+    }
+
+    var children = replies.filter(function (row) {
+        return row.hasOwnProperty('references') && row['references'].indexOf(id) != -1;
+    });
+
+    children = children.map(function (row) {
+        return row['id'];
+    });
+
+    children.reverse();
+
+    if (children.length) {
+        for (var i = 0; i < children.length; i++)
+            show_thread(annos, children[i], level + 1, replies);
+    }
+}
+
+function annotation_view(rows) {
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var anno = parse_annotation(row);
+        show_annotation(anno);
+    }
+}
+
+function show_annotation(anno) {
+    var margin = 20;
+    var dt = new Date(anno.updated);
+    var user = anno.user.replace('acct:','').replace('@hypothes.is','')
+    user = wrap_search_term(user);
+    var url = wrap_search_term(anno.url);
+    var quote = '';
+    if (anno.quote)
+        quote = wrap_search_term(anno.quote);
+    var title = wrap_search_term(anno.title);
+    var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
+    var converter = new Showdown.converter();
+    var text = wrap_search_term(anno.text);
+    var html = '';
+    if (text) {
+        html = converter.makeHtml(text);
+        html = filterXSS(html, options);
+        html = wrap_search_term(html);
+        if ( ! html ) {
+            html = '';
+        }
+    }
+    var options = {
+        whiteList: {
+            a: ['href', 'title'],
+            img: ['alt', 'src'],
+            p: [],
+            blockquote: [],
+            span: ['title', 'class']
+        },
+        stripIgnoreTag: true,
+        stripIgnoreTagBody: ['script']
+    };
+    var tags = '';
+    if (anno.tags.length) {
+        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+        tags = '<div class="tags">' +
+            '<span class="tag-item">' +
+            links.join('</span><span class="tag-item">') +
+            '</span></div>';
+    }
+    var template = '<div style="background-color:rgba(235, 230, 224, 0.21);padding:10px;margin-bottom:10px; margin-left:_MARGIN_px;background-color:">' +
+        '<span class="user"><a target="_user" href="user.html?search=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
+        '<span class="timestamp">' + dt_str + '</span>' +
+        '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
+        '<div class="uri">' + url + '</div>' +
+        '<div class="title">' + title + '</div>' +
+        '<div class="annotation-quote">' + quote + '</div>' +
+        tags +
+        '<div>' + html + '</div>' +
+        '</div>';
+    output += template.toString();
+}
+
+function wrap_search_term(s) {
+    if ( ! s || typeof(search) == 'undefined' )
+        return s;
+    var re = new RegExp( search, 'i');
+    var m = s.match(re);
+    if ( m )
+        return s.replace(m[0], '<span class="search_term">' + m[0] + '</span>');
+    else 
+        return s;
 }
 
 function parse_annotation(row) {
@@ -443,7 +441,6 @@ function item_checked(id) {
        }
 }
 
-
 function getRVBN(rName) {
     var radioButtons = document.getElementsByName(rName);
     for (var i = 0; i < radioButtons.length; i++) {
@@ -546,7 +543,6 @@ function add_form(facet, mode) {
   document.getElementById('token').value = token;
   }
 
-
 function add_menu(facet) {
   document.getElementById('menu').innerHTML = menu(facet);
   }
@@ -565,13 +561,11 @@ function _export() {
   load(0, [], []);
 }
 
-
 function _select() {
   start_selections();
   search = document.getElementById('facet').value;
   location.href = 'facet.html?facet=' + facet + '&mode=' + mode + '&search=' + search + '&selections=yes';
 }
-
 
 function expand_all() {
     document.getElementById('expander').style.display = 'none';

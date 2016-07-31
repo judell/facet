@@ -61,6 +61,7 @@ if ( mode == 'documents' )
 
 function process(rows, replies) {
   switch (mode) {
+    case '':
     case 'documents': 
       var gathered = gather(rows);
       document_view('widget', gathered, replies);

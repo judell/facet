@@ -525,6 +525,33 @@ function menu(facet) {
   return html_items.join('  &#8226; ');
 }
 
+function heredoc(fn) {
+ var a = fn.toString();
+ var b = a.slice(14, -3);
+ return b;
+}
+
+var form = function(){/*
+<div>
+<p>
+<input id="user"></input> <br><span class="small">(a Hypothesis username)</span>
+</p>
+<p>
+<input size="40" id="token"></input> <br> <span class="small"> (for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)</span> 
+</p>
+<p>
+<input type="button" onclick="_search()" value="documents"></input>
+<input type="button" onclick="_really_search()" value="annotations"></input>
+</p>
+</div>
+
+*/};
+
+function add_form(facet) {
+  document.getElementById('form').innerHTML = heredoc(form);
+  }
+
+
 function add_menu(facet) {
   document.getElementById('menu').innerHTML = menu(facet);
   }

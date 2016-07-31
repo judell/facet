@@ -54,7 +54,7 @@ document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet 
 
 document.getElementById('selections').innerHTML = '<input onchange="javascript:all_or_none()" name="selections" type="radio" checked value="all"> all <input onchange="all_or_none()" name="selections" type="radio" value="none"> none';
 
-var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&' + facet + '=' + search;
+query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&' + facet + '=' + search;
 
 if ( mode == 'documents' )
   query = query + '&_separate_replies=true';

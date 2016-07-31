@@ -1,7 +1,6 @@
 var output = '';
 var token = '';
-var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__&_separate_replies=true';
-var _query;
+var query = '';
 var displayed_in_thread = [];
 
 function process(rows, replies) {
@@ -208,7 +207,7 @@ function show_annotation(anno) {
 
 function load(offset, rows, replies) {
     var limit = 400;
-    _query = query.replace('__OFFSET__', offset);
+    var _query = query.replace('__OFFSET__', offset);
     $.ajax({
         url: _query,
         type: "GET",

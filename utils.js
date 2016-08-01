@@ -556,6 +556,7 @@ function _search(facet, mode) {
 }
 
 function _export() {
+  query += '&' + facet + '=' + search;
   localStorage.setItem('h_is_exporting','true');
   localStorage.setItem('h_is_selecting','false');
   load(0, [], []);
@@ -570,9 +571,6 @@ function _select() {
 function expand_all() {
     document.getElementById('expander').style.display = 'none';
     document.getElementById('collapser').style.display = 'inline';
-    var annos = document.querySelectorAll('.annotation');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'block';
     var annos = document.querySelectorAll('.annotations');
     for (var i = 0; i < annos.length; i++)
         annos[i].style.display = 'block';
@@ -581,9 +579,6 @@ function expand_all() {
 function collapse_all() {
     document.getElementById('expander').style.display = 'inline';
     document.getElementById('collapser').style.display = 'none';
-    var annos = document.querySelectorAll('.annotation');
-    for (var i = 0; i < annos.length; i++)
-        annos[i].style.display = 'none';
     var annos = document.querySelectorAll('.annotations');
     for (var i = 0; i < annos.length; i++)
         annos[i].style.display = 'none';

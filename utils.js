@@ -1,7 +1,7 @@
 var output = '';
 var token = '';
-var query = '';
 var displayed_in_thread = [];
+var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__';
 
 function load(offset, rows, replies) {
     var limit = 400;

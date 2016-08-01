@@ -160,13 +160,8 @@ function show_thread(annos, id, level, replies) {
         html = filterXSS(html, options);
         html = wrap_search_term(html);
         var tags = '';
-        if (anno.tags.length) {
-            var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
-            tags = '<div class="tags">' +
-                      '<span class="tag-item">' +
-                      links.join('</span><span class="tag-item">') +
-                      '</span></div>';
-        }
+        if (anno.tags.length) 
+			tags = make_tags(anno.tags);
         html = wrap_search_term(html);
         var user = anno.user;
         var quote = wrap_search_term(anno.quote);
@@ -240,13 +235,8 @@ function show_annotation(anno) {
         stripIgnoreTagBody: ['script']
     };
     var tags = '';
-    if (anno.tags.length) {
-        var links = anno.tags.map(function (x) { return '<a target="_tag" href="facet.html?facet=tag&search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
-        tags = '<div class="tags">' +
-            '<span class="tag-item">' +
-            links.join('</span><span class="tag-item">') +
-            '</span></div>';
-    }
+    if (anno.tags.length) 
+		tags = make_tags(anno.tags);
     var template = '<div class="annotation">' +
         '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + anno.user + '">' + user + '</a></span>' + ' ' +
         '<span class="timestamp">' + dt_str + '</span>' +
@@ -593,4 +583,12 @@ function compare(a,b) {
     return 0;
 }
 
+function make_tags(tags) {
+  var links = tags.map(function (x) { return '<a target="_tag" href="facet.html?mode=' + mode + '&facet=tag&search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+  var tags = '<div class="tags">' +
+      '<span class="tag-item">' +
+      links.join('</span><span class="tag-item">') +
+      '</span></div>';
+  return tags;
+}
 

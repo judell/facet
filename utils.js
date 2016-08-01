@@ -498,7 +498,7 @@ var form = function(){/*
 <input value="" id="facet"></input> <br><span class="small">__MSG1__</span>
 </p>
 <p>
-<input value="" size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
+<input type="password" value="" size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
 </p>
 <p>
 <input type="button" onclick="_search('__FACET__', 'documents')" value="documents"></input>
@@ -509,7 +509,7 @@ var form = function(){/*
 
 function add_form(facet, mode) {
   var token_msg_1 = '(for private annotations, include your <a href="https://hypothes.is/profile/developer">API token</a>)';
-  var token_msg_2 = 'your <a href="https://hypothes.is/profile/developer">API token</a>)';
+  var token_msg_2 = '(your <a href="https://hypothes.is/profile/developer">API token</a>)';
 
   var s = heredoc(form);
   s = s.replace(/__FACET__/g, facet);

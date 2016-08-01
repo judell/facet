@@ -1,7 +1,7 @@
 var count = 0;
 var output = '';
 
-function show_thread(fn, annos, ids, reverse_chron_urls, output) {
+function export_show_thread(fn, annos, ids, reverse_chron_urls, output) {
     count = 0;
     for (var i = 0; i < reverse_chron_urls.length; i++) {
         var url = reverse_chron_urls[i][0];
@@ -23,7 +23,7 @@ function to_markdown(rows) {
     var annos = gathered.annos;
     var reverse_chron_urls = organize(url_updates);
     displayed_in_thread = [];
-    var result = show_thread(show_thread_md, annos, ids, reverse_chron_urls, '');
+    var result = export_show_thread(show_thread_md, annos, ids, reverse_chron_urls, '');
     document.getElementById('export_done').innerText = 'Done: ' + count;
     try { download(output, 'md'); }
     catch (e) { console.log('cannot download') }
@@ -37,7 +37,7 @@ function to_csv(rows) {
     var annos = gathered.annos;
     var reverse_chron_urls = organize(url_updates);
     displayed_in_thread = [];
-    var result = show_thread(show_thread_csv, annos, ids, reverse_chron_urls, '');
+    var result = export_show_thread(show_thread_csv, annos, ids, reverse_chron_urls, '');
     var output = result.output;
     document.getElementById('export_done').innerText = 'Done: ' + result.count;
     try { download(output, 'csv'); }
@@ -52,7 +52,7 @@ function to_text(rows) {
     var annos = gathered.annos;
     var reverse_chron_urls = organize(url_updates);
     displayed_in_thread = [];
-    var result = show_thread(show_thread_text, annos, ids, reverse_chron_urls, '');
+    var result = export_show_thread(show_thread_text, annos, ids, reverse_chron_urls, '');
     var output = result.output;
     document.getElementById('export_done').innerText = 'Done: ' + result.count;
     try { download(output, 'txt'); }

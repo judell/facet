@@ -209,8 +209,10 @@ function show_annotation(anno) {
     user = user;
     var url = wrap_search_term(anno.url);
     var quote = '';
-    if (anno.quote)
-        quote = wrap_search_term(anno.quote);
+    if (anno.quote) {
+      quote = wrap_search_term(anno.quote);
+      quote = filterXSS(quote, {});
+	  }
     var title = wrap_search_term(anno.title);
     var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString();
     var converter = new Showdown.converter();

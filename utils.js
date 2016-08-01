@@ -166,7 +166,7 @@ function show_thread(annos, id, level, replies) {
         var user = anno.user;
         var quote = filterXSS(anno.quote, {});
 		quote = wrap_search_term(quote);
-        var template = '<div>' +
+        var template = '<div style="margin-left:_MARGIN_px; margin-top:20px">' +
                         '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + user + '">' + user + '</a></span>' + ' ' +
                         '<span class="timestamp">' + dt_str + '</span>' +
                         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +

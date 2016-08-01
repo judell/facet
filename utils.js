@@ -128,7 +128,7 @@ function document_view(element, gathered, replies) {
             output = '';
             show_thread(annos, id, 0, replies, []);
             if (output != '')
-                $('#' + dom_id).append('<blockquote class="annotation">' + output + '</blockquote>')
+                $('#' + dom_id).append('<blockquote class="thread">' + output + '</blockquote>')
         }
         elt.append('</div>');
     }
@@ -170,8 +170,8 @@ function show_thread(annos, id, level, replies) {
         html = wrap_search_term(html);
         var user = anno.user;
         var quote = wrap_search_term(anno.quote);
-        var template = '<div style="padding:10px;margin-left:_MARGIN_px">' +
-                        '<span class="user"><a target="_user" href="user.html?search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
+        var template = '<div class="annotation">' +
+                        '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
                         '<span class="timestamp">' + dt_str + '</span>' +
                         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
                         '<div class="annotation-quote">' + quote + '</div>' +
@@ -241,14 +241,14 @@ function show_annotation(anno) {
     };
     var tags = '';
     if (anno.tags.length) {
-        var links = anno.tags.map(function (x) { return '<a target="_tag" href="tag.html?search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
+        var links = anno.tags.map(function (x) { return '<a target="_tag" href="facet.html?facet=tag&search=' + x.replace('#', '') + '">' + wrap_search_term(x) + '</a>' });
         tags = '<div class="tags">' +
             '<span class="tag-item">' +
             links.join('</span><span class="tag-item">') +
             '</span></div>';
     }
-    var template = '<div style="background-color:rgba(235, 230, 224, 0.21);padding:10px;margin-bottom:10px; margin-left:_MARGIN_px;background-color:">' +
-        '<span class="user"><a target="_user" href="user.html?search=' + anno['user'] + '">' + user + '</a></span>' + ' ' +
+    var template = '<div >' +
+        '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + anno.user + '">' + user + '</a></span>' + ' ' +
         '<span class="timestamp">' + dt_str + '</span>' +
         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
         '<div class="uri">' + url + '</div>' +

@@ -119,7 +119,7 @@ function document_view(element, gathered, replies) {
         var s_count = '<span class="anno-count">' + count.toString() + '</span>';
         var elt = $('#' + element);
         var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
-        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="overlay" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
+        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="visit" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
         elt.append('<div class="url">' + wrap_search_term(url) + '</div>');
         elt.append('<div class="annotations" id="' + dom_id + '"/>');
         var ids_for_url = ids[url];
@@ -241,8 +241,8 @@ function show_annotation(anno) {
         '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + anno.user + '">' + user + '</a></span>' + ' ' +
         '<span class="timestamp">' + dt_str + '</span>' +
         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
-        '<div class="uri">' + url + '</div>' +
-        '<div class="title">' + title + '</div>' +
+        '<div><a class="visit" target="visit" href="' + url + '">' + title + '</a></div>' +
+        '<div class="url">' + url + '</div>' +
         '<div class="annotation-quote">' + quote + '</div>' +
         tags +
         '<div>' + html + '</div>' +

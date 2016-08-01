@@ -77,11 +77,11 @@ function process(rows, replies) {
     if ($('#format_html').is(":checked")) {
         document_view('exported_html', gathered, replies);
         var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query ' + facet + ' = ' + search + '</title>';
-        html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .annotation { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
+        html += '<style>input { display:none} body { margin:.75in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .thread { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
         html += '</head>';
         html += '<body>';
         html += '<h1>Hypothesis activity for the query ' + facet + ' = ' + search + '</h1>';
-        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.annotation\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
+        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.thread\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
         download(html, 'html');
         rows = [];
     }
@@ -170,7 +170,7 @@ function show_thread(annos, id, level, replies) {
         html = wrap_search_term(html);
         var user = anno.user;
         var quote = wrap_search_term(anno.quote);
-        var template = '<div class="annotation">' +
+        var template = '<div>' +
                         '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
                         '<span class="timestamp">' + dt_str + '</span>' +
                         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
@@ -247,7 +247,7 @@ function show_annotation(anno) {
             links.join('</span><span class="tag-item">') +
             '</span></div>';
     }
-    var template = '<div >' +
+    var template = '<div class="annotation">' +
         '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + anno.user + '">' + user + '</a></span>' + ' ' +
         '<span class="timestamp">' + dt_str + '</span>' +
         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +

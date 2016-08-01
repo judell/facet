@@ -2,11 +2,11 @@
 
 Use remotely:
 
-- [user](http://jonudell.net/h/facet.html?facet=user&search=judell)
-- [group](http://jonudell.net/h/facet.html?facet=group)
-- [tag](http://jonudell.net/h/facet.html?facet=tag&search=nextprez)
-- [uri](http://jonudell.net/h/facet.html?facet=uri&search=http://example.com)
-- [any](http://jonudell.net/h/facet.html?facet=any&search=Jeremy)
+- [user](http://jonudell.net/h/facet.html?facet=user&mode=documents&search=judell)
+- [group](http://jonudell.net/h/facet.html?facet=group&mode=documents)
+- [tag](http://jonudell.net/h/facet.html?facet=tag&mode=documents&search=nextprez)
+- [uri](http://jonudell.net/h/facet.html?facet=uri&mode=documents&search=http://example.com)
+- [any](http://jonudell.net/h/facet.html?facet=any&mode=documents&search=Jeremy)
 
 Or clone and use locally:
 

@@ -166,7 +166,7 @@ function show_thread(annos, id, level, replies) {
         var user = anno.user;
         var quote = wrap_search_term(anno.quote);
         var template = '<div>' +
-                        '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + user + '">' + wrap_search_term(user) + '</a></span>' + ' ' +
+                        '<span class="user"><a target="_user" href="facet.html?facet=user&search=' + user + '">' + user + '</a></span>' + ' ' +
                         '<span class="timestamp">' + dt_str + '</span>' +
                         '<span style="font-size:smaller"><a title="permalink" target="_new" href="https://hyp.is/' + anno.id + '"> # </a></span>' +
                         '<div class="annotation-quote">' + quote + '</div>' +
@@ -205,7 +205,7 @@ function show_annotation(anno) {
     var margin = 20;
     var dt = new Date(anno.updated);
     var user = anno.user.replace('acct:','').replace('@hypothes.is','')
-    user = wrap_search_term(user);
+    user = user;
     var url = wrap_search_term(anno.url);
     var quote = '';
     if (anno.quote)

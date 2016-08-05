@@ -357,16 +357,29 @@ function toggle(dom_id) {
     }
 }
 
-function add_export_choices() {
-    document.getElementById('export_ux').innerHTML = '<hr>Export results to:<p><div><input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML<input id="format_csv" type="radio" name="format" value="CSV"> CSV<input id="format_text" type="radio" name="format" value="TEXT"> TEXT<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN</div>';
+function add_export(el) {
+    var s = 
+  	    add_export_choices(el) +
+	    add_select_button(el) +
+	    add_export_button(el) +
+	    add_export_tip(el);
+    document.getElementById(el).innerHTML = s;
 }
 
-function add_export_buttons() {
-    document.getElementById('export_ux').innerHTML = '<p><input type="button" onclick="_select()" value="select"></input> <input type="button" onclick="_export()" value="export"></input></p><div id="exported_html" style="display:none"></div><div id="export_done"></div>';
+function add_export_choices(el) {
+    return '<hr>Export results to:<p><div><input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML<input id="format_csv" type="radio" name="format" value="CSV"> CSV<input id="format_text" type="radio" name="format" value="TEXT"> TEXT<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN</div>';
 }
 
-function add_export_tip() {
-    document.getElementById('export_ux').innerHTML  += '<p style="font-size:smaller">(Click <i>select</i> to surface checkboxes. Click <i>documents</i> or <i>annotations</i> to reset.)</p>';
+function add_select_button(el) {
+    return '<p><input type="button" onclick="_select()" value="select"></input></p><div id="exported_html" style="display:none"></div><div id="export_done"></div>';
+}
+
+function add_export_button(el) {
+    return '<input type="button" onclick="_export()" value="export"></input>';
+}
+
+function add_export_tip(el) {
+    return '<p style="font-size:smaller">(Click <i>select</i> to surface checkboxes. Click <i>documents</i> or <i>annotations</i> to reset.)</p>';
 }
 
 function add_doc() {

@@ -357,31 +357,31 @@ function toggle(dom_id) {
     }
 }
 
+var export_form = function(){/*
+<div id="export_ux">
+<hr>
+Export results to:
+<p>
+<input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML
+<input id="format_csv" type="radio" name="format" value="CSV"> CSV
+<input id="format_text" type="radio" name="format" value="TEXT"> TEXT
+<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN
+</p>
+<p>
+<input type="button" onclick="_select()" value="select">
+<span class="small">(if you only want some stuff)</span>
+</p>
+<p>
+ <input type="button" onclick="_export()" value="export">
+ <span class="small">(to get your stuff in the selected format)</span>
+</p>
+<div id="exported_html" style="display:none"></div>
+<div id="export_done"></div><p style="font-size:smaller">(Click <i>documents</i> or <i>annotations</i> to reset)</div>
+*/};
+
 function add_export(el) {
-    var s = 
-  	    add_export_choices(el) +
-	    add_select_button(el) +
-	    add_export_button(el) +
-	    add_export_tip(el);
-    document.getElementById(el).innerHTML = s;
+    document.getElementById(el).innerHTML = heredoc(export_form);
 }
-
-function add_export_choices(el) {
-    return '<hr>Export results to:<p><div><input id="format_html" type="radio" name="format" value="HTML" checked="checked"> HTML<input id="format_csv" type="radio" name="format" value="CSV"> CSV<input id="format_text" type="radio" name="format" value="TEXT"> TEXT<input id="format_md" type="radio" name="format" value="MARKDOWN"> MARKDOWN</div>';
-}
-
-function add_select_button(el) {
-    return '<p><input type="button" onclick="_select()" value="select"></input></p><div id="exported_html" style="display:none"></div><div id="export_done"></div>';
-}
-
-function add_export_button(el) {
-    return '<input type="button" onclick="_export()" value="export"></input>';
-}
-
-function add_export_tip(el) {
-    return '<p style="font-size:smaller">(Click <i>select</i> to surface checkboxes. Click <i>documents</i> or <i>annotations</i> to reset.)</p>';
-}
-
 function add_doc() {
     document.getElementById('doc').innerHTML = '<hr><p>Results are organized as follows:</p><ol><li> Annotations are grouped into threads.<li> Threads are grouped by URL.<li> URLs appear in reverse order by recency of annotation.</ol><hr><p>Source: <a href="https://github.com/judell/h_export">https://github.com/judell/h_export</a>';
 }

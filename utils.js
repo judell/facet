@@ -158,7 +158,7 @@ var docview_template = function(){/*
 <input checked="" onchange="javascript:item_checked(__INDEX__)" class="checkbox" id="c__INDEX__" type="checkbox">
 <a class="visit" target="visit" title="click to visit article and see annotations as overlay" 
   href="__URL__">__DOCTITLE__</a> 
-<a class="toggle" title="click to expand annotations" href="javascript:toggle('__INDEX__')">
+<a class="toggle" title="expand annotations" href="javascript:toggle('__INDEX__')">
 <span class="anno-count">+__COUNT__</span></a>
 <div class="url">__URL__</div>
 <div class="annotations" id="a__INDEX__">
@@ -425,17 +425,18 @@ function toggle(dom_id) {
     var element = document.getElementById('a' + dom_id);
     var display = element.style['display'];
     var annos = element.querySelectorAll('.annotation');
-    var toggler = document.getElementById('d' + dom_id).querySelector('.anno-count').innerText;
+    var toggler = document.getElementById('d' + dom_id).querySelector('.toggle');
+    var toggler_text = toggler.querySelector('.anno-count');
     if (display == 'none' || display == '') {
-        toggler = toggler.replace('+','-');
-        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        toggler_text.innerText = toggler_text.innerText.replace('+','-');
+        toggler.title = 'collapse annotations';
         element.style['display'] = 'block';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'block';
     }
     else {
-        toggler = toggler.replace('-','+');
-        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        toggler_text.innerText = toggler_text.innerText.replace('-','+');
+        toggler.title = 'expand annotations';
         element.style['display'] = 'none';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'none';
@@ -671,6 +672,7 @@ function _select() {
 function expand_all() {
     document.getElementById('expander').style.display = 'none';
     document.getElementById('collapser').style.display = 'inline';
+    document.getElementById('collapser').title = 'collapse all';
     var annos = document.querySelectorAll('.annotations');
     for (var i = 0; i < annos.length; i++)
         annos[i].style.display = 'block';
@@ -678,6 +680,7 @@ function expand_all() {
 
 function collapse_all() {
     document.getElementById('expander').style.display = 'inline';
+    document.getElementById('collapser').title = 'expand all';
     document.getElementById('collapser').style.display = 'none';
     var annos = document.querySelectorAll('.annotations');
     for (var i = 0; i < annos.length; i++)

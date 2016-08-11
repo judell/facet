@@ -99,6 +99,23 @@ function process(rows, replies) {
     }
 }
 
+var docview_template = function(){/*
+<div id="d__INDEX__">
+<input checked="" onchange="javascript:item_checked(__INDEX__)" class="checkbox" id="c__INDEX__" type="checkbox">
+<a class="visit" target="visit" title="click to visit article and see annotations as overlay" 
+  href="__URL__">__DOCTITLE__</a> 
+<a class="toggle" title="click to expand annotations" href="javascript:toggle('a__INDEX__')">
+<span class="anno-count">__COUNT__</span></a>
+<div class="url">__URL__</div>
+<div class="annotations" id="a__INDEX__">
+<blockquote class="thread">
+__THREAD__
+</blockquote>
+</div>
+</div>
+*/};
+
+
 function document_view(element, gathered, replies) {
     var url_updates = gathered.url_updates;
     var ids = gathered.ids;
@@ -107,30 +124,39 @@ function document_view(element, gathered, replies) {
     var urls = gathered.urls;
     var reverse_chron_urls = organize(url_updates);
 
+
+    var elt = $('#' + element);
+
     for (var i = 0; i < reverse_chron_urls.length; i++) {
+
+        var s = heredoc(docview_template);
+
         if ( is_exporting() ) {
             var selected_ids = get_ids();
             if ( selected_ids.length>0 && selected_ids.indexOf(i) == -1 )
                 continue;
             }
+
+        s = s.replace(/__INDEX__/g, i);
+
         var url = reverse_chron_urls[i][0];
-        var dom_id = 'a' + i;
+        s = s.replace(/__URL__/g, url);
+
         var count = urls[url];
-        var s_count = '<span class="anno-count">' + count.toString() + '</span>';
-        var elt = $('#' + element);
-        var count_html = '<span><a class="toggle" title="click to expand annotations" href=\"javascript:toggle(\'' + dom_id + '\')\">' + s_count + '</a></span>';
-        elt.append('<div><input checked onchange="javascript:item_checked(' + dom_id.replace('a','') + ')" class="checkbox" id="c' + i + '" type="checkbox"><a class="visit" target="visit" title="click to visit article and see annotations as overlay" href="' + url + '">' + wrap_search_term(titles[url]) + '</a>' + ' ' + count_html);
-        elt.append('<div class="url">' + wrap_search_term(url) + '</div>');
-        elt.append('<div class="annotations" id="' + dom_id + '"/>');
+        s = s.replace(/__COUNT__/g, count);
+
+        s = s.replace(/__DOCTITLE__/g, titles[url]);
+         
         var ids_for_url = ids[url];
+        var thread_html = ''
         for (var j = 0; j < ids_for_url.length; j++) {
             var id = ids_for_url[j];
             output = '';
             show_thread(annos, id, 0, replies, []);
-            if (output != '')
-                $('#' + dom_id).append('<blockquote class="thread">' + output + '</blockquote>')
+            thread_html += output;
         }
-        elt.append('</div>');
+        s = s.replace(/__THREAD__/, thread_html);
+        elt.append(s);
     }
 
     all_or_none();
@@ -373,7 +399,7 @@ Export results to:
 </p>
 <p>
  <input type="button" onclick="_export()" value="export">
- <span class="small">(to get your stuff in the selected format)</span>
+ <span class="small">(to get your stuff in your preferred format)</span>
 </p>
 <div id="exported_html" style="display:none"></div>
 <div id="export_done"></div><p style="font-size:smaller">(Click <i>documents</i> or <i>annotations</i> to reset)</div>
@@ -506,6 +532,7 @@ function heredoc(fn) {
  return b;
 }
 
+
 var form = function(){/*
 <div>
 <p>
@@ -515,7 +542,7 @@ var form = function(){/*
 <input type="password" value="" size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 
 </p>
 <p>
-<input type="button" onclick="_search('__FACET__', 'documents')" value="documents"></input>
+View by <input type="button" onclick="_search('__FACET__', 'documents')" value="documents"></input> or
 <input type="button" onclick="_search('__FACET__', 'annotations')" value="annotations"></input>
 </p>
 </div>

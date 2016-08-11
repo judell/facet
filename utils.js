@@ -106,17 +106,18 @@ function toggle(dom_id) {
     var element = document.getElementById('a' + dom_id);
     var display = element.style['display'];
     var annos = element.querySelectorAll('.annotation');
-    var toggler = document.getElementById('d' + dom_id).querySelector('.anno-count').innerText;
+    var toggler = document.getElementById('d' + dom_id).querySelector('.toggle');
+    var toggler_text = toggler.querySelector('.anno-count');
     if (display == 'none' || display == '') {
-        toggler = toggler.replace('+','-');
-        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        toggler_text.innerText = toggler_text.innerText.replace('+','-');
+        toggler.title = 'collapse annotations';
         element.style['display'] = 'block';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'block';
     }
     else {
-        toggler = toggler.replace('-','+');
-        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        toggler_text.innerText = toggler_text.innerText.replace('-','+');
+        toggler.title = 'expand annotations';
         element.style['display'] = 'none';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'none';

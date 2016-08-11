@@ -71,17 +71,71 @@ function organize(url_updates) {
     return reverse_chron_urls;
 }
 
+var export_template = function(){/*
+<html>
+<head><meta charset="utf-8"></head>
+<title>Hypothesis activity for the query __FACET__ = __QUERY__</title>
+<style>
+body { font-family:verdana; word-break:break-word; margin:10px; } 
+.url { font-family:italic; margin-bottom:10px; color:gray; }
+a { text-decoration: none; color: brown } 
+a.toggle {font-weight: bold; }
+a.visit { color: #151414 } 
+a.expand_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
+a.collapse_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
+.checkbox { display:none }
+img { width: 90%; margin: 8px } 
+.user { font-weight:bold } 
+.search_term { background-color:antiquewhite }
+.timestamp { font-style:italic; font-size:smaller } 
+.thread, .annotation { border:thin solid lightgray;padding:10px;margin:10px; } 
+.annotations { display:none; } 
+.annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px } 
+ .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } 
+.anno-count { } 
+.tags { line-height: 2 }
+#selections { display: none }
+#expander { display: none }
+</style>
+</head>
+<body>
+<h1>Hypothesis activity for the query __FACET__ = __QUERY__</h1>
+__EXPORT__
+<script>
+function toggle(dom_id) {
+    var element = document.getElementById('a' + dom_id);
+    var display = element.style['display'];
+    var annos = element.querySelectorAll('.annotation');
+    var toggler = document.getElementById('d' + dom_id).querySelector('.anno-count').innerText;
+    if (display == 'none' || display == '') {
+        toggler = toggler.replace('+','-');
+        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        element.style['display'] = 'block';
+        for (var i = 0; i < annos.length; i++)
+            annos[i].style.display = 'block';
+    }
+    else {
+        toggler = toggler.replace('-','+');
+        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
+        element.style['display'] = 'none';
+        for (var i = 0; i < annos.length; i++)
+            annos[i].style.display = 'none';
+    }
+}
+</script>
+</body>
+</html>
+*/};
+
 function process(rows, replies) {
     var gathered = gather(rows);
 
     if ($('#format_html').is(":checked")) {
         document_view('exported_html', gathered, replies);
-        var html = '<html><head><meta charset="utf-8"><title>Hypothesis activity for the query ' + facet + ' = ' + search + '</title>';
-        html += '<style>input { display:none} body { margin:.8in; font-family:verdana; word-break:break-word; } .url { font-family:italic; margin-bottom:6px; color:gray } a.visit { color: #151414 } img { width: 90%; margin: 8px } .user { font-weight:bold } .timestamp { font-style:italic; font-size:smaller } .thread { display:none; border:thin solid lightgray;padding:10px;margin:10px; } .annotations { display:none; } .annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px }  .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } a { text-decoration: none; color: brown } a.toggle {font-weight: bold; } .anno-count { } span.anno-count:before { content:"+" } .tags { line-height: 2 }</style>';
-        html += '</head>';
-        html += '<body>';
-        html += '<h1>Hypothesis activity for the query ' + facet + ' = ' + search + '</h1>';
-        html += document.getElementById('exported_html').innerHTML + '<script>function toggle(dom_id) {	var element = document.getElementById(dom_id);	var display = element.style[\'display\']; var annos = document.getElementById(dom_id).querySelectorAll(\'.thread\');	if (display == \'none\' || display == \'\' ) {		element.style[\'display\'] = \'block\'; for (var i=0; i<annos.length; i++) annos[i].style.display = \'block\';	}	else {		element.style[\'display\'] = \'none\';  for (var i=0; i<annos.length; i++)  annos[i].style.display = \'none\';	} }</script></body></html>';
+        var html = heredoc(export_template);
+        html = html.replace(/__QUERY__/g, search);
+        html = html.replace(/__FACET__/g, facet);
+        html = html.replace(/__EXPORT__/g, document.getElementById('exported_html').innerHTML);
         download(html, 'html');
         rows = [];
     }
@@ -104,8 +158,8 @@ var docview_template = function(){/*
 <input checked="" onchange="javascript:item_checked(__INDEX__)" class="checkbox" id="c__INDEX__" type="checkbox">
 <a class="visit" target="visit" title="click to visit article and see annotations as overlay" 
   href="__URL__">__DOCTITLE__</a> 
-<a class="toggle" title="click to expand annotations" href="javascript:toggle('a__INDEX__')">
-<span class="anno-count">__COUNT__</span></a>
+<a class="toggle" title="click to expand annotations" href="javascript:toggle('__INDEX__')">
+<span class="anno-count">+__COUNT__</span></a>
 <div class="url">__URL__</div>
 <div class="annotations" id="a__INDEX__">
 <blockquote class="thread">
@@ -143,7 +197,7 @@ function document_view(element, gathered, replies) {
         s = s.replace(/__URL__/g, url);
 
         var count = urls[url];
-        s = s.replace(/__COUNT__/g, count);
+        s = s.replace(/__COUNT__/g, count.toString().trim());
 
         s = s.replace(/__DOCTITLE__/g, titles[url]);
          
@@ -368,15 +422,20 @@ function add_css(css) {
 }
 
 function toggle(dom_id) {
-    var element = document.getElementById(dom_id);
+    var element = document.getElementById('a' + dom_id);
     var display = element.style['display'];
-    var annos = document.getElementById(dom_id).querySelectorAll('.annotation');
+    var annos = element.querySelectorAll('.annotation');
+    var toggler = document.getElementById('d' + dom_id).querySelector('.anno-count').innerText;
     if (display == 'none' || display == '') {
+        toggler = toggler.replace('+','-');
+        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
         element.style['display'] = 'block';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'block';
     }
     else {
+        toggler = toggler.replace('-','+');
+        document.getElementById('d' + dom_id).querySelector('.anno-count').innerText = toggler;
         element.style['display'] = 'none';
         for (var i = 0; i < annos.length; i++)
             annos[i].style.display = 'none';

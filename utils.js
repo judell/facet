@@ -597,7 +597,7 @@ function heredoc(fn) {
 var form = function(){/*
 <div>
 <p>
-<input value="" id="facet"></input> <br><span class="small">__MSG1__</span>
+<input onchange="_search('__FACET__', 'documents')" value="" id="facet"></input> <br><span class="small">__MSG1__</span>
 </p>
 <p>
 <input type="password" value="" size="40" id="token"></input> <br> <span class="small">__MSG2__</span> 

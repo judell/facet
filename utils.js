@@ -1,5 +1,4 @@
 var output = '';
-var token = '';
 var displayed_in_thread = [];
 var query = 'https://hypothes.is/api/search?limit=200&offset=__OFFSET__';
 
@@ -10,6 +9,7 @@ function load(offset, rows, replies) {
         url: _query,
         type: "GET",
         beforeSend: function (xhr) {
+            var token = localStorage.getItem('h_token');
             if (token != '') {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + token);
                 xhr.setRequestHeader('Content-Type', 'application/json;charset=utf-8');
@@ -288,7 +288,8 @@ function show_annotation(anno) {
     var dt = new Date(anno.updated);
     var user = anno.user.replace('acct:','').replace('@hypothes.is','')
     user = user;
-    var url = wrap_search_term(anno.url);
+//    var url = wrap_search_term(anno.url);
+    var url = anno.url;
     var quote = '';
     if (anno.quote) {
       quote = wrap_search_term(anno.quote);
@@ -393,16 +394,21 @@ function parse_annotation(row) {
     }
 }
 
-function gup(name) {
+function gup(name, str) {
+    if (! str) 
+        str = window.location.href;
+    else
+        str = '?' + str;
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     var regexS = "[\\?&]" + name + "=([^&#]*)";
     var regex = new RegExp(regexS);
-    var results = regex.exec(window.location.href);
+    var results = regex.exec(str);
     if (results == null)
         return "";
     else
         return results[1];
 }
+
 
 function getLocalStorageItem(key) {
     var value = localStorage.getItem(key);
@@ -651,7 +657,6 @@ function add_menu(facet) {
 
 function _search(facet, mode) {
   localStorage.setItem('h_token', document.getElementById('token').value);
-  token = localStorage.getItem('h_token');
   var search = document.getElementById('facet').value;
   var href = 'facet.html?facet=' + facet + '&mode=' + mode + '&search=' + search;
   location.href = href;

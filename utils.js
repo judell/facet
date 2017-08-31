@@ -171,6 +171,18 @@ __THREAD__
 */};
 
 
+function single_annotation_view(element, rows, replies) {
+    var elt = $('#' + element);
+     output = '';
+     show_single_thread(rows, rows[0].id, 0, replies, []);
+            thread_html += output;
+        }
+        s = s.replace(/__THREAD__/, thread_html);
+        elt.append(s);
+    }
+}
+
+
 function document_view(element, gathered, replies) {
     var url_updates = gathered.url_updates;
     var ids = gathered.ids;
@@ -241,7 +253,8 @@ function show_thread(annos, id, level, replies) {
         html = filterXSS(html, options);
         html = wrap_search_term(html);
         var tags = '';
-        if (anno.tags.length) 
+//        if (use_tags && anno.tags.length)
+        if (anno.tags.length)
 			tags = make_tags(anno.tags);
         html = wrap_search_term(html);
         var user = anno.user;
@@ -274,6 +287,7 @@ function show_thread(annos, id, level, replies) {
             show_thread(annos, children[i], level + 1, replies);
     }
 }
+
 
 function annotation_view(rows) {
     for (var i = 0; i < rows.length; i++) {
@@ -320,6 +334,7 @@ function show_annotation(anno) {
         stripIgnoreTagBody: ['script']
     };
     var tags = '';
+//    if (use_tags && anno.tags.length) 
     if (anno.tags.length) 
 		tags = make_tags(anno.tags);
     var template = '<div class="annotation">' +
@@ -346,25 +361,29 @@ function wrap_search_term(s) {
         return s;
 }
 
+
 function parse_annotation(row) {
-    var id = row['id'];
-    var url = row['uri'];
-    var updated = row['updated'].slice(0, 19);
-    var group = row['group'];
+    var id = row.id;
+    var url = row.uri;
+    var updated = row.updated.slice(0, 19);
+    var group = row.group;
     var title = url;
-    var refs = row.hasOwnProperty('references') ? row['references'] : [];
+    var refs = row.hasOwnProperty('references') ? row.references : [];
     var user = row['user'].replace('acct:', '').replace('@hypothes.is', '');
+	var start;
     var quote = '';
     if ( // sigh...
             row.hasOwnProperty('target') &&
             row['target'].length
             ) {
-        var selectors = row['target'][0]['selector'];
+        var selectors = row.target[0].selector;
         if (selectors) {
             for (var i = 0; i < selectors.length; i++) {
                 selector = selectors[i];
-                if (selector['type'] == 'TextQuoteSelector')
-                    quote = selector['exact'];
+                if (selector.type == 'TextQuoteSelector')
+                    quote = selector.exact;
+                if (selector.type == 'TextPositionSelector')
+                    start = selector.start;
             }
         }
     }
@@ -390,9 +409,10 @@ function parse_annotation(row) {
         text: text,
         quote: quote,
         tags: tags,
-        group: group
+        group: group,
+		start: start
+		}
     }
-}
 
 function gup(name, str) {
     if (! str) 
@@ -710,4 +730,39 @@ function make_tags(tags) {
       '</span></div>';
   return tags;
 }
+
+
+function single_document_view(element, gathered, replies) {
+	var annos = Object.keys(gathered.annos).map(function(key) {
+		return gathered.annos[key];
+	});
+
+	annos.sort(compare_by_start);
+
+	var html = '';
+
+    for ( var i=0; i<annos.length; i++ ) {
+		output = ''
+		var anno = annos[i];
+		show_annotation(anno);
+		html += output;
+	}
+
+	document.getElementById('widget').innerHTML = html;
+
+}
+
+
+function compare_by_start(a,b) {
+  a = a.start;
+  b = b.start;
+  if (a < b)
+    return -1;
+  else if (a > b)
+    return 1;
+  else 
+    return 0;
+}
+
+
 

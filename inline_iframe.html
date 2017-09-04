@@ -32,7 +32,15 @@ img { width: 90%; margin: 8px }
 <div id="widget"></div>
 
 <script>
-token = localStorage.getItem('h_token');
+var token = localStorage.getItem('h_token');
+
+var server = 'https://hypothes.is/';
+console.log('default server', server);
+var _server = gup('server');
+if ( _server ) {
+  server = _server;
+  console.log('server', server);
+}
 
 var id = gup('id');
 

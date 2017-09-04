@@ -1,5 +1,3 @@
-var server = 'https://hyp.jonudell.info/';
-
 var orderedReplies = [];
 
 function loadAnnotation(id) {

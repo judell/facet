@@ -68,6 +68,7 @@ function processSearchResults(annos, replies) {
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function(url) {
+    getById('progress').innerHTML += '.';
     counter++;
 
     var perUrlCards = document.createElement('div');
@@ -91,6 +92,8 @@ function processSearchResults(annos, replies) {
 
     perUrlCards.remove();
   });
+ 
+  getById('progress').innerHTML = '';
 
   collapseAll();
 }
@@ -155,8 +158,7 @@ function showAnnotation(eltId, anno, id, level) {
     if (anno.group !== '__world__') {
       groupSlug = `
 in group 
-<span class="groupid"><a title="search group" 
-  href="./?group=${anno.group}">${anno.group}</a>
+<span class="groupid"><a title="search group" target="_group" href="./?group=${anno.group}">${anno.group}</a>
 </span>`;
     }
 
@@ -166,8 +168,7 @@ in group
     <span class="user">
       <a title="search user" target="_user"  href="./?user=${user}">${user}</a>
     </span>
-    <span class="timestamp"><a title="view/edit/reply" 
-      href="${standaloneAnnotationUrl}">${dt_str}</a>
+    <span class="timestamp"><a title="view/edit/reply"  href="${standaloneAnnotationUrl}">${dt_str}</a>
     </span>
 
   ${groupSlug}
@@ -190,7 +191,7 @@ in group
 function formatTags(tags) {
   var formattedTags = [];
   tags.forEach(function(tag){
-    var formattedTag = `<span class="annotationTag">${tag}</span>`;
+    var formattedTag = `<a target="_tag" href="./?tag=${tag}"><span class="annotationTag">${tag}</span></a>`;
     formattedTags.push(formattedTag);
   });
   return formattedTags.join(' ');

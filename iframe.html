@@ -1,81 +1,339 @@
-<html>
+<!doctype html>
 <head>
 <style>
 body { font-family:verdana; word-break:break-word; margin:10px; } 
 .url { font-family:italic; margin-bottom:10px; color:gray; }
-a { text-decoration: none; color: brown } 
-a.toggle {font-weight: bold; }
-a.visit { color: #151414 } 
-a.expand_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
-a.collapse_all { font-weight:bold; margin-right:20px; font-size:larger; float:right }
-.checkbox { display:none }
+a { text-decoration: none; color: #2a2a2d; }
+.urlHeading {color:black;font-size:10pt;}
+.nnotationBody { margin-top:12px; }
+.annotationCard { 
+  border-bottom:thin solid lightgray;
+  margin-top:10px;
+  margin-bottom:0px;
+  } 
+.annotationTags { margin-top:12px; margin-bottom:12px; }
+.annotationTag { font-size:x-small; margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } 
+.annotationQuote {
+    margin-top: 12px;
+    color: #777;
+    font-style: italic;
+    padding: 0 .615em;
+    border-left: 3px solid #d3d3d3;
+  }
 img { width: 90%; margin: 8px } 
-.user { font-weight:bold } 
-.search_term { background-color:antiquewhite }
-.timestamp { font-style:italic; font-size:smaller } 
-.thread, .annotation { border:thin solid lightgray;padding:10px;margin:10px; } 
-.annotations { display:none; } 
-.annotation-quote { color: #777; font-style: italic;padding: 0 .615em; border-left: 3px solid #d3d3d3; margin-top:12px; margin-bottom: 12px } 
- .tag-item { margin: 2px; text-decoration: none; border: 1px solid #BBB3B3; border-radius: 2px; padding: 3px; color: #4B4040; background: #f9f9f9; } 
-.anno-count { } 
-.tags { line-height: 2 }
-#selections { display: none }
-#expander { display: none }
+.timestamp, .groupid { font-style:italic; font-size:smaller } 
+.controlsContainer { display:flex; font-size:smaller;}
+.toggle { font-size:x-large; }
+.counter { font-size: smaller; }
+button {margin-left: 8px}
 </style>
-<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.2.min.js"></script>
-<script src="xss.min.js"></script>
-<script src="showdown.js"></script>
-<script src="utils.js"></script>
+<script src="https://jonudell.info/hlib/hlib.js"></script>
+<script src="https://jonudell.info/hlib/showdown.js"></script>
+<script src="https://jonudell.info/hlib/xss.min.js"></script>
 </head>
+
 <body>
+<div class="controlsContainer">
+  <button onclick="expandAll()">expand all</button>
+  <button onclick="collapseAll()">collapse all</button>
+  <button onclick="downloadHTML()">download HTML</button>
+  <button onclick="downloadCSV()">download CSV</button>
+  <button onclick="downloadText()">download Text</button>
+</div>  
 
-<a id="collapser" style="display:none" class="collapse_all" title="collapse all" href="javascript:collapse_all()">-</a>
-<a id="expander" class="expand_all" title="expand all" href="javascript:expand_all()">+</a>
-
-<h2 id="title"></h2>
-
-<p id="selections"></p>
+<p id="title"></p>
 
 <div id="widget"></div>
 
 <script>
-token = localStorage.getItem('h_token');
 
-var search = gup('search');
-var facet = gup('facet');
-var mode = gup('mode');
-var selections = gup('selections');
+var params = gup('params');
+var decodedParams = decodeURIComponent(params);
+params = JSON.parse(decodedParams);
 
-if ( mode == 'documents' )
-  document.getElementById('expander').style.display = 'inline';
+document.getElementById('title').innerHTML = `Hypothesis query: ${decodedParams} &nbsp; <span id="progress"></span>`;
 
-document.getElementById('title').innerHTML = 'Hypothesis activity for ' + facet + '=' + search;
+hApiSearch(params, processSearchResults, 'progress');
 
-document.getElementById('selections').innerHTML = '<input onchange="javascript:all_or_none()" name="selections" type="radio" checked value="all"> all <input onchange="all_or_none()" name="selections" type="radio" value="none"> none';
+var orderedReplies;
 
-query += '&' + facet + '=' + search;
-
-if ( mode == 'documents' )
-  query = query + '&_separate_replies=true';
-
-function process(rows, replies) {
-  switch (mode) {
-    case '':
-    case 'documents': 
-      var gathered = gather(rows);
-      document_view('widget', gathered, replies);
-      break;
-    case 'annotations': 
-      rows = rows.sort(compare);
-      annotation_view(rows);
-      document.getElementById('widget').innerHTML = output;
-      break;
-    default:
-      console.log('iframe: process: unexpected mode ' + mode);
-    }
+function findImmediateReplies(id, replies) {
+  return replies.filter(function(x) {
+      return x.references.slice(-1) == id;
+    });
 }
 
-load(0, [], []);
+function processSearchResults(annos, replies) {
+  var gathered = gather(annos)
+  var reversedUrls = reverseChronUrls(gathered.urlUpdates);
+  var counter = 0;
+  reversedUrls.forEach(function(url) {
+    counter++;
+
+    var perUrlCards = document.createElement('div');
+    perUrlCards.id = `_counter_${counter}`;
+    document.body.appendChild(perUrlCards);
+
+    var idsForUrl = gathered.ids[url];
+    idsForUrl.forEach(function(id){
+      var immediateReplies = findImmediateReplies(id, replies);
+      var all = [gathered.annos[id]].concat(immediateReplies);
+      all.forEach(function(anno) {
+        var level = 0;
+        if ( anno.references ) {
+          level = anno.references.length;
+        }
+        showAnnotation(perUrlCards.id, anno, anno.id, level);
+      });
+    });
+
+    showUrlResults(counter, 'widget', url, perUrlCards, gathered.titles[url]);
+
+    perUrlCards.remove();
+  });
+
+  collapseAll();
+}
+
+function showUrlResults(counter, eltId, url, perUrlCards, doctitle) {
+  var urlResultsId = `counter_${counter}`;
+
+  var output = `
+<h1 id="heading_${urlResultsId}" class="urlHeading">
+
+<a title="collapse" href="javascript:toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
+
+<span class="counter">${perUrlCards.querySelectorAll('.annotationCard').length} &nbsp;</span>
+
+<a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+</h1>
+<div id="cards_${urlResultsId}">
+  ${perUrlCards.innerHTML}
+</div>
+`;
+  getById(eltId).innerHTML += output;
+}
+
+function showAnnotation(eltId, anno, id, level) {
+    var dt = new Date(anno.updated);
+    var dt_str = dt.toLocaleDateString() + ' ' + dt.toLocaleTimeString().replace(/:\d{2}\s/,' ');
+
+    var converter = new Showdown.converter();
+    var text = anno.text == null ? '' : anno.text;
+    var html = converter.makeHtml(text);
+    var options = {
+        whiteList: {
+            a: ['href', 'title'],
+            img: ['alt', 'src'],
+            p: [],
+            blockquote: [],
+            span: ['title', 'class']
+        },
+        stripIgnoreTag: true,
+        stripIgnoreTagBody: ['script']
+    };
+    html = filterXSS(html, options);
+
+    var tags = '';
+    if (anno.tags.length) {
+        tags = formatTags(anno.tags);    
+      }
+
+    var user = anno.user.replace('acct:','').replace('@hypothes.is','');
+
+    var quote = filterXSS(anno.quote, {});
+
+    if (anno.quote) {
+      quote = `<div class="annotationQuote">${anno.quote}</div>`;
+    }
+
+    var standaloneAnnotationUrl = `https://hypothes.is/a/${anno.id}`;
+
+    var marginLeft = level * 20;
+
+    var groupSlug = 'in Public';
+    if (anno.group !== '__world__') {
+      groupSlug = `
+in group 
+<span class="groupid"><a title="search group" 
+  href="./?group=${anno.group}">${anno.group}</a>
+</span>`;
+    }
+
+    var output = `
+<div class="annotationCard" style="display:block; margin-left:${marginLeft}px;">
+  <div class="annotationHeader">
+    <span class="user">
+      <a title="search user" target="_user"  href="./?user=${user}">${user}</a>
+    </span>
+    <span class="timestamp"><a title="view/edit/reply" 
+      href="${standaloneAnnotationUrl}">${dt_str}</a>
+    </span>
+
+  ${groupSlug}
+
+  </div>
+  <div class="annotationBody">
+    ${quote}
+     <div>
+       ${html}
+     </div>
+     <div class="annotationTags">
+        ${tags}
+     </div>
+  </div>  
+</div>`
+    var elt = getById(eltId);
+    elt.innerHTML += output;
+}
+
+function formatTags(tags) {
+  var formattedTags = [];
+  tags.forEach(function(tag){
+    var formattedTag = `<span class="annotationTag">${tag}</span>`;
+    formattedTags.push(formattedTag);
+  });
+  return formattedTags.join(' ');
+}
+
+function gather(rows) {
+    var urls = {};
+    var ids = {};
+    var titles = {};
+    var urlUpdates = {};
+    var annos = {};
+    for (var i = 0; i < rows.length; i++) {
+        var row = rows[i];
+        var annotation = parseAnnotation(row);  // parse the annotation
+        var id = annotation.id;
+        annos[id] = annotation;                  // save it by id
+        var url = annotation.url;             // remember these things
+        url = url.replace(/\/$/, "");            // strip trailing slash
+        var updated = annotation.updated;
+        var title = annotation.title;
+        if (!title)
+            title = url;
+        if (url in urls) {                     // add/update this url's info
+            urls[url] += 1;
+            ids[url].push(id);
+            if (updated > urlUpdates.url)
+                urlUpdates[url] = updated;
+        }
+        else {                                   // init this url's info
+            urls[url] = 1;
+            ids[url] = [id];
+            titles[url] = title;
+            urlUpdates[url] = updated;
+
+        }
+    }
+    return { ids: ids, urlUpdates: urlUpdates, annos: annos, titles: titles, urls: urls };
+}
+
+function reverseChronUrls(urlUpdates) {
+    var reverseChronUrls = [];
+    for (var urlUpdate in urlUpdates)  // sort urls in reverse chron of recent update
+        reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]]);
+    reverseChronUrls.sort(function (a, b) { return new Date(b[1]) - new Date(a[1]) });
+    return reverseChronUrls.map(item => item[0]);
+}
+
+function downloadHTML() {
+  var html = `<html>
+${document.head.outerHTML}
+${document.body.outerHTML}
+</html>`;
+  download(html, 'html');
+}
+
+function downloadCSV() {
+  var csvOutput = '"updated","url","user","id","group","tags","quote","text"\n';
+  Object.values(gathered.annos).forEach(function(anno) {
+    var fields = [anno.updated, anno.url, anno.user, anno.id, anno.group, anno.tags.join(', '), anno.quote, anno.text];
+    fields = fields.map(function (field) {
+      field = field.replace(/"/g, '\"\"'); // escape double quotes
+      field = field.replace(/\r?\n|\r/g, ' '); // remove cr lf
+      field = `"${field}"`; // quote the field
+      return field;
+    });
+    var row = fields.join(',');
+    csvOutput += `${row}\n`;
+  });
+  download(csvOutput, 'csv');
+}
+
+function downloadText() {
+  var text = document.body.innerText;
+  download(text, 'txt');
+}
+
+function download(text, type) {
+  var a = document.createElement('a');
+  a.href = 'data:attachment/' + type + ',' + encodeURIComponent(text);
+  a.target = '_blank';
+  a.download = 'hypothesis.' + type;
+  document.body.appendChild(a);
+  a.click();
+}
+
+function collapseAll() {
+  var togglers = document.querySelectorAll('.urlHeading .toggle');
+  togglers.forEach(function(toggler) {
+    setToggleControlCollapse(toggler);
+  });
+  var cards = document.querySelectorAll('.annotationCard');
+  hideCards(cards);
+}
+
+function expandAll() {
+  var togglers = document.querySelectorAll('.urlHeading .toggle');
+  togglers.forEach(function(toggler) {
+    setToggleControlExpand(toggler);
+  });
+  var cards = document.querySelectorAll('.annotationCard');
+  showCards(cards);
+}
+
+function setToggleControlCollapse(toggler) {
+   toggler.innerText = '+';
+   toggler.title = 'expand';
+  }
+
+function setToggleControlExpand(toggler) {
+   toggler.innerText = '-';
+   toggler.title = 'collapse';
+  }
+
+function showCards(cards) {
+  for (var i = 0; i < cards.length; i++) {
+    cards[i].style.display = 'block';
+  }
+}
+
+function hideCards(cards) {
+  for (var i = 0; i < cards.length; i++) {
+    cards[i].style.display = 'none';
+  }
+}
+
+function toggle(id) {
+    var heading = getById('heading_' + id);
+    var toggler = heading.querySelector('.toggle');
+
+    var cardsId = `cards_${id}`;
+    var selector = `#${cardsId} .annotationCard`;
+    var perUrlCards = document.querySelectorAll(selector)
+    var cardsDisplay = perUrlCards[0].style.display;
+
+    if (cardsDisplay === 'block') {
+      setToggleControlCollapse(toggler);
+      hideCards(perUrlCards);
+    }
+    else {
+      setToggleControlExpand(toggler);
+      showCards(perUrlCards);
+    }
+}
 
 </script>
 </body>

@@ -5,7 +5,7 @@ body { font-family:verdana; word-break:break-word; margin:10px; }
 .url { font-family:italic; margin-bottom:10px; color:gray; }
 a { text-decoration: none; color: #2a2a2d; }
 .urlHeading {color:black;font-size:10pt;}
-.nnotationBody { margin-top:12px; }
+.annotationBody { }
 .annotationCard { 
   border-bottom:thin solid lightgray;
   margin-top:10px;
@@ -57,6 +57,8 @@ hApiSearch(params, processSearchResults, 'progress');
 
 var orderedReplies;
 
+var gathered;
+
 function findImmediateReplies(id, replies) {
   return replies.filter(function(x) {
       return x.references.slice(-1) == id;
@@ -64,7 +66,7 @@ function findImmediateReplies(id, replies) {
 }
 
 function processSearchResults(annos, replies) {
-  var gathered = gather(annos)
+  gathered = gather(annos);
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function(url) {

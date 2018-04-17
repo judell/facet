@@ -54,6 +54,11 @@ params = JSON.parse(decodedParams);
 
 document.getElementById('title').innerHTML = `Hypothesis query: ${decodedParams} &nbsp; <span id="progress"></span>`;
 
+var nonEmptyParams = Object.values(params).filter(x => x != '');
+if ( nonEmptyParams.length == 0 ) {
+  params.max = 400;
+}
+
 hApiSearch(params, processSearchResults, 'progress');
 
 var orderedReplies;

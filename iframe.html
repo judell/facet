@@ -58,11 +58,11 @@ hApiSearch(params, processSearchResults, 'progress');
 
 var orderedReplies;
 
-function findImmediateReplies(id, replies) {
-  var immediates = replies.filter(function(x) {
-      return x.references.slice(-1) == id;
+function findReplies(id, replies) {
+  var _replies = replies.filter(function(x) {
+      return ( x.references.indexOf(id) != -1 );
   });
-  return immediates.map(a => parseAnnotation(a));
+  return _replies.map(a => parseAnnotation(a)).reverse();
 }
 
 function processSearchResults(annos, replies) {
@@ -79,8 +79,8 @@ function processSearchResults(annos, replies) {
 
     var idsForUrl = gathered.ids[url];
     idsForUrl.forEach(function(id){
-      var immediateReplies = findImmediateReplies(id, replies);
-      var all = [gathered.annos[id]].concat(immediateReplies);
+      var _replies = findReplies(id, replies);
+      var all = [gathered.annos[id]].concat(_replies);
       all.forEach(function(anno) {
         var level = 0;
         if ( anno.refs ) {

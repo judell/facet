@@ -25,6 +25,7 @@ img { width: 90%; margin: 8px }
 .controlsContainer { display:flex; font-size:smaller;}
 .toggle { font-size:x-large; }
 .counter { font-size: smaller; }
+.csvRow { display: none; }
 button {margin-left: 8px}
 </style>
 <script src="https://jonudell.info/hlib/hlib.js"></script>
@@ -57,16 +58,15 @@ hApiSearch(params, processSearchResults, 'progress');
 
 var orderedReplies;
 
-var gathered;
-
 function findImmediateReplies(id, replies) {
-  return replies.filter(function(x) {
+  var immediates = replies.filter(function(x) {
       return x.references.slice(-1) == id;
-    });
+  });
+  return immediates.map(a => parseAnnotation(a));
 }
 
 function processSearchResults(annos, replies) {
-  gathered = gather(annos);
+  var gathered = gather(annos);
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function(url) {
@@ -83,8 +83,8 @@ function processSearchResults(annos, replies) {
       var all = [gathered.annos[id]].concat(immediateReplies);
       all.forEach(function(anno) {
         var level = 0;
-        if ( anno.references ) {
-          level = anno.references.length;
+        if ( anno.refs ) {
+          level = anno.refs.length;
         }
         showAnnotation(perUrlCards.id, anno, anno.id, level);
       });
@@ -166,6 +166,7 @@ in group
 
     var output = `
 <div class="annotationCard" style="display:block; margin-left:${marginLeft}px;">
+  <div class="csvRow">${csvRow(level,anno)}</div>
   <div class="annotationHeader">
     <span class="user">
       <a title="search user" target="_user"  href="./?user=${user}">${user}</a>
@@ -249,18 +250,22 @@ ${document.body.outerHTML}
   download(html, 'html');
 }
 
+function csvRow(level,anno) {
+  var fields = [level.toString(), anno.updated, anno.url, anno.user, anno.id, anno.group, anno.tags.join(', '), anno.quote, anno.text];
+  fields = fields.map(function (field) {
+    field = field.replace(/"/g, '\"\"'); // escape double quotes
+    field = field.replace(/\r?\n|\r/g, ' '); // remove cr lf
+    field = `"${field}"`; // quote the field
+    return field;
+  });
+  return fields.join(',');
+}
+
 function downloadCSV() {
-  var csvOutput = '"updated","url","user","id","group","tags","quote","text"\n';
-  Object.values(gathered.annos).forEach(function(anno) {
-    var fields = [anno.updated, anno.url, anno.user, anno.id, anno.group, anno.tags.join(', '), anno.quote, anno.text];
-    fields = fields.map(function (field) {
-      field = field.replace(/"/g, '\"\"'); // escape double quotes
-      field = field.replace(/\r?\n|\r/g, ' '); // remove cr lf
-      field = `"${field}"`; // quote the field
-      return field;
-    });
-    var row = fields.join(',');
-    csvOutput += `${row}\n`;
+  var csvOutput = '"level","updated","url","user","id","group","tags","quote","text"\n';
+  var rows = document.querySelectorAll('.csvRow');
+  rows.forEach(function(row){
+    csvOutput += `${row.innerText}\n`;
   });
   download(csvOutput, 'csv');
 }

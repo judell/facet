@@ -75,7 +75,6 @@ function processSearchResults(annos, replies) {
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function(url) {
-    getById('progress').innerHTML += '.';
     counter++;
 
     var perUrlCards = document.createElement('div');
@@ -83,7 +82,7 @@ function processSearchResults(annos, replies) {
     document.body.appendChild(perUrlCards);
 
     var idsForUrl = gathered.ids[url];
-    idsForUrl.forEach(function(id){
+    idsForUrl.forEach(function(id) {
       var _replies = findReplies(id, replies);
       var all = [gathered.annos[id]].concat(_replies);
       all.forEach(function(anno) {
@@ -100,8 +99,6 @@ function processSearchResults(annos, replies) {
     perUrlCards.remove();
   });
  
-  getById('progress').innerHTML = '';
-
   collapseAll();
 }
 

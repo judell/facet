@@ -61,8 +61,6 @@ if ( nonEmptyParams.length == 0 ) {
 
 hApiSearch(params, processSearchResults, 'progress');
 
-var orderedReplies;
-
 function findReplies(id, replies) {
   var _replies = replies.filter(function(x) {
       return ( x.references.indexOf(id) != -1 );
@@ -98,7 +96,9 @@ function processSearchResults(annos, replies) {
 
     perUrlCards.remove();
   });
- 
+
+  getById('progress').innerHTML = '';
+
   collapseAll();
 }
 

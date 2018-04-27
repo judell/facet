@@ -1,89 +1,78 @@
 <!doctype html>
 <html>
+
 <head>
-<title>View and export Hypothesis annotations</title>
-<style>
-body { font-family:arial; margin:.2in; }
-button { margin-top:12px; }
-.formContainer { display:flex; flex-direction:column; }
-.formLabel { font-weight: bold; }
-.formMessage { font-size:smaller }
-.formField { margin-top: 12px; }
-li { margin-bottom: 8px }
-.small { font-size: smaller }
-.green { color:green }
-.thread { margin-left:0px; margin-top:20px }
-</style>
-<script src="https://jonudell.info/hlib/hlib.js"></script>
+  <title>View and export Hypothesis annotations</title>
+  <link rel="stylesheet" href="https://jonudell.info/hlib/hlib.css">
+  <script src="https://jonudell.info/hlib/hlib.js"></script>
 </head>
+
 <body>
 
-<iframe id="iframe" style="margin-left:20px;width:60%;height:2000px;float:right;" src=""></iframe>
+  <iframe id="iframe" style="margin-left:20px;width:70%;height:2000px;float:right;" src=""></iframe>
 
-<div id="menu"></div>
+  <div id="menu"></div>
 
-<form autocomplete="off">
-  <div class="formContainer">
-    <div class="formField" id="userContainer"></div>
-    <div class="formField" id="groupContainer"></div>
-    <div class="formField" id="urlContainer"></div>
-    <div class="formField" id="tagContainer"></div>
-    <div class="formField" id="anyContainer"></div>
-    <div class="formField" id="tokenContainer"></div>
+  <form autocomplete="off">
+    <div class="formContainer">
+      <div class="formField" id="userContainer"></div>
+      <div class="formField" id="groupContainer"></div>
+      <div class="formField" id="urlContainer"></div>
+      <div class="formField" id="tagContainer"></div>
+      <div class="formField" id="anyContainer"></div>
+      <div class="formField" id="tokenContainer"></div>
+    </div>
+  </form>
+
+  <div>
+    <button onclick="search()">search</button>
   </div>
-</form>
 
-<div>
-<button onclick="search()">search</button>
-</div>
+  <script>
 
-<script>
+    createUserInputForm(userContainer);
 
-createUserInputForm(userContainer);
+    createGroupInputForm(groupContainer);
 
-createGroupInputForm(groupContainer);
+    createFacetInputForm(urlContainer, 'url', 'URL of annotated document');
 
-createFacetInputForm(urlContainer, 'url', 'URL of annotated document');
+    createFacetInputForm(tagContainer, 'tag', '');
 
-createFacetInputForm(tagContainer, 'tag', '');
+    createFacetInputForm(anyContainer, 'any', 'freetext search');
 
-createFacetInputForm(anyContainer, 'any', 'freetext search');
+    createApiTokenInputForm(getById('tokenContainer'));
 
-createApiTokenInputForm(getById('tokenContainer'));
+    ['user', 'group', 'url', 'tag', 'any'].forEach(function (facet) {
+      if (gup(facet) !== '') {
+        document.querySelector(`#${facet}Container input`).value = gup(facet);
+      }
+    })
 
-['user','group','url','tag','any'].forEach(function(facet){
-  if (gup(facet) !== '') {
-    document.querySelector(`#${facet}Container input`).value = gup(facet);
-  }
-})
+    function search() {
+      var params = {
+        user: document.querySelector('#userContainer input').value,
+        group: getSelectedGroup(),
+        url: document.querySelector('#urlContainer input').value,
+        tag: document.querySelector('#tagContainer input').value,
+        any: document.querySelector('#anyContainer input').value,
+      }
+      document.title = 'Hypothesis activity for the query ' + JSON.stringify(params);
+      params = encodeURIComponent(JSON.stringify(params));
+      var iframeUrl = `iframe.html?params=${params}`;
+      document.getElementById('iframe').setAttribute('src', iframeUrl);
+    }
 
-function search() {
-  var params = {
-    user: document.querySelector('#userContainer input').value,
-    group: document.querySelector('#groupContainer input').value,
-    url: document.querySelector('#urlContainer input').value,
-    tag: document.querySelector('#tagContainer input').value,
-    any: document.querySelector('#anyContainer input').value,
-  }
-  document.title = 'Hypothesis activity for the query ' + JSON.stringify(params);
-  params = encodeURIComponent(JSON.stringify(params));
-  var iframeUrl = `iframe.html?params=${params}`;
-  document.getElementById('iframe').setAttribute('src', iframeUrl);
-}
-
-function createFacetInputForm (e, facet, msg) {
-  var form = `
+    function createFacetInputForm(e, facet, msg) {
+      var form =
+        `
 <div class="formLabel">${facet}</div>
-<div class="${facet}Form"><input size="40" id="${facet}Form"></input></div>
+<div class="${facet}Form"><input id="${facet}Form"></input></div>
 <div class="formMessage">${msg}</div>`;
-  e.innerHTML += form;
-}
+      e.innerHTML += form;
+    }
 
-search();
-
-</script>
-
+  </script>
 
 </body>
-</html>
 
+</html>

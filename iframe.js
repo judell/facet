@@ -16,6 +16,9 @@ Object.keys(params).forEach(function(key) {
   if (params[key] === '' ) {
     delete params[key];
   }
+  if (params['group'] && params['group'] === '__world__') {
+    delete params['group'];
+  }
 })
 
 document.getElementById('title').innerHTML =

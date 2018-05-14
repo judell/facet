@@ -123,15 +123,6 @@ function downloadText() {
   download(text, 'txt');
 }
 
-function download(text, type) {
-  var a = document.createElement('a');
-  a.href = 'data:attachment/' + type + ',' + encodeURIComponent(text);
-  a.target = '_blank';
-  a.download = 'hypothesis.' + type;
-  document.body.appendChild(a);
-  a.click();
-}
-
 function collapseAll() {
   var togglers = document.querySelectorAll('.urlHeading .toggle');
   togglers.forEach(function (toggler) {

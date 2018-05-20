@@ -20,12 +20,15 @@
       <div class="formField" id="urlContainer"></div>
       <div class="formField" id="tagContainer"></div>
       <div class="formField" id="anyContainer"></div>
+      <div class="formField" id="maxContainer"></div>
       <div class="formField" id="tokenContainer"></div>
     </div>
   </form>
 
   <div>
-    <button onclick="search()">search</button>
+    <button title="view or download search results as HTML" onclick="getHTML()">HTML</button>
+    <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
+    <button title="view or download search results as JSON" onclick="getJSON()">JSON</button>
   </div>
 
   <script src="./index.js"></script>

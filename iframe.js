@@ -1,7 +1,7 @@
 var worker = new Worker('showAnnotation.js');
 worker.addEventListener('message', function (e) {
   try {
-    var elt = getById(`cards${e.data.id}`);
+    var elt = getById(`cards_counter_${e.data.id}`);
     elt.innerHTML += e.data.output;
   }
   catch (e) {
@@ -11,6 +11,20 @@ worker.addEventListener('message', function (e) {
 
 var params = decodeURIComponent(gup('params'));
 params = JSON.parse(params);
+
+var format = params['format'];
+delete params['format'];
+
+if (format==='html') {
+  getById('controlsContainer').innerHTML = 
+    `<button onclick="expandAll()">expand all</button>
+     <button onclick="collapseAll()">collapse all</button>
+     <button onclick="downloadHTML()">download HTML</button>`;
+} else if (format==='csv') {
+  getById('controlsContainer').innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
+} else {
+  getById('controlsContainer').innerHTML = '<button onclick="downloadJSON()">download JSON</button>';
+}
 
 Object.keys(params).forEach(function(key) {
   if (params[key] === '' ) {
@@ -32,14 +46,14 @@ if (nonEmptyParams.length == 0) {
 hApiSearch(params, processSearchResults, 'progress');
 
 function processSearchResults(annos, replies) {
+  var csv = '';
+  var json = [];
   var gathered = gatherAnnotationsByUrl(annos);
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function (url) {
     counter++;
-    var perUrlCards = document.createElement('div');
-    perUrlCards.id = `_counter_${counter}`;
-    document.body.appendChild(perUrlCards);
+    var perUrlId = counter;
     var perUrlCount = 0;
     var idsForUrl = gathered.ids[url];
     idsForUrl.forEach(function (id) {
@@ -51,17 +65,34 @@ function processSearchResults(annos, replies) {
         if (anno.refs) {
           level = anno.refs.length;
         }
-        worker.postMessage({
-          cardId: perUrlCards.id,
-          anno: anno,
-          annoId: anno.id,
-          level: level,
-        })
+        if (format==='html') {
+          worker.postMessage({
+            perUrlId: perUrlId,
+            anno: anno,
+            annoId: anno.id,
+            level: level,
+          });
+        } else if (format==='csv') {
+          var _row = document.createElement('div');
+          _row.innerHTML = csvRow(level, anno);
+          csv += _row.innerText + '\n';
+        } else if (format==='json') {
+          anno.text = anno.text.replace(/</g, '&lt;');
+          json.push(anno);
+        }
+
       });
     });
-    showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url]);
-    perUrlCards.remove();
+    if (format==='html') {
+      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url]);
+    }
   });
+
+  if (format==='csv') {
+    getById('widget').innerHTML = '<pre>' + csv + '</pre>';
+  } else if (format==='json') {
+    getById('widget').innerHTML = '<pre>' + JSON.stringify(json, null, 2) + '</pre>';
+  }
 
   getById('progress').innerHTML = '';
 
@@ -75,18 +106,13 @@ function showUrlResults(counter, eltId, url, count, doctitle) {
   var urlResultsId = `counter_${counter}`;
 
   var output =
-        `
-<h1 id="heading_${urlResultsId}" class="urlHeading">
-
-<a title="collapse" href="javascript:toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
-
-<span class="counter">&nbsp;${count}&nbsp;</span>
-
-<a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
-</h1>
-<div id="cards_${urlResultsId}">
-</div>
-`;
+    `<h1 id="heading_${urlResultsId}" class="urlHeading">
+    <a title="collapse" href="javascript:toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
+    <span class="counter">&nbsp;${count}&nbsp;</span>
+   <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+   </h1>
+   <div id="cards_${urlResultsId}">
+   </div>`;
   getById(eltId).innerHTML += output;
 }
 
@@ -111,72 +137,14 @@ ${document.body.outerHTML}
 
 function downloadCSV() {
   var csvOutput = '"level","updated","url","user","id","group","tags","quote","text"\n';
-  var rows = document.querySelectorAll('.csvRow');
-  rows.forEach(function (row) {
-    csvOutput += `${row.innerText}\n`;
-  });
+  csvOutput += getById('widget').innerText;
   download(csvOutput, 'csv');
 }
 
-function downloadText() {
-  var text = document.body.innerText;
-  download(text, 'txt');
+function downloadJSON() {
+  var jsonOutput = '[' + getById('widget').innerText + ']';
+  download(jsonOutput, 'json');
 }
 
-function collapseAll() {
-  var togglers = document.querySelectorAll('.urlHeading .toggle');
-  togglers.forEach(function (toggler) {
-    setToggleControlCollapse(toggler);
-  });
-  var cards = document.querySelectorAll('.annotationCard');
-  hideCards(cards);
-}
 
-function expandAll() {
-  var togglers = document.querySelectorAll('.urlHeading .toggle');
-  togglers.forEach(function (toggler) {
-    setToggleControlExpand(toggler);
-  });
-  var cards = document.querySelectorAll('.annotationCard');
-  showCards(cards);
-}
 
-function setToggleControlCollapse(toggler) {
-  toggler.innerText = '\u25b6';
-  toggler.title = 'expand';
-}
-
-function setToggleControlExpand(toggler) {
-  toggler.innerText = '\u25bc';
-  toggler.title = 'collapse';
-}
-
-function showCards(cards) {
-  for (var i = 0; i < cards.length; i++) {
-    cards[i].style.display = 'block';
-  }
-}
-
-function hideCards(cards) {
-  for (var i = 0; i < cards.length; i++) {
-    cards[i].style.display = 'none';
-  }
-}
-
-function toggle(id) {
-  var heading = getById('heading_' + id);
-  var toggler = heading.querySelector('.toggle');
-
-  var cardsId = `cards_${id}`;
-  var selector = `#${cardsId} .annotationCard`;
-  var perUrlCards = document.querySelectorAll(selector);
-  var cardsDisplay = perUrlCards[0].style.display;
-
-  if (cardsDisplay === 'block') {
-    setToggleControlCollapse(toggler);
-    hideCards(perUrlCards);
-  } else {
-    setToggleControlExpand(toggler);
-    showCards(perUrlCards);
-  }
-}

@@ -8,6 +8,8 @@ createFacetInputForm(getById('tagContainer'), 'tag', '');
 
 createFacetInputForm(getById('anyContainer'), 'any', 'freetext search');
 
+createFacetInputForm(getById('maxContainer'), 'max', 'max annotations to fetch');
+
 createApiTokenInputForm(getById('tokenContainer'));
 
 ["user", "group", "url", "tag", "any"].forEach(function(facet) {
@@ -16,13 +18,27 @@ createApiTokenInputForm(getById('tokenContainer'));
   }
 });
 
-function search() {
+function getCSV() {
+  search('csv');
+}
+
+function getHTML() {
+  search('html');
+}
+
+function getJSON() {
+  search('json');
+}
+
+function search(format) {
   var params = {
     user: document.querySelector("#userContainer input").value,
     group: getSelectedGroup(),
     url: document.querySelector("#urlContainer input").value,
     tag: document.querySelector("#tagContainer input").value,
-    any: document.querySelector("#anyContainer input").value
+    any: document.querySelector("#anyContainer input").value,
+    max: document.querySelector('#maxContainer input').value,
+    format: format,
   };
   document.title =
     "Hypothesis activity for the query " + JSON.stringify(params);

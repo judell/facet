@@ -3,7 +3,7 @@ self.importScripts('https://jonudell.info/hlib/hlib.js', 'https://jonudell.info/
 self.addEventListener('message', function (e) {
   var output = showAnnotation(e.data.anno, e.data.level);
   self.postMessage({
-    id: e.data.cardId,
+    id: e.data.perUrlId,
     output: output
   });
 });

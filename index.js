@@ -47,10 +47,3 @@ function search(format) {
   document.getElementById("iframe").setAttribute("src", iframeUrl);
 }
 
-function createFacetInputForm(e, facet, msg) {
-  var form = `
-<div class="formLabel">${facet}</div>
-<div class="${facet}Form"><input id="${facet}Form"></input></div>
-<div class="formMessage">${msg}</div>`;
-  e.innerHTML += form;
-}

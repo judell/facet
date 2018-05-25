@@ -12,18 +12,21 @@ worker.addEventListener('message', function (e) {
 var params = decodeURIComponent(gup('params'));
 params = JSON.parse(params);
 
+var widget = getById('widget');
+var controlsContainer = getById('controlsContainer');
+
 var format = params['format'];
 delete params['format'];
 
 if (format==='html') {
-  getById('controlsContainer').innerHTML = 
+  controlsContainer.innerHTML = 
     `<button onclick="expandAll()">expand all</button>
      <button onclick="collapseAll()">collapse all</button>
      <button onclick="downloadHTML()">download HTML</button>`;
 } else if (format==='csv') {
-  getById('controlsContainer').innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
+  controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
 } else {
-  getById('controlsContainer').innerHTML = '<button onclick="downloadJSON()">download JSON</button>';
+  controlsContainerinnerHTML = '<button onclick="downloadJSON()">download JSON</button>';
 }
 
 Object.keys(params).forEach(function(key) {
@@ -89,16 +92,18 @@ function processSearchResults(annos, replies) {
   });
 
   if (format==='csv') {
-    getById('widget').innerHTML = '<pre>' + csv + '</pre>';
+    widget.style['white-space'] = 'pre';
+    widget.innerText = csv;
   } else if (format==='json') {
-    getById('widget').innerHTML = '<pre>' + JSON.stringify(json, null, 2) + '</pre>';
+    widget.style['white-space'] = 'pre';
+    widget.innerText = JSON.stringify(json, null, 2);
   }
 
   getById('progress').innerHTML = '';
 
   setTimeout(function () {
     collapseAll();
-    getById('widget').style.display = 'block';
+    widget.style.display = 'block';
   }, 500)
 }
 
@@ -137,7 +142,7 @@ ${document.body.outerHTML}
 
 function downloadCSV() {
   var csvOutput = '"level","updated","url","user","id","group","tags","quote","text"\n';
-  csvOutput += getById('widget').innerText;
+  csvOutput += widget.innerText;
   download(csvOutput, 'csv');
 }
 

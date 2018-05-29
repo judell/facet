@@ -1,7 +1,7 @@
 var worker = new Worker('showAnnotation.js');
 worker.addEventListener('message', function (e) {
   try {
-    var elt = getById(`cards_counter_${e.data.id}`);
+    var elt = hlib.getById(`cards_counter_${e.data.id}`);
     elt.innerHTML += e.data.output;
   }
   catch (e) {
@@ -9,19 +9,19 @@ worker.addEventListener('message', function (e) {
   }
 });
 
-var params = decodeURIComponent(gup('params'));
+var params = decodeURIComponent(hlib.gup('params'));
 params = JSON.parse(params);
 
-var widget = getById('widget');
-var controlsContainer = getById('controlsContainer');
+var widget = hlib.getById('widget');
+var controlsContainer = hlib.getById('controlsContainer');
 
 var format = params['format'];
 delete params['format'];
 
 if (format==='html') {
   controlsContainer.innerHTML = 
-    `<button onclick="expandAll()">expand all</button>
-     <button onclick="collapseAll()">collapse all</button>
+    `<button onclick="hlib.expandAll()">expand all</button>
+     <button onclick="hlib.collapseAll()">collapse all</button>
      <button onclick="downloadHTML()">download HTML</button>`;
 } else if (format==='csv') {
   controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
@@ -46,12 +46,12 @@ if (nonEmptyParams.length == 0) {
   params.max = 400;
 }
 
-hApiSearch(params, processSearchResults, 'progress');
+hlib.hApiSearch(params, processSearchResults, 'progress');
 
 function processSearchResults(annos, replies) {
   var csv = '';
   var json = [];
-  var gathered = gatherAnnotationsByUrl(annos);
+  var gathered = hlib.gatherAnnotationsByUrl(annos);
   var reversedUrls = reverseChronUrls(gathered.urlUpdates);
   var counter = 0;
   reversedUrls.forEach(function (url) {
@@ -61,7 +61,7 @@ function processSearchResults(annos, replies) {
     var idsForUrl = gathered.ids[url];
     idsForUrl.forEach(function (id) {
       perUrlCount++;
-      var _replies = findRepliesForId(id, replies);
+      var _replies = hlib.findRepliesForId(id, replies);
       var all = [gathered.annos[id]].concat(_replies);
       all.forEach(function (anno) {
         var level = 0;
@@ -77,7 +77,7 @@ function processSearchResults(annos, replies) {
           });
         } else if (format==='csv') {
           var _row = document.createElement('div');
-          _row.innerHTML = csvRow(level, anno);
+          _row.innerHTML = hlib.csvRow(level, anno);
           csv += _row.innerText + '\n';
         } else if (format==='json') {
           anno.text = anno.text.replace(/</g, '&lt;');
@@ -99,10 +99,10 @@ function processSearchResults(annos, replies) {
     widget.innerText = JSON.stringify(json, null, 2);
   }
 
-  getById('progress').innerHTML = '';
+  hlib.getById('progress').innerHTML = '';
 
   setTimeout(function () {
-    collapseAll();
+    hlib.collapseAll();
     widget.style.display = 'block';
   }, 500)
 }
@@ -112,13 +112,13 @@ function showUrlResults(counter, eltId, url, count, doctitle) {
 
   var output =
     `<h1 id="heading_${urlResultsId}" class="urlHeading">
-    <a title="collapse" href="javascript:toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
+    <a title="collapse" href="javascript:hlib.toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
     <span class="counter">&nbsp;${count}&nbsp;</span>
    <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
    </h1>
    <div id="cards_${urlResultsId}">
    </div>`;
-  getById(eltId).innerHTML += output;
+  hlib.getById(eltId).innerHTML += output;
 }
 
 function reverseChronUrls(urlUpdates) {
@@ -137,18 +137,18 @@ function downloadHTML() {
 ${document.head.outerHTML}
 ${document.body.outerHTML}
 </html>`;
-  download(html, 'html');
+  hlib.download(html, 'html');
 }
 
 function downloadCSV() {
-  var csvOutput = '"level","updated","url","user","id","group","tags","quote","text"\n';
+  var csvOutput = '"level","updated","url","user","id","group","tags","quote","text","direct link"\n';
   csvOutput += widget.innerText;
-  download(csvOutput, 'csv');
+  hlib.download(csvOutput, 'csv');
 }
 
 function downloadJSON() {
   var jsonOutput = '[' + getById('widget').innerText + ']';
-  download(jsonOutput, 'json');
+  hlib.download(jsonOutput, 'json');
 }
 
 

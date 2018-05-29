@@ -1,20 +1,20 @@
-createUserInputForm(getById('userContainer'));
+hlib.createUserInputForm(hlib.getById('userContainer'));
 
-createGroupInputForm(getById('groupContainer'));
+hlib.createGroupInputForm(hlib.getById('groupContainer'));
 
-createFacetInputForm(getById('urlContainer'), 'url', 'URL of annotated document');
+hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');
 
-createFacetInputForm(getById('tagContainer'), 'tag', '');
+hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '');
 
-createFacetInputForm(getById('anyContainer'), 'any', 'freetext search');
+hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search');
 
-createFacetInputForm(getById('maxContainer'), 'max', 'max annotations to fetch');
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch');
 
-createApiTokenInputForm(getById('tokenContainer'));
+hlib.createApiTokenInputForm(hlib.getById('tokenContainer'));
 
 ["user", "group", "url", "tag", "any"].forEach(function(facet) {
-  if (gup(facet) !== "") {
-    document.querySelector(`#${facet}Container input`).value = gup(facet);
+  if (hlib.gup(facet) !== "") {
+    document.querySelector(`#${facet}Container input`).value = hlib.gup(facet);
   }
 });
 
@@ -33,7 +33,7 @@ function getJSON() {
 function search(format) {
   var params = {
     user: document.querySelector("#userContainer input").value,
-    group: getSelectedGroup(),
+    group: hlib.getSelectedGroup(),
     url: document.querySelector("#urlContainer input").value,
     tag: document.querySelector("#tagContainer input").value,
     any: document.querySelector("#anyContainer input").value,

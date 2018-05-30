@@ -91,6 +91,7 @@ function processSearchResults (annos, replies) {
 
   if (format === 'csv') {
     widget.style['white-space'] = 'pre'
+    widget.style['overflow-x'] = 'scroll'
     widget.innerText = csv
   } else if (format === 'json') {
     widget.style['white-space'] = 'pre'

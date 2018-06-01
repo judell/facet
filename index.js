@@ -10,13 +10,14 @@ hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search'
 
 hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch')
 
-hlib
-    .createApiTokenInputForm(hlib.getById('tokenContainer'))[('user', 'group', 'url', 'tag', 'any')]
-    .forEach(function (facet) {
-      if (hlib.gup(facet) !== '') {
-        document.querySelector(`#${facet}Container input`).value = hlib.gup(facet)
-      }
-    })
+hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
+
+let facets = ['user', 'group', 'url', 'tag', 'any']
+facets.forEach(facet => {
+  if (hlib.gup(facet) !== '') {
+    document.querySelector(`#${facet}Container input`).value = hlib.gup(facet)
+  }
+})
 
 function getCSV () {
   search('csv')

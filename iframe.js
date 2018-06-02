@@ -1,4 +1,4 @@
-// import * as hlib from '../../hlib/hlib';
+// import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
 var worker = new Worker('showAnnotation.js');
 worker.addEventListener('message', function (e) {
     try {
@@ -24,7 +24,7 @@ else if (format === 'csv') {
     controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
 }
 else {
-    controlsContainerinnerHTML = '<button onclick="downloadJSON()">download JSON</button>';
+    controlsContainer.innerHTML = '<button onclick="downloadJSON()">download JSON</button>';
 }
 Object.keys(params).forEach(function (key) {
     if (params[key] === '') {
@@ -133,6 +133,6 @@ function downloadCSV() {
     hlib.download(csvOutput, 'csv');
 }
 function downloadJSON() {
-    var jsonOutput = '[' + getById('widget').innerText + ']';
+    var jsonOutput = '[' + widget.innerText + ']';
     hlib.download(jsonOutput, 'json');
 }

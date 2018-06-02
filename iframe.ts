@@ -1,4 +1,4 @@
-import * as hlib from '../../hlib/hlib'
+import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
 var worker = new Worker('showAnnotation.js')
 worker.addEventListener('message', function (e) {

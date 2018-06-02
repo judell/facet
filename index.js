@@ -1,4 +1,4 @@
-// import * as hlib from '../../hlib/hlib';
+// import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
 hlib.createUserInputForm(hlib.getById('userContainer'));
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');

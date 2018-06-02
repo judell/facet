@@ -1,5 +1,3 @@
-# -*- coding: <encoding name> -*-
-
 filenames = [
     'index.html',
     'iframe.html',

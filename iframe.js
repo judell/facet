@@ -146,6 +146,6 @@ function downloadCSV () {
 }
 
 function downloadJSON () {
-  var jsonOutput = '[' + getById('widget').innerText + ']'
+  var jsonOutput = '[' + widget.innerText + ']'
   hlib.download(jsonOutput, 'json')
 }

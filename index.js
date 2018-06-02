@@ -1,4 +1,4 @@
-//import * as hlib from '../../hlib/hlib';
+// import * as hlib from '../../hlib/hlib';
 hlib.createUserInputForm(hlib.getById('userContainer'));
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');

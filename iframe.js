@@ -24,7 +24,7 @@ if (format === 'html') {
 } else if (format === 'csv') {
   controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>'
 } else {
-  controlsContainerinnerHTML = '<button onclick="downloadJSON()">download JSON</button>'
+  controlsContainer.innerHTML = '<button onclick="downloadJSON()">download JSON</button>'
 }
 
 Object.keys(params).forEach(function (key) {

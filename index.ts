@@ -34,18 +34,23 @@ function getJSON () {
   search('json')
 }
 
-function search (format) {
-  var params = {
-    user: document.querySelector('#userContainer input').value,
+function inputQuerySelector(query:string) : HTMLInputElement {
+  return document.querySelector(query) as HTMLInputElement
+}
+
+
+function search (format:string) {
+  let params:any = {
+    user: inputQuerySelector('#userContainer input').value,
     group: hlib.getSelectedGroup(),
-    url: document.querySelector('#urlContainer input').value,
-    tag: document.querySelector('#tagContainer input').value,
-    any: document.querySelector('#anyContainer input').value,
-    max: document.querySelector('#maxContainer input').value,
+    url: inputQuerySelector('#urlContainer input').value,
+    tag: inputQuerySelector('#tagContainer input').value,
+    any: inputQuerySelector('#anyContainer input').value,
+    max: inputQuerySelector('#maxContainer input').value,
     format: format
   }
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))
   var iframeUrl = `iframe.html?params=${params}`
-  document.getElementById('iframe').setAttribute('src', iframeUrl)
+  hlib.getById('iframe').setAttribute('src', iframeUrl)
 }

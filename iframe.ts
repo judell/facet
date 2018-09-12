@@ -38,9 +38,7 @@ Object.keys(params).forEach(function (key) {
   }
 })
 
-document.getElementById(
-    'title'
-).innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`
+hlib.getById('title').innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`
 
 var nonEmptyParams = Object.values(params).filter(x => x != '')
 if (nonEmptyParams.length == 0) {
@@ -49,26 +47,26 @@ if (nonEmptyParams.length == 0) {
 
 hlib.hApiSearch(params, processSearchResults, 'progress')
 
-function processSearchResults (annos, replies) {
-  var csv = ''
-  var json = []
-  var gathered = hlib.gatherAnnotationsByUrl(annos)
-  var reversedUrls = reverseChronUrls(gathered.urlUpdates)
-  var counter = 0
+function processSearchResults (annos:any[], replies:any[]) {
+  let csv = ''
+  let json:any[] = []
+  let gathered = hlib.gatherAnnotationsByUrl(annos)
+  let reversedUrls = reverseChronUrls(gathered.urlUpdates)
+  let counter = 0
   reversedUrls.forEach(function (url) {
     counter++
-    var perUrlId = counter
-    var perUrlCount = 0
-    var idsForUrl = gathered.ids[url]
+    let perUrlId = counter
+    let perUrlCount = 0
+    let idsForUrl = gathered.ids[url]
     idsForUrl.forEach(function (id) {
       perUrlCount++
-      var _replies = hlib.findRepliesForId(id, replies)
+      let _replies = hlib.findRepliesForId(id, replies)
       _replies = _replies.map( r => {
         return hlib.parseAnnotation(r)
       })
-      var all = [gathered.annos[id]].concat(_replies.reverse())
+      let all = [gathered.annos[id]].concat(_replies.reverse())
       all.forEach(function (anno) {
-        var level = 0
+        let level = 0
         if (anno.refs) {
           level = anno.refs.length
         }
@@ -80,7 +78,7 @@ function processSearchResults (annos, replies) {
             level: level
           })
         } else if (format === 'csv') {
-          var _row = document.createElement('div')
+          let _row = document.createElement('div')
           _row.innerHTML = hlib.csvRow(level, anno)
           csv += _row.innerText + '\n'
         } else if (format === 'json') {
@@ -95,11 +93,11 @@ function processSearchResults (annos, replies) {
   })
 
   if (format === 'csv') {
-    widget.style['white-space'] = 'pre'
-    widget.style['overflow-x'] = 'scroll'
+    widget.style.whiteSpace = 'pre'
+    widget.style.overflowX = 'scroll'
     widget.innerText = csv
   } else if (format === 'json') {
-    widget.style['white-space'] = 'pre'
+    widget.style.whiteSpace = 'pre'
     widget.innerText = JSON.stringify(json, null, 2)
   }
 
@@ -111,7 +109,7 @@ function processSearchResults (annos, replies) {
   }, 500)
 }
 
-function showUrlResults (counter, eltId, url, count, doctitle) {
+function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string) {
   var urlResultsId = `counter_${counter}`
 
   var output = `<h1 id="heading_${urlResultsId}" class="urlHeading">
@@ -124,13 +122,13 @@ function showUrlResults (counter, eltId, url, count, doctitle) {
   hlib.getById(eltId).innerHTML += output
 }
 
-function reverseChronUrls (urlUpdates) {
+function reverseChronUrls (urlUpdates:any) {
   var reverseChronUrls = []
   for (var urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
     reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
   }
-  reverseChronUrls.sort(function (a, b) {
-    return new Date(b[1]) - new Date(a[1])
+  reverseChronUrls.sort(function (a:string[], b:string[]) {
+    return new Date(b[1]).getTime() - new Date(a[1]).getTime()
   })
   return reverseChronUrls.map(item => item[0])
 }

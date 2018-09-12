@@ -63,7 +63,10 @@ function processSearchResults (annos, replies) {
     idsForUrl.forEach(function (id) {
       perUrlCount++
       var _replies = hlib.findRepliesForId(id, replies)
-      var all = [gathered.annos[id]].concat(_replies)
+      _replies = _replies.map( r => {
+        return hlib.parseAnnotation(r)
+      })
+      var all = [gathered.annos[id]].concat(_replies.reverse())
       all.forEach(function (anno) {
         var level = 0
         if (anno.refs) {

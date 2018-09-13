@@ -17,12 +17,12 @@
   <form autocomplete="off">
     <div class="formContainer">
       <div class="formField" id="userContainer"></div>
+      <div class="formField" id="tokenContainer"></div>
       <div class="formField" id="groupContainer"></div>
       <div class="formField" id="urlContainer"></div>
       <div class="formField" id="tagContainer"></div>
       <div class="formField" id="anyContainer"></div>
       <div class="formField" id="maxContainer"></div>
-      <div class="formField" id="tokenContainer"></div>
     </div>
   </form>
 
@@ -33,6 +33,15 @@
   </div>
 
   <script src="./index.js"></script>
+
+  <script>
+    setTimeout( _ => {
+      let token = hlib.getToken()
+      if (token) {
+        hlib.getById('tokenContainer').style.display = 'none'
+      }
+    }, 500)
+  </script>  
 
 </body>
 

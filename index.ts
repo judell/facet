@@ -6,6 +6,9 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
 
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document')
 
+hlib.createFacetInputForm(hlib.getById('wildcardUriContainer'), 'wildcard_uri', 
+  'see <a target="_hdoc" href="https://h.readthedocs.io/en/latest/api-reference/#operation/search">API doc</a>')
+
 hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
 
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search')
@@ -14,7 +17,7 @@ hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations 
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
-let facets = ['user', 'group', 'url', 'tag', 'any']
+let facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
 facets.forEach(facet => {
   if (hlib.gup(facet) !== '') {
     let inputElement = document.querySelector(`#${facet}Container input`) as HTMLInputElement
@@ -44,6 +47,7 @@ function search (format:string) {
     user: inputQuerySelector('#userContainer input').value,
     group: hlib.getSelectedGroup(),
     url: inputQuerySelector('#urlContainer input').value,
+    wildcard_uri: inputQuerySelector('#wildcardUriContainer input').value,
     tag: inputQuerySelector('#tagContainer input').value,
     any: inputQuerySelector('#anyContainer input').value,
     max: inputQuerySelector('#maxContainer input').value,

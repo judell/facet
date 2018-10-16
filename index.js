@@ -2,11 +2,12 @@
 hlib.createUserInputForm(hlib.getById('userContainer'));
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');
+hlib.createFacetInputForm(hlib.getById('wildcardUriContainer'), 'wildcard_uri', 'see <a target="_hdoc" href="https://h.readthedocs.io/en/latest/api-reference/#operation/search">API doc</a>');
 hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '');
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search');
 hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch');
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'));
-let facets = ['user', 'group', 'url', 'tag', 'any'];
+let facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any'];
 facets.forEach(facet => {
     if (hlib.gup(facet) !== '') {
         let inputElement = document.querySelector(`#${facet}Container input`);
@@ -22,18 +23,22 @@ function getHTML() {
 function getJSON() {
     search('json');
 }
+function inputQuerySelector(query) {
+    return document.querySelector(query);
+}
 function search(format) {
-    var params = {
-        user: document.querySelector('#userContainer input').value,
+    let params = {
+        user: inputQuerySelector('#userContainer input').value,
         group: hlib.getSelectedGroup(),
-        url: document.querySelector('#urlContainer input').value,
-        tag: document.querySelector('#tagContainer input').value,
-        any: document.querySelector('#anyContainer input').value,
-        max: document.querySelector('#maxContainer input').value,
+        url: inputQuerySelector('#urlContainer input').value,
+        wildcard_uri: inputQuerySelector('#wildcardUriContainer input').value,
+        tag: inputQuerySelector('#tagContainer input').value,
+        any: inputQuerySelector('#anyContainer input').value,
+        max: inputQuerySelector('#maxContainer input').value,
         format: format
     };
     document.title = 'Hypothesis activity for the query ' + JSON.stringify(params);
     params = encodeURIComponent(JSON.stringify(params));
     var iframeUrl = `iframe.html?params=${params}`;
-    document.getElementById('iframe').setAttribute('src', iframeUrl);
+    hlib.getById('iframe').setAttribute('src', iframeUrl);
 }

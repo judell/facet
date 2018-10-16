@@ -18,11 +18,13 @@ delete params['format'];
 if (format === 'html') {
     controlsContainer.innerHTML = `<button onclick="hlib.expandAll()">expand all</button>
      <button onclick="hlib.collapseAll()">collapse all</button>
-     <button onclick="downloadHTML()">download HTML</button>`
-} else if (format === 'csv') {
-  controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>'
-} else {
-  controlsContainer.innerHTML = '<button onclick="downloadJSON()">download JSON</button>'
+     <button onclick="downloadHTML()">download HTML</button>`;
+}
+else if (format === 'csv') {
+    controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>';
+}
+else {
+    controlsContainer.innerHTML = '<button onclick="downloadJSON()">download JSON</button>';
 }
 Object.keys(params).forEach(function (key) {
     if (params[key] === '') {
@@ -32,29 +34,32 @@ Object.keys(params).forEach(function (key) {
         delete params['group'];
     }
 });
-document.getElementById('title').innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`;
+hlib.getById('title').innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`;
 var nonEmptyParams = Object.values(params).filter(x => x != '');
 if (nonEmptyParams.length == 0) {
     params.max = 400;
 }
 hlib.hApiSearch(params, processSearchResults, 'progress');
 function processSearchResults(annos, replies) {
-    var csv = '';
-    var json = [];
-    var gathered = hlib.gatherAnnotationsByUrl(annos);
-    var reversedUrls = reverseChronUrls(gathered.urlUpdates);
-    var counter = 0;
+    let csv = '';
+    let json = [];
+    let gathered = hlib.gatherAnnotationsByUrl(annos);
+    let reversedUrls = reverseChronUrls(gathered.urlUpdates);
+    let counter = 0;
     reversedUrls.forEach(function (url) {
         counter++;
-        var perUrlId = counter;
-        var perUrlCount = 0;
-        var idsForUrl = gathered.ids[url];
+        let perUrlId = counter;
+        let perUrlCount = 0;
+        let idsForUrl = gathered.ids[url];
         idsForUrl.forEach(function (id) {
             perUrlCount++;
-            var _replies = hlib.findRepliesForId(id, replies);
-            var all = [gathered.annos[id]].concat(_replies);
+            let _replies = hlib.findRepliesForId(id, replies);
+            _replies = _replies.map(r => {
+                return hlib.parseAnnotation(r);
+            });
+            let all = [gathered.annos[id]].concat(_replies.reverse());
             all.forEach(function (anno) {
-                var level = 0;
+                let level = 0;
                 if (anno.refs) {
                     level = anno.refs.length;
                 }
@@ -67,7 +72,7 @@ function processSearchResults(annos, replies) {
                     });
                 }
                 else if (format === 'csv') {
-                    var _row = document.createElement('div');
+                    let _row = document.createElement('div');
                     _row.innerHTML = hlib.csvRow(level, anno);
                     csv += _row.innerText + '\n';
                 }
@@ -82,12 +87,12 @@ function processSearchResults(annos, replies) {
         }
     });
     if (format === 'csv') {
-        widget.style['white-space'] = 'pre';
-        widget.style['overflow-x'] = 'scroll';
+        widget.style.whiteSpace = 'pre';
+        widget.style.overflowX = 'scroll';
         widget.innerText = csv;
     }
     else if (format === 'json') {
-        widget.style['white-space'] = 'pre';
+        widget.style.whiteSpace = 'pre';
         widget.innerText = JSON.stringify(json, null, 2);
     }
     hlib.getById('progress').innerHTML = '';
@@ -109,11 +114,11 @@ function showUrlResults(counter, eltId, url, count, doctitle) {
 }
 function reverseChronUrls(urlUpdates) {
     var reverseChronUrls = [];
-    for (var urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
+    for (var urlUpdate in urlUpdates) {
         reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]]);
     }
     reverseChronUrls.sort(function (a, b) {
-        return new Date(b[1]) - new Date(a[1]);
+        return new Date(b[1]).getTime() - new Date(a[1]).getTime();
     });
     return reverseChronUrls.map(item => item[0]);
 }
@@ -130,8 +135,7 @@ function downloadCSV() {
     csvOutput += widget.innerText;
     hlib.download(csvOutput, 'csv');
 }
-
-function downloadJSON () {
-  var jsonOutput = '[' + widget.innerText + ']'
-  hlib.download(jsonOutput, 'json')
+function downloadJSON() {
+    var jsonOutput = '[' + widget.innerText + ']';
+    hlib.download(jsonOutput, 'json');
 }

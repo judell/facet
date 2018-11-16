@@ -5,11 +5,25 @@
   <title>View and export Hypothesis annotations</title>
   <link rel="stylesheet" href="https://jonudell.info/hlib/hlib.css">
   <script src="https://jonudell.info/hlib/hlib.bundle.js" charset="utf-8"></script> 
-
+  <style>
+    body {
+      margin-top:0;
+    }
+    .help {
+      font-size:smaller;
+    }
+  </style>
 </head>
 
 <body>
-
+  <p class="help">
+    Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them 
+    in one of those formats. Fill in one or more <i>facets</i> to filter results. The facets are 
+    <b>username</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. If you need more 
+    than 400 results, set <b>max</b> to a larger number. If you just click a button without specifying
+    any facets other than the default group Public, you'll get the most recent 400 Hypothesis annotations
+    in the Public group.
+  </p>
   <iframe id="iframe" style="margin-left:20px;width:70%;height:2000px;float:right;" src=""></iframe>
 
   <div id="menu"></div>

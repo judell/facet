@@ -1,5 +1,5 @@
-// import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
-hlib.createUserInputForm(hlib.getById('userContainer'), 'Not need for authentication, use only as a search term');
+import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
+hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term');
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');
 hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://nytimes.com/*');

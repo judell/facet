@@ -1,6 +1,6 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-hlib.createUserInputForm(hlib.getById('userContainer'), 'Not need for authentication, use only as a search term')
+hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term')
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
 

@@ -1,5 +1,5 @@
 // import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
-hlib.createUserInputForm(hlib.getById('userContainer'));
+hlib.createUserInputForm(hlib.getById('userContainer'), 'Not need for authentication, use only as a search term');
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');
 hlib.createFacetInputForm(hlib.getById('wildcardUriContainer'), 'wildcard_uri', 'see <a target="_hdoc" href="https://h.readthedocs.io/en/latest/api-reference/#operation/search">API doc</a>');

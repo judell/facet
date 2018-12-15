@@ -6,8 +6,7 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
 
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document')
 
-hlib.createFacetInputForm(hlib.getById('wildcardUriContainer'), 'wildcard_uri', 
-  'see <a target="_hdoc" href="https://h.readthedocs.io/en/latest/api-reference/#operation/search">API doc</a>')
+hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://nytimes.com/*')
 
 hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
 
@@ -47,7 +46,7 @@ function search (format:string) {
     user: inputQuerySelector('#userContainer input').value,
     group: hlib.getSelectedGroup(),
     url: inputQuerySelector('#urlContainer input').value,
-    wildcard_uri: inputQuerySelector('#wildcardUriContainer input').value,
+    wildcard_uri: inputQuerySelector('#wildcard_uriContainer input').value,
     tag: inputQuerySelector('#tagContainer input').value,
     any: inputQuerySelector('#anyContainer input').value,
     max: inputQuerySelector('#maxContainer input').value,

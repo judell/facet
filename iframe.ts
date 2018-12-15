@@ -58,7 +58,7 @@ function processSearchResults (annos:any[], replies:any[]) {
     let perUrlId = counter
     let perUrlCount = 0
     let idsForUrl = gathered.ids[url]
-    idsForUrl.forEach(function (id) {
+    idsForUrl.forEach(function (id:string) {
       perUrlCount++
       let _replies = hlib.findRepliesForId(id, replies)
       _replies = _replies.map( r => {

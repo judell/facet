@@ -4,59 +4,84 @@
 <head>
   <title>View and export Hypothesis annotations</title>
   <link rel="stylesheet" href="https://jonudell.info/hlib/hlib.css">
-  <script src="https://jonudell.info/hlib/hlib.bundle.js" charset="utf-8"></script> 
+  <script src="https://jonudell.info/hlib/hlib.bundle.js" charset="utf-8"></script>
   <style>
     body {
-      margin-top:0;
+      margin-top: 0;
+    }
+    #container {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+    }
+    #formsContainer {
+      width: 30%;
+    }
+    #iframeContainer {
+      width: 100%;
+      margin-left: 40px;
+    }
+    #iframe {
+      width: 100%;
+      height: 100%;
     }
     .help {
-      font-size:smaller;
+      font-size: smaller;
     }
   </style>
 </head>
 
 <body>
   <p class="help">
-    Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them 
-    in one of those formats. Fill in one or more <i>facets</i> to filter results. The facets are 
-    <b>username</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. If you need more 
-    than 400 results, set <b>max</b> to a larger number. If you specify no facets other than the 
-    default group Public, you'll get the most recent 400 Hypothesis annotations in the Public group. 
+    Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them
+    in one of those formats. Fill in one or more <i>facets</i> to filter results. The facets are
+    <b>username</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. If you need more
+    than 400 results, set <b>max</b> to a larger number. If you specify no facets other than the
+    default group Public, you'll get the most recent 400 Hypothesis annotations in the Public group.
   </p>
-  <iframe id="iframe" style="margin-left:20px;width:70%;height:2000px;float:right;" src=""></iframe>
 
-  <div id="menu"></div>
+  <div id="container">
 
-  <form autocomplete="off">
-    <div class="formContainer">
-      <div class="formField" id="userContainer"></div>
-      <div class="formField" id="tokenContainer"></div>
-      <div class="formField" id="groupContainer"></div>
-      <div class="formField" id="urlContainer"></div>
-      <div class="formField" id="wildcard_uriContainer"></div>
-      <div class="formField" id="tagContainer"></div>
-      <div class="formField" id="anyContainer"></div>
-      <div class="formField" id="maxContainer"></div>
+    <div id="formsContainer">
+
+      <form autocomplete="off">
+        <div class="formContainer">
+          <div class="formField" id="userContainer"></div>
+          <div class="formField" id="tokenContainer"></div>
+          <div class="formField" id="groupContainer"></div>
+          <div class="formField" id="urlContainer"></div>
+          <div class="formField" id="wildcard_uriContainer"></div>
+          <div class="formField" id="tagContainer"></div>
+          <div class="formField" id="anyContainer"></div>
+          <div class="formField" id="maxContainer"></div>
+        </div>
+      </form>
+
+      <div>
+        <button id="buttonHTML" title="view or download search results as HTML" onclick="getHTML()">HTML</button>
+        <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
+        <button title="view or download search results as JSON" onclick="getJSON()">JSON</button>
+      </div>
     </div>
-  </form>
 
-  <div>
-    <button id="buttonHTML" title="view or download search results as HTML" onclick="getHTML()">HTML</button>
-    <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
-    <button title="view or download search results as JSON" onclick="getJSON()">JSON</button>
+    <div id="iframeContainer">
+      <iframe id="iframe" src=""></iframe>
+    </div>
+
   </div>
+
 
   <script src="./index.js"></script>
 
   <script>
-    setTimeout( _ => {
+    setTimeout(_ => {
       let token = hlib.getToken()
       if (token) {
         hlib.getById('tokenContainer').style.display = 'none'
         hlib.getById('buttonHTML').click()
       }
     }, 500)
-  </script>  
+  </script>
 
 </body>
 

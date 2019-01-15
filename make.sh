@@ -25,8 +25,6 @@ python comment-out-imports.py
 
 if [ $1 = "dev" ]; then
   python use-debug-lib.py
-fi
-
-if [ $1 = 'prd' ]; then
+else
   python use-production-lib.py
 fi

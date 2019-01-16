@@ -43,7 +43,18 @@ hlib.search(params, 'progress')
     .then(data => {
     processSearchResults(data[0], data[1]);
 });
+function exactTagSearch(annos) {
+    if (params.exactTagSearch === 'false') {
+        console.log('no exact');
+        return annos;
+    }
+    else {
+        console.log('exact');
+        return annos;
+    }
+}
 function processSearchResults(annos, replies) {
+    annos = exactTagSearch(annos);
     let csv = '';
     let json = [];
     let gathered = hlib.gatherAnnotationsByUrl(annos);

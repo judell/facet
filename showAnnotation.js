@@ -6,6 +6,5 @@ self.addEventListener('message', function (e) {
     id: e.data.perUrlId,
     output: output
   }
-  console.log('worker responding', e.data.anno.id)
   self.postMessage(payload);
 });

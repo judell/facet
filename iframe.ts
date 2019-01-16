@@ -50,7 +50,16 @@ hlib.search(params, 'progress')
     processSearchResults(data[0], data[1])
   })
 
+function exactTagSearch(annos:any[])  {
+  if (params.exactTagSearch==='false') {
+    return annos
+  } else {
+    return annos
+  }
+}
+
 function processSearchResults (annos:any[], replies:any[]) {
+  annos = exactTagSearch(annos)
   let csv = ''
   let json:any[] = []
   let gathered = hlib.gatherAnnotationsByUrl(annos)

@@ -54,37 +54,38 @@ function processSearchResults(annos, replies) {
         let perUrlId = counter;
         let perUrlCount = 0;
         let idsForUrl = gathered.ids[url];
-        idsForUrl.forEach(function (id) {
+        idsForUrl.forEach(idForUrl => {
             perUrlCount++;
             let _replies = replies;
             if (params._separate_replies === 'true') {
-                _replies = hlib.findRepliesForId(id, replies);
+                _replies = hlib.findRepliesForId(idForUrl, replies);
                 _replies = _replies.map(r => {
                     return hlib.parseAnnotation(r);
                 });
             }
-            let all = [gathered.annos[id]].concat(_replies.reverse());
-            all.forEach(function (anno) {
-                let level = 0;
-                if (anno.refs) {
-                    level = anno.refs.length;
-                }
-                if (format === 'html') {
-                    worker.postMessage({
-                        perUrlId: perUrlId,
-                        anno: anno,
-                        annoId: anno.id,
-                        level: level
-                    });
-                }
-                else if (format === 'csv') {
-                    let _row = document.createElement('div');
-                    _row.innerHTML = hlib.csvRow(level, anno);
-                    csv += _row.innerText + '\n';
-                }
-                else if (format === 'json') {
-                    anno.text = anno.text.replace(/</g, '&lt;');
-                    json.push(anno);
+            let all = [gathered.annos[idForUrl]].concat(_replies.reverse());
+            all.forEach(anno => {
+                {
+                    let level = params._separate_replies === 'false' ? 0 : anno.refs.length;
+                    if (format === 'html') {
+                        let payload = {
+                            perUrlId: perUrlId,
+                            anno: anno,
+                            annoId: anno.id,
+                            level: level
+                        };
+                        console.log('iframe calling', anno.id);
+                        worker.postMessage(payload);
+                    }
+                    else if (format === 'csv') {
+                        let _row = document.createElement('div');
+                        _row.innerHTML = hlib.csvRow(level, anno);
+                        csv += _row.innerText + '\n';
+                    }
+                    else if (format === 'json') {
+                        anno.text = anno.text.replace(/</g, '&lt;');
+                        json.push(anno);
+                    }
                 }
             });
         });

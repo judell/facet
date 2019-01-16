@@ -28,7 +28,7 @@ function inputQuerySelector(query) {
 }
 function search(format) {
     let repliesOnlyCheckbox = hlib.getById('searchReplies');
-    //let exactTagSearch = hlib.getById('exactTagSearch') as HTMLInputElement
+    let exactTagSearch = hlib.getById('exactTagSearch');
     let params = {
         user: inputQuerySelector('#userContainer input').value,
         group: hlib.getSelectedGroup(),
@@ -39,6 +39,7 @@ function search(format) {
         max: inputQuerySelector('#maxContainer input').value,
         format: format,
         _separate_replies: repliesOnlyCheckbox.checked ? 'false' : 'true',
+        exactTagSearch: exactTagSearch.checked ? 'true' : 'false'
     };
     document.title = 'Hypothesis activity for the query ' + JSON.stringify(params);
     params = encodeURIComponent(JSON.stringify(params));

@@ -42,7 +42,7 @@ function inputQuerySelector(query:string) : HTMLInputElement {
 
 
 function search (format:string) {
-  let repliesOnlyCheckbox = hlib.getById('repliesOnly') as HTMLInputElement
+  let repliesOnlyCheckbox = hlib.getById('searchReplies') as HTMLInputElement
   let params:any = {
     user: inputQuerySelector('#userContainer input').value,
     group: hlib.getSelectedGroup(),

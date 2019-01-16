@@ -27,7 +27,7 @@ function inputQuerySelector(query) {
     return document.querySelector(query);
 }
 function search(format) {
-    let repliesOnlyCheckbox = hlib.getById('repliesOnly');
+    let repliesOnlyCheckbox = hlib.getById('searchReplies');
     let params = {
         user: inputQuerySelector('#userContainer input').value,
         group: hlib.getSelectedGroup(),

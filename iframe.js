@@ -74,7 +74,6 @@ function processSearchResults(annos, replies) {
                             annoId: anno.id,
                             level: level
                         };
-                        console.log('iframe calling', anno.id);
                         worker.postMessage(payload);
                     }
                     else if (format === 'csv') {

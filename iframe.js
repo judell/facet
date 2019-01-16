@@ -45,11 +45,9 @@ hlib.search(params, 'progress')
 });
 function exactTagSearch(annos) {
     if (params.exactTagSearch === 'false') {
-        console.log('no exact');
         return annos;
     }
     else {
-        console.log('exact');
         return annos;
     }
 }

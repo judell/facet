@@ -1,11 +1,11 @@
-import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
+// import * as hlib from '../../hlib/hlib'; // this will be commented out in the shipping bundle
 hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term');
 hlib.createGroupInputForm(hlib.getById('groupContainer'));
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document');
 hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://nytimes.com/*');
 hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '');
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search');
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch');
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '100');
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'));
 let facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any'];
 facets.forEach(facet => {
@@ -27,6 +27,7 @@ function inputQuerySelector(query) {
     return document.querySelector(query);
 }
 function search(format) {
+    let repliesOnlyCheckbox = hlib.getById('repliesOnly');
     let params = {
         user: inputQuerySelector('#userContainer input').value,
         group: hlib.getSelectedGroup(),
@@ -35,7 +36,8 @@ function search(format) {
         tag: inputQuerySelector('#tagContainer input').value,
         any: inputQuerySelector('#anyContainer input').value,
         max: inputQuerySelector('#maxContainer input').value,
-        format: format
+        format: format,
+        _separate_replies: repliesOnlyCheckbox.checked ? 'false' : 'true'
     };
     document.title = 'Hypothesis activity for the query ' + JSON.stringify(params);
     params = encodeURIComponent(JSON.stringify(params));

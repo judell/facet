@@ -37,9 +37,12 @@ Object.keys(params).forEach(function (key) {
 hlib.getById('title').innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`;
 var nonEmptyParams = Object.values(params).filter(x => x != '');
 if (nonEmptyParams.length == 0) {
-    params.max = 400;
+    params.max = 100;
 }
-hlib.hApiSearch(params, processSearchResults, 'progress');
+hlib.search(params, 'progress')
+    .then(data => {
+    processSearchResults(data[0], data[1]);
+});
 function processSearchResults(annos, replies) {
     let csv = '';
     let json = [];
@@ -53,10 +56,13 @@ function processSearchResults(annos, replies) {
         let idsForUrl = gathered.ids[url];
         idsForUrl.forEach(function (id) {
             perUrlCount++;
-            let _replies = hlib.findRepliesForId(id, replies);
-            _replies = _replies.map(r => {
-                return hlib.parseAnnotation(r);
-            });
+            let _replies = replies;
+            if (params._separate_replies === 'true') {
+                _replies = hlib.findRepliesForId(id, replies);
+                _replies = _replies.map(r => {
+                    return hlib.parseAnnotation(r);
+                });
+            }
             let all = [gathered.annos[id]].concat(_replies.reverse());
             all.forEach(function (anno) {
                 let level = 0;

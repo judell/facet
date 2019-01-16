@@ -1,4 +1,4 @@
-self.importScripts('https://jonudell.info/hlib/hlib.bundle.js', 'https://jonudell.info/hlib/showdown.js');
+self.importScripts('http://10.0.0.9:8000/hlib.bundle.js', 'https://jonudell.info/hlib/showdown.js');
 
 self.addEventListener('message', function (e) {
   var output = hlib.showAnnotation(e.data.anno, e.data.level);

@@ -1,7 +1,6 @@
 filenames = [
     'index.html',
     'iframe.html',
-    'showAnnotation.js'
 ]
 
 for filename in filenames: 

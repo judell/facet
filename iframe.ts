@@ -55,30 +55,9 @@ function processSearchResults (annos:any[], replies:any[]) {
   let gathered = hlib.gatherAnnotationsByUrl(annos)
   let reversedUrls = reverseChronUrls(gathered.urlUpdates)
   let counter = 0
-  reversedUrls.forEach(function (url) {
-    counter++
-    let perUrlCount = gathered.urls[url]
-    let idsForUrl:string[] = gathered.ids[url]
-    if (format === 'html') {
-      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
-    }    
-    idsForUrl.forEach( idForUrl => {
-      let _replies = handleSeparateReplies(idForUrl);
-      let all = [gathered.annos[idForUrl]].concat(_replies.reverse())
-      all.forEach( anno => { 
-        let level = params._separate_replies==='false' ? 0 : anno.refs.length
-        if (format === 'html') {
-          hlib.getById(`cards_counter_${counter}`).innerHTML += hlib.showAnnotation(anno, level)
-        } else if (format === 'csv') {
-          let _row = document.createElement('div')
-          _row.innerHTML = hlib.csvRow(level, anno)
-          csv += _row.innerText + '\n'
-        } else if (format === 'json') {
-          anno.text = anno.text.replace(/</g, '&lt;')
-          json.push(anno)
-        }
-      })
-    })
+  
+  reversedUrls.forEach(url => {
+    renderCardsForUrl(url)
   })
 
   if (format === 'csv') {
@@ -96,6 +75,34 @@ function processSearchResults (annos:any[], replies:any[]) {
     hlib.collapseAll()
     widget.style.display = 'block'
   }, 500)
+
+  function renderCardsForUrl(url: any) {
+    counter++;
+    let perUrlCount = gathered.urls[url];
+    let idsForUrl: string[] = gathered.ids[url];
+    if (format === 'html') {
+      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url]);
+    }
+    idsForUrl.forEach(idForUrl => {
+      let _replies = handleSeparateReplies(idForUrl);
+      let all = [gathered.annos[idForUrl]].concat(_replies.reverse());
+      all.forEach(anno => {
+        let level = params._separate_replies === 'false' ? 0 : anno.refs.length;
+        if (format === 'html') {
+          hlib.getById(`cards_counter_${counter}`).innerHTML += hlib.showAnnotation(anno, level);
+        }
+        else if (format === 'csv') {
+          let _row = document.createElement('div');
+          _row.innerHTML = hlib.csvRow(level, anno);
+          csv += _row.innerText + '\n';
+        }
+        else if (format === 'json') {
+          anno.text = anno.text.replace(/</g, '&lt;');
+          json.push(anno);
+        }
+      });
+    });
+  }
 
   function handleSeparateReplies(idForUrl: string) {
     let _replies = replies;

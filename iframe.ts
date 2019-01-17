@@ -1,15 +1,5 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-var worker = new Worker('showAnnotation.js')
-worker.addEventListener('message', function (e) {
-  try {
-    var elt = hlib.getById(`cards_counter_${e.data.id}`)
-    elt.innerHTML += e.data.output
-  } catch (e) {
-    console.log(e)
-  }
-})
-
 var params:any = decodeURIComponent(hlib.gup('params'))
 params = JSON.parse(params)
 
@@ -67,31 +57,18 @@ function processSearchResults (annos:any[], replies:any[]) {
   let counter = 0
   reversedUrls.forEach(function (url) {
     counter++
-    let perUrlId = counter
-    let perUrlCount = 0
+    let perUrlCount = gathered.urls[url]
     let idsForUrl:string[] = gathered.ids[url]
+    if (format === 'html') {
+      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
+    }    
     idsForUrl.forEach( idForUrl => {
-      perUrlCount++
-      let _replies = replies
-
-      if (params._separate_replies==='true') {
-        _replies = hlib.findRepliesForId(idForUrl, replies)
-        _replies = _replies.map( r => {
-          return hlib.parseAnnotation(r)
-        })
-      }
-
+      let _replies = handleSeparateReplies(idForUrl);
       let all = [gathered.annos[idForUrl]].concat(_replies.reverse())
-      all.forEach( anno => { {
+      all.forEach( anno => { 
         let level = params._separate_replies==='false' ? 0 : anno.refs.length
         if (format === 'html') {
-          let payload = {
-            perUrlId: perUrlId,
-            anno: anno,
-            annoId: anno.id,
-            level: level
-          }
-          worker.postMessage(payload)
+          hlib.getById(`cards_counter_${counter}`).innerHTML += hlib.showAnnotation(anno, level)
         } else if (format === 'csv') {
           let _row = document.createElement('div')
           _row.innerHTML = hlib.csvRow(level, anno)
@@ -102,9 +79,6 @@ function processSearchResults (annos:any[], replies:any[]) {
         }
       })
     })
-    if (format === 'html') {
-      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
-    }
   })
 
   if (format === 'csv') {
@@ -122,18 +96,27 @@ function processSearchResults (annos:any[], replies:any[]) {
     hlib.collapseAll()
     widget.style.display = 'block'
   }, 500)
+
+  function handleSeparateReplies(idForUrl: string) {
+    let _replies = replies;
+    if (params._separate_replies === 'true') {
+      _replies = hlib.findRepliesForId(idForUrl, replies);
+      _replies = _replies.map(r => {
+        return hlib.parseAnnotation(r);
+      });
+    }
+    return _replies;
+  }
 }
 
-function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string) {
-  var urlResultsId = `counter_${counter}`
-
-  var output = `<h1 id="heading_${urlResultsId}" class="urlHeading">
-    <a title="collapse" href="javascript:hlib.toggle('${urlResultsId}')"> <span class="toggle">-</span></a>
+function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
+  var headingCounter = `counter_${counter}`
+  var output = `<h1 id="heading_${headingCounter}" class="urlHeading">
+    <a title="collapse" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">-</span></a>
     <span class="counter">&nbsp;${count}&nbsp;</span>
-   <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
-   </h1>
-   <div id="cards_${urlResultsId}">
-   </div>`
+    <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+    </h1>
+    <div id="cards_${headingCounter}"></div>`
   hlib.getById(eltId).innerHTML += output
 }
 

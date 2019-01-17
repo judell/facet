@@ -48,7 +48,24 @@ function processSearchResults(annos, replies) {
     let gathered = hlib.gatherAnnotationsByUrl(annos);
     let reversedUrls = reverseChronUrls(gathered.urlUpdates);
     let counter = 0;
-    reversedUrls.forEach(function (url) {
+    reversedUrls.forEach(url => {
+        renderCardsForUrl(url);
+    });
+    if (format === 'csv') {
+        widget.style.whiteSpace = 'pre';
+        widget.style.overflowX = 'scroll';
+        widget.innerText = csv;
+    }
+    else if (format === 'json') {
+        widget.style.whiteSpace = 'pre';
+        widget.innerText = JSON.stringify(json, null, 2);
+    }
+    hlib.getById('progress').innerHTML = '';
+    setTimeout(function () {
+        hlib.collapseAll();
+        widget.style.display = 'block';
+    }, 500);
+    function renderCardsForUrl(url) {
         counter++;
         let perUrlCount = gathered.urls[url];
         let idsForUrl = gathered.ids[url];
@@ -74,21 +91,7 @@ function processSearchResults(annos, replies) {
                 }
             });
         });
-    });
-    if (format === 'csv') {
-        widget.style.whiteSpace = 'pre';
-        widget.style.overflowX = 'scroll';
-        widget.innerText = csv;
     }
-    else if (format === 'json') {
-        widget.style.whiteSpace = 'pre';
-        widget.innerText = JSON.stringify(json, null, 2);
-    }
-    hlib.getById('progress').innerHTML = '';
-    setTimeout(function () {
-        hlib.collapseAll();
-        widget.style.display = 'block';
-    }, 500);
     function handleSeparateReplies(idForUrl) {
         let _replies = replies;
         if (params._separate_replies === 'true') {

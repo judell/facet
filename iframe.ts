@@ -43,9 +43,18 @@ hlib.search(params, 'progress')
 function exactTagSearch(annos:any[])  {
   if (params.exactTagSearch==='false') {
     return annos
-  } else {
+  }
+  if (!params.tag) {
     return annos
   }
+  let checkedAnnos:any[] = []
+  let queryTag = params.tag
+  annos.forEach(anno => {
+    if (anno.tags.indexOf(queryTag) != -1) {
+      checkedAnnos.push(anno)
+    }
+  })
+  return checkedAnnos
 }
 
 function processSearchResults (annos:any[], replies:any[]) {

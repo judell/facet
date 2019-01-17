@@ -37,9 +37,17 @@ function exactTagSearch(annos) {
     if (params.exactTagSearch === 'false') {
         return annos;
     }
-    else {
+    if (!params.tag) {
         return annos;
     }
+    let checkedAnnos = [];
+    let queryTag = params.tag;
+    annos.forEach(anno => {
+        if (anno.tags.indexOf(queryTag) != -1) {
+            checkedAnnos.push(anno);
+        }
+    });
+    return checkedAnnos;
 }
 function processSearchResults(annos, replies) {
     annos = exactTagSearch(annos);

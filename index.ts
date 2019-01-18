@@ -5,6 +5,9 @@ hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authenti
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
     let select = hlib.getById('groupsList')
+    select.onchange = function() {
+      hlib.getById('buttonHTML').click()
+    }
     let option = new Option('All','all')
     option.selected = true
     select.insertBefore(option, select.firstChild)

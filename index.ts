@@ -3,6 +3,12 @@ import * as hlib from '../../hlib/hlib' // this will be commented out in the shi
 hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term')
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
+  .then( _ => {
+    let select = hlib.getById('groupsList')
+    let option = new Option('All','all')
+    option.selected = true
+    select.insertBefore(option, select.firstChild)
+  })
 
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document')
 

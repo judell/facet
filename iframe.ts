@@ -10,9 +10,9 @@ const format = params['format']
 delete params['format']
 
 const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
-let subjectUserTokens = {}
+let subjectUserTokens = {} as string[]
 if (_subjectUserTokens) {
-  subjectUserTokens = JSON.parse(_subjectUserTokens) as object
+  subjectUserTokens = JSON.parse(_subjectUserTokens) 
 }
 
 if (format === 'html') {
@@ -218,6 +218,8 @@ function makeHtmlContentEditable(annoId:string) {
 
 function saveHtmlFromContentEditable(e:Event) {
   let annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
+  let userElement = this.closest('.annotationCard').querySelector('.user')
+  let username = userElement.innerText.trim() 
   let body = this.closest('.annotationBody')
   let editor = body.querySelector('.annotationText')
   editor.setAttribute('class', 'annotationText')
@@ -229,7 +231,8 @@ function saveHtmlFromContentEditable(e:Event) {
   this.onclick = makeHtmlContentEditable
   e.stopPropagation()
   let payload = JSON.stringify( { text: text } )
-  hlib.updateAnnotation(annoId, hlib.getToken(), payload)
+  let token = subjectUserTokens[username]
+  hlib.updateAnnotation(annoId, token, payload)
   let converter = new showdown.Converter()
   let html = converter.makeHtml(text)
   body.querySelector('.annotationText').innerHTML = html

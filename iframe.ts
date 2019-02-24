@@ -1,13 +1,19 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-var params:any = decodeURIComponent(hlib.gup('params'))
+let params:any = decodeURIComponent(hlib.gup('params'))
 params = JSON.parse(params)
 
-var widget = hlib.getById('widget') as HTMLElement
-var controlsContainer = hlib.getById('controlsContainer') as HTMLElement
+let widget = hlib.getById('widget') as HTMLElement
+let controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 
-var format = params['format']
+const format = params['format']
 delete params['format']
+
+const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
+let subjectUserTokens = {}
+if (_subjectUserTokens) {
+  subjectUserTokens = JSON.parse(_subjectUserTokens) as object
+}
 
 if (format === 'html') {
   controlsContainer.innerHTML = `<button onclick="hlib.expandAll()">expand all</button>
@@ -98,7 +104,10 @@ function processSearchResults (annos:any[], replies:any[]) {
       all.forEach(anno => {
         let level = params._separate_replies === 'false' ? 0 : anno.refs.length;
         if (format === 'html') {
-          hlib.getById(`cards_counter_${counter}`).innerHTML += hlib.showAnnotation(anno, level);
+          let cardsHTML = hlib.showAnnotation(anno, level);
+          const elementId = `cards_counter_${counter}`
+          cardsHTML = enableEditing(cardsHTML)
+          hlib.getById(elementId).innerHTML += cardsHTML;
         }
         else if (format === 'csv') {
           let _row = document.createElement('div');
@@ -166,3 +175,68 @@ function downloadJSON () {
   var jsonOutput = '[' + widget.innerText + ']'
   hlib.download(jsonOutput, 'json')
 }
+
+function enableEditing(cardsHTML:string) {
+  const cardsElement = document.createElement('div')
+  cardsElement.innerHTML = cardsHTML
+  let cardElements = cardsElement.querySelectorAll('.annotationCard')
+  for (let i = 0; i < cardElements.length; i++ ) {
+    let cardElement = cardElements[i]
+    let userElement
+    userElement! = cardElement.querySelector('.user')
+    let username = userElement.innerText.trim()
+    let textElement
+    textElement! = cardElement.querySelector('.annotationText') 
+    // create wrapper container
+    let wrapper = document.createElement('div');
+    wrapper.setAttribute('class', 'textEditor')
+    let display
+    if (subjectUserTokens.hasOwnProperty(username)) {
+      display = 'block'
+    } 
+    wrapper.innerHTML = `
+      <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
+          <svg style="display:${display}" class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
+      </div>`
+    textElement.parentNode.insertBefore(wrapper, textElement);
+    // move elmement into wrapper
+    wrapper.appendChild(textElement);
+  }
+  return cardsElement.outerHTML
+}
+
+function makeHtmlContentEditable(annoId:string) {
+  let editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
+  editor.setAttribute('contentEditable','true')
+  let text = editor.querySelector('.annotationText') as HTMLElement
+  text.setAttribute('class', text.getAttribute('class') + ' preformatted')
+  text.innerHTML = text.innerHTML.replace(/</g, '&lt;') 
+  let iconContainer = editor.querySelector('.icon-pencil') as HTMLElement
+  iconContainer.innerHTML = renderIcon('icon-floppy')
+  iconContainer.onclick = saveHtmlFromContentEditable
+}
+
+function saveHtmlFromContentEditable(e:Event) {
+  let annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
+  let body = this.closest('.annotationBody')
+  let editor = body.querySelector('.annotationText')
+  editor.setAttribute('class', 'annotationText')
+  let text = editor.innerHTML
+  text = text.replace(/&lt;/g, '<')
+  text = text.replace(/&gt;/g, '>')
+  this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
+  this.parentElement.innerHTML = renderIcon('icon-pencil')
+  this.onclick = makeHtmlContentEditable
+  e.stopPropagation()
+  let payload = JSON.stringify( { text: text } )
+  hlib.updateAnnotation(annoId, hlib.getToken(), payload)
+  let converter = new showdown.Converter()
+  let html = converter.makeHtml(text)
+  body.querySelector('.annotationText').innerHTML = html
+  body.querySelector('.icon-pencil').style.display = 'block'
+}
+
+function renderIcon(iconClass:string) {
+return `<svg class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
+}
+

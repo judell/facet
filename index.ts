@@ -21,7 +21,32 @@ hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
 
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search')
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '100')
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '10')
+
+const subjectUserTokenArgs = {
+  element: hlib.getById('subjectsContainer'),
+  name: 'subject user tokens',
+  id: 'subjectUserTokens',
+  value: `{"user":"token"}`,
+  onchange: 'saveSubjectUserTokens',
+  type: '',
+  msg: 'subject user tokens'
+};
+
+hlib.createNamedInputForm(subjectUserTokenArgs)
+let subjectUserTokensForm
+subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+subjectUserTokensForm.value = `{"user1":"***", "user2":"***"}`
+
+function saveSubjectUserTokens() {
+  hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers') 
+  subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+  let obj = JSON.parse(subjectUserTokensForm.value)
+  Object.keys(obj).forEach( function(key) {
+    obj[key] = '***'
+  })
+  subjectUserTokensForm.value = JSON.stringify(obj)  
+  }
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 

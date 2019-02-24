@@ -23,29 +23,43 @@ hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search'
 
 hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '20')
 
+const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
+let subjectUserTokens:any = {} 
+if (_subjectUserTokens) {
+  subjectUserTokens = JSON.parse(_subjectUserTokens) 
+}
+
+function subjectUserHiddenTokens() {
+  let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
+  if (Object.keys(subjectUserHiddenTokens).length) {
+    Object.keys(subjectUserHiddenTokens).forEach( function(key) {
+      subjectUserHiddenTokens[key] = '***'
+    })
+  } else {
+    subjectUserHiddenTokens = {"user1":"***", "user2":"***"}
+  }
+  return JSON.stringify(subjectUserHiddenTokens)
+}
+
 const subjectUserTokenArgs = {
   element: hlib.getById('subjectsContainer'),
   name: 'subject user tokens',
   id: 'subjectUserTokens',
-  value: `{"user":"token"}`,
+  value: `{}`,
   onchange: 'saveSubjectUserTokens',
   type: '',
   msg: 'subject user tokens'
 };
 
 hlib.createNamedInputForm(subjectUserTokenArgs)
-let subjectUserTokensForm
-subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-subjectUserTokensForm.value = `{"user1":"***", "user2":"***"}`
+let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+subjectUserTokensForm.value = subjectUserHiddenTokens()
 
 function saveSubjectUserTokens() {
-  hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers') 
-  subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-  let obj = JSON.parse(subjectUserTokensForm.value)
-  Object.keys(obj).forEach( function(key) {
-    obj[key] = '***'
-  })
-  subjectUserTokensForm.value = JSON.stringify(obj)  
+  let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+  subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
+  hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')
+  subjectUserTokensForm.value = subjectUserHiddenTokens()
   }
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))

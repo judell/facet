@@ -216,7 +216,7 @@ function makeHtmlContentEditable(annoId:string) {
   iconContainer.onclick = saveHtmlFromContentEditable
 }
 
-function saveHtmlFromContentEditable(e:Event) {
+async function saveHtmlFromContentEditable(e:Event) {
   let annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
   let userElement = this.closest('.annotationCard').querySelector('.user')
   let username = userElement.innerText.trim() 
@@ -232,7 +232,11 @@ function saveHtmlFromContentEditable(e:Event) {
   e.stopPropagation()
   let payload = JSON.stringify( { text: text } )
   let token = subjectUserTokens[username]
-  hlib.updateAnnotation(annoId, token, payload)
+  const r = await hlib.updateAnnotation(annoId, token, payload)
+  let updatedText = JSON.parse(r.response).text
+  if ( !updatedText || updatedText !== text) {
+    alert (`unable to update, ${r.response}`)
+  }
   let converter = new showdown.Converter()
   let html = converter.makeHtml(text)
   body.querySelector('.annotationText').innerHTML = html

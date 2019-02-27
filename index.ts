@@ -4,6 +4,7 @@ hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authenti
 
 function groupChangeHandler() {
   hlib.setSelectedGroup()
+  hlib.getById('buttonHTML').click()
 }
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))

@@ -171,7 +171,7 @@ ${document.body.outerHTML}
 }
 
 function downloadCSV () {
-  const csvOutput = '"level","updated","url","user","id","group","tags","quote","text","direct link"\n'
+  let csvOutput = '"level","updated","url","user","id","group","tags","quote","text","direct link"\n'
   csvOutput += widget.innerText
   hlib.download(csvOutput, 'csv')
 }
@@ -239,7 +239,7 @@ async function saveHtmlFromContentEditable(e:Event) {
   let token = subjectUserTokens[username]
   const r = await hlib.updateAnnotation(annoId, token, payload)
   let updatedText = JSON.parse(r.response).text
-  if ( !updatedText || updatedText !== text) {
+  if ( updatedText !== text) {
     alert (`unable to update, ${r.response}`)
   }
   let converter = new showdown.Converter()

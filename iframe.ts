@@ -67,6 +67,15 @@ function exactTagSearch(annos:any[])  {
 }
 
 function processSearchResults (annos:any[], replies:any[]) {
+  if ( annos.length == 0 && replies.length == 0 ) {
+    hlib.getById('progress').innerText = ''
+    hlib.getById('widget').innerHTML = `
+      <p>Nothing found for this query. 
+      <p>Please try removing one or more filters. 
+      <p>If you still find nothing, try ticking <i>search replies</i>.`
+    hlib.getById('widget').style.display= 'block'
+    return 
+  }
   annos = exactTagSearch(annos)
   let csv = ''
   let json:any[] = []

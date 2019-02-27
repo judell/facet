@@ -92,45 +92,45 @@ function processSearchResults (annos:any[], replies:any[]) {
   }, 500)
 
   function renderCardsForUrl(url: any) {
-    counter++;
-    let perUrlCount = gathered.urls[url];
-    let idsForUrl: string[] = gathered.ids[url];
+    counter++
+    let perUrlCount = gathered.urls[url]
+    let idsForUrl: string[] = gathered.ids[url]
     if (format === 'html') {
-      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url]);
+      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
     }
     idsForUrl.forEach(idForUrl => {
-      let _replies = handleSeparateReplies(idForUrl);
-      let all = [gathered.annos[idForUrl]].concat(_replies.reverse());
+      let _replies = handleSeparateReplies(idForUrl)
+      let all = [gathered.annos[idForUrl]].concat(_replies.reverse())
       all.forEach(anno => {
-        let level = params._separate_replies === 'false' ? 0 : anno.refs.length;
+        let level = params._separate_replies === 'false' ? 0 : anno.refs.length
         if (format === 'html') {
-          let cardsHTML = hlib.showAnnotation(anno, level);
+          let cardsHTML = hlib.showAnnotation(anno, level)
           const elementId = `cards_counter_${counter}`
           cardsHTML = enableEditing(cardsHTML)
-          hlib.getById(elementId).innerHTML += cardsHTML;
+          hlib.getById(elementId).innerHTML += cardsHTML
         }
         else if (format === 'csv') {
-          let _row = document.createElement('div');
-          _row.innerHTML = hlib.csvRow(level, anno);
-          csv += _row.innerText + '\n';
+          let _row = document.createElement('div')
+          _row.innerHTML = hlib.csvRow(level, anno)
+          csv += _row.innerText + '\n'
         }
         else if (format === 'json') {
-          anno.text = anno.text.replace(/</g, '&lt;');
-          json.push(anno);
+          anno.text = anno.text.replace(/</g, '&lt')
+          json.push(anno)
         }
-      });
-    });
+      })
+    })
   }
 
   function handleSeparateReplies(idForUrl: string) {
-    let _replies = replies;
+    let _replies = replies
     if (params._separate_replies === 'true') {
-      _replies = hlib.findRepliesForId(idForUrl, replies);
+      _replies = hlib.findRepliesForId(idForUrl, replies)
       _replies = _replies.map(r => {
-        return hlib.parseAnnotation(r);
-      });
+        return hlib.parseAnnotation(r)
+      })
     }
-    return _replies;
+    return _replies
   }
 }
 
@@ -188,7 +188,7 @@ function enableEditing(cardsHTML:string) {
     let textElement
     textElement! = cardElement.querySelector('.annotationText') 
     // create wrapper container
-    let wrapper = document.createElement('div');
+    let wrapper = document.createElement('div')
     wrapper.setAttribute('class', 'textEditor')
     let display
     if (subjectUserTokens.hasOwnProperty(username)) {
@@ -198,9 +198,9 @@ function enableEditing(cardsHTML:string) {
       <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
           <svg style="display:${display}" class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
       </div>`
-    textElement.parentNode.insertBefore(wrapper, textElement);
+    textElement.parentNode.insertBefore(wrapper, textElement)
     // move elmement into wrapper
-    wrapper.appendChild(textElement);
+    wrapper.appendChild(textElement)
   }
   return cardsElement.outerHTML
 }

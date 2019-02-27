@@ -49,7 +49,7 @@ const subjectUserTokenArgs = {
   onchange: 'saveSubjectUserTokens',
   type: '',
   msg: 'subject user tokens'
-};
+}
 
 hlib.createNamedInputForm(subjectUserTokenArgs)
 let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement

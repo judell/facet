@@ -2,6 +2,10 @@ import * as hlib from '../../hlib/hlib' // this will be commented out in the shi
 
 hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term')
 
+function groupChangeHandler() {
+  hlib.setSelectedGroup()
+}
+
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
     let select = hlib.getById('groupsList')
@@ -9,19 +13,21 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
       hlib.getById('buttonHTML').click()
     }
     let option = new Option('All','all')
-    option.selected = true
     select.insertBefore(option, select.firstChild)
+    let groupsList = hlib.getById('groupsList')
+    groupsList.setAttribute('onchange', 'groupChangeHandler()')
+  
   })
 
 hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document')
 
-hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://nytimes.com/*')
+hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://www.nytimes.com/*')
 
 hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
 
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search')
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '200')
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '100')
 
 const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
 let subjectUserTokens:any = {} 

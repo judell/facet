@@ -7,15 +7,17 @@
   <script src="https://jonudell.info/hlib/hlib.bundle.js" charset="utf-8"></script>
   <style>
     body {
-      margin-top: 0;
+      margin-top: 20px;
     }
     #container {
       display: flex;
       flex-direction: row;
       width: 100%;
     }
-    #formsContainer {
+    #leftbarContainer {
       width: 30%;
+      display: flex;
+      flex-direction: column;
     }
     #iframeContainer {
       width: 100%;
@@ -27,61 +29,97 @@
     }
     .help {
       font-size: smaller;
+      margin-top:12px;
     }
+
+    .facets, .settings {
+      border-style: solid;
+      border-width: thin;
+      padding-left: 1em;
+      border-color: lightgray;
+      margin-bottom: 20px;
+    }
+
+    .formField {
+      margin-bottom: 8px;
+    }
+
+    button {
+      font-size: smaller;
+      margin: 6px;
+    }
+
+    #buttonsContainer {
+      display: flex;
+      padding: 6px;
+      flex-direction: row;
+    }
+
   </style>
 </head>
 
 <body>
-  <p class="help">
-    Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them
-    in one of those formats. Fill in one or more <i>facets</i> to filter results. The facets are
-    <b>username</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. If you need more
-    than 200 results, set <b>max</b> to a larger number. If you specify no facets other than the
-    default group All, you'll get the most recent 100 Hypothesis annotations in any group you're authorized to see. 
-    Results by default are grouped by URL, ordered by recency, and displayed as threads. But the default view 
-    won't find things that exist only in replies. For that, tick <i>search replies</i> to get all matching
-    annotations and replies, again grouped by URL and ordered by recency, but not displayed as threads.
-    To match a tag exactly (and case-sensitively), tick <i>exact tag search</i>. Use <i>subject user tokens</i> 
-    to enable in-place editing of users who have shared thair tokens.
-  </p>
 
   <div id="container">
 
-    <div id="formsContainer">
+    <div id="leftbarContainer">
 
-      <form autocomplete="off">
-        <div class="formContainer">
-          <div class="formField" id="userContainer"></div>
-          <div class="formField" id="tokenContainer"></div>
-          <div class="formField" id="groupContainer"></div>
-          <div class="formField" id="urlContainer"></div>
-          <div class="formField" id="wildcard_uriContainer"></div>
-          <div class="formField" id="tagContainer"></div>
-          <div class="formField" id="anyContainer"></div>
-          <div class="formField" id="maxContainer"></div>
-          <div class="formField" id="subjectsContainer"></div>
-          <p>
-            <input type="checkbox" id="searchReplies"/> search replies
-          </p>
-          <p>
-            <input type="checkbox" id="exactTagSearch"/> exact tag search
-          </p>
+      <div id="buttonsContainer">
+        <div>
+          <button id="buttonHTML" title="view or download search results as HTML" onclick="getHTML()">HTML</button>
+        </div>  
+         <div>
+          <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
+         </div>
+         <div>
+          <button title="view or download search results as JSON" onclick="getJSON()">JSON</button>
         </div>
-      </form>
-
-      <div>
-        <button id="buttonHTML" title="view or download search results as HTML" onclick="getHTML()">HTML</button>
-        <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
-        <button title="view or download search results as JSON" onclick="getJSON()">JSON</button>
       </div>
-    </div>
 
+      <div class="formContainer">
+            <div class="facets">
+            <div class="formField" id="userContainer"></div>
+            <div class="formField" id="groupContainer"></div>
+            <div class="formField" id="urlContainer"></div>
+            <div class="formField" id="wildcard_uriContainer"></div>
+            <div class="formField" id="tagContainer"></div>
+            <div class="formField" id="anyContainer"></div>
+          </div>
+          <div class="settings">
+            <div class="formField" id="tokenContainer"></div>
+            <div class="formField" id="maxContainer"></div>
+            <div class="formField" id="subjectsContainer"></div>
+            <p>
+              <input type="checkbox" id="searchReplies"/> search replies
+            </p>
+            <p>
+              <input type="checkbox" id="exactTagSearch"/> exact tag search
+            </p>
+          </div>
+      
+      </div>
+
+    </div>
+    
     <div id="iframeContainer">
       <iframe id="iframe" src=""></iframe>
     </div>
 
   </div>
 
+  <p class="help">
+      Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them
+      in one of those formats. Fill in one or more <i>facets</i> to filter results. The facets are
+      <b>username</b>, <b>group</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. If you need more
+      than 100 results, set <b>max</b> to a larger number. If you specify no facets other than the
+      default group All, you'll get the most recent 100 Hypothesis annotations in any group you're authorized to see. 
+      Results by default are grouped by URL, ordered by recency, and displayed as threads. But the default view 
+      won't find things that exist only in replies. For that, tick <i>search replies</i> to get all matching
+      annotations and replies, again grouped by URL and ordered by recency, but not displayed as threads.
+      To match a tag exactly (and case-sensitively), tick <i>exact tag search</i>. Use <i>subject user tokens</i> 
+      to enable in-place editing of annotations by users who have shared their tokens with you.
+    </p>
+  
 
   <script src="./index.js"></script>
 

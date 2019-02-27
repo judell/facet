@@ -74,7 +74,7 @@ let facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
 facets.forEach(facet => {
   if (hlib.gup(facet) !== '') {
     let inputElement = document.querySelector(`#${facet}Container input`) as HTMLInputElement
-    inputElement.value = hlib.gup(facet)
+    inputElement.value = decodeURIComponent(hlib.gup(facet))
   }
 })
 

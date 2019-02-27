@@ -9,6 +9,8 @@ let controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 const format = params['format']
 delete params['format']
 
+let htmlBuffer = ''
+
 const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
 let subjectUserTokens = {} as string[]
 if (_subjectUserTokens) {
@@ -34,13 +36,14 @@ Object.keys(params).forEach(function (key) {
   }
 })
 
-hlib.getById('title').innerHTML = `Hypothesis query: ${JSON.stringify(params)} &nbsp; <span id="progress"></span>`
+hlib.getById('title').innerHTML += `Hypothesis query: ${JSON.stringify(params)}`
 
 var nonEmptyParams = Object.values(params).filter(x => x != '')
 if (nonEmptyParams.length == 0) {
   params.max = 100
 }
 
+hlib.getById('progress').innerText = 'fetching annotations '
 hlib.search(params, 'progress')
   .then( data => {
     processSearchResults(data[0], data[1])
@@ -75,29 +78,29 @@ function processSearchResults (annos:any[], replies:any[]) {
     renderCardsForUrl(url)
   })
 
-  if (format === 'csv') {
+  if (format === 'html') {
+    hlib.getById('widget').innerHTML = htmlBuffer
+  } else if (format === 'csv') {
     widget.style.whiteSpace = 'pre'
     widget.style.overflowX = 'scroll'
     widget.innerText = csv
   } else if (format === 'json') {
     widget.style.whiteSpace = 'pre'
     widget.innerText = JSON.stringify(json, null, 2)
-  }
+  } 
 
+  hlib.collapseAll()
+  widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
-
-  setTimeout(function () {
-    hlib.collapseAll()
-    widget.style.display = 'block'
-  }, 500)
 
   function renderCardsForUrl(url: any) {
     counter++
     let perUrlCount = gathered.urls[url]
     let idsForUrl: string[] = gathered.ids[url]
     if (format === 'html') {
-      showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
+      htmlBuffer += showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
     }
+    let cardsHTMLBuffer = ''
     idsForUrl.forEach(idForUrl => {
       let _replies = handleSeparateReplies(idForUrl)
       let all = [gathered.annos[idForUrl]].concat(_replies.reverse())
@@ -105,9 +108,8 @@ function processSearchResults (annos:any[], replies:any[]) {
         let level = params._separate_replies === 'false' ? 0 : anno.refs.length
         if (format === 'html') {
           let cardsHTML = hlib.showAnnotation(anno, level)
-          const elementId = `cards_counter_${counter}`
           cardsHTML = enableEditing(cardsHTML)
-          hlib.getById(elementId).innerHTML += cardsHTML
+          cardsHTMLBuffer += cardsHTML
         }
         else if (format === 'csv') {
           let _row = document.createElement('div')
@@ -120,6 +122,7 @@ function processSearchResults (annos:any[], replies:any[]) {
         }
       })
     })
+    htmlBuffer = htmlBuffer.replace(`CARDS_${counter}`, cardsHTMLBuffer)
   }
 
   function handleSeparateReplies(idForUrl: string) {
@@ -135,14 +138,16 @@ function processSearchResults (annos:any[], replies:any[]) {
 }
 
 function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
-  var headingCounter = `counter_${counter}`
-  var output = `<h1 id="heading_${headingCounter}" class="urlHeading">
+  const headingCounter = `counter_${counter}`
+  let output = `<h1 id="heading_${headingCounter}" class="urlHeading">
     <a title="collapse" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">-</span></a>
     <span class="counter">&nbsp;${count}&nbsp;</span>
     <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
     </h1>
-    <div id="cards_${headingCounter}"></div>`
-  hlib.getById(eltId).innerHTML += output
+    <div id="cards_${headingCounter}">
+      CARDS_${counter}
+    </div>`
+  return output
 }
 
 function reverseChronUrls (urlUpdates:any) {

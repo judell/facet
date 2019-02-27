@@ -21,7 +21,7 @@ hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
 
 hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search')
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '20')
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '200')
 
 const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
 let subjectUserTokens:any = {} 

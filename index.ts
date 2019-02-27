@@ -107,6 +107,7 @@ function search (format:string) {
     tag: inputQuerySelector('#tagContainer input').value,
     any: inputQuerySelector('#anyContainer input').value,
     max: inputQuerySelector('#maxContainer input').value,
+    expand: hlib.gup('expand') === 'true',
     format: format,
     _separate_replies: repliesOnlyCheckbox.checked ? 'false' : 'true',
     exactTagSearch: exactTagSearch.checked ? 'true' : 'false'

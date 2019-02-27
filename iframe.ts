@@ -36,7 +36,7 @@ Object.keys(params).forEach(function (key) {
   }
 })
 
-hlib.getById('title').innerHTML += `Hypothesis query: ${JSON.stringify(params)}`
+hlib.getById('title').innerHTML += `${JSON.stringify(params)}`
 
 const nonEmptyParams = Object.values(params).filter(x => x != '')
 if (nonEmptyParams.length == 0) {
@@ -89,7 +89,9 @@ function processSearchResults (annos:any[], replies:any[]) {
     widget.innerText = JSON.stringify(json, null, 2)
   } 
 
-  hlib.collapseAll()
+  if (! params.expand) {
+    hlib.collapseAll()
+  }
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
@@ -140,7 +142,7 @@ function processSearchResults (annos:any[], replies:any[]) {
 function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
   const headingCounter = `counter_${counter}`
   let output = `<h1 id="heading_${headingCounter}" class="urlHeading">
-    <a title="collapse" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">-</span></a>
+    <a title="collapse" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">\u{25bc}</span></a>
     <span class="counter">&nbsp;${count}&nbsp;</span>
     <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
     </h1>

@@ -106,6 +106,6 @@ function search (format:string) {
   }
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))
-  var iframeUrl = `iframe.html?params=${params}`
+  const iframeUrl = `iframe.html?params=${params}`
   hlib.getById('iframe').setAttribute('src', iframeUrl)
 }

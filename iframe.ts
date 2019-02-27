@@ -38,7 +38,7 @@ Object.keys(params).forEach(function (key) {
 
 hlib.getById('title').innerHTML += `Hypothesis query: ${JSON.stringify(params)}`
 
-var nonEmptyParams = Object.values(params).filter(x => x != '')
+const nonEmptyParams = Object.values(params).filter(x => x != '')
 if (nonEmptyParams.length == 0) {
   params.max = 100
 }
@@ -151,8 +151,8 @@ function showUrlResults (counter:number, eltId:string, url:string, count:number,
 }
 
 function reverseChronUrls (urlUpdates:any) {
-  var reverseChronUrls = []
-  for (var urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
+  let reverseChronUrls = []
+  for (let urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
     reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
   }
   reverseChronUrls.sort(function (a:string[], b:string[]) {
@@ -162,7 +162,7 @@ function reverseChronUrls (urlUpdates:any) {
 }
 
 function downloadHTML () {
-  var html = `
+  const html = `
 <html>
 ${document.head.outerHTML}
 ${document.body.outerHTML}
@@ -171,13 +171,13 @@ ${document.body.outerHTML}
 }
 
 function downloadCSV () {
-  var csvOutput = '"level","updated","url","user","id","group","tags","quote","text","direct link"\n'
+  const csvOutput = '"level","updated","url","user","id","group","tags","quote","text","direct link"\n'
   csvOutput += widget.innerText
   hlib.download(csvOutput, 'csv')
 }
 
 function downloadJSON () {
-  var jsonOutput = '[' + widget.innerText + ']'
+  const jsonOutput = '[' + widget.innerText + ']'
   hlib.download(jsonOutput, 'json')
 }
 

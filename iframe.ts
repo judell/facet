@@ -17,16 +17,6 @@ if (_subjectUserTokens) {
   subjectUserTokens = JSON.parse(_subjectUserTokens) 
 }
 
-if (format === 'html') {
-  controlsContainer.innerHTML = `<button onclick="hlib.expandAll()">expand all</button>
-     <button onclick="hlib.collapseAll()">collapse all</button>
-     <button onclick="downloadHTML()">download HTML</button>`
-} else if (format === 'csv') {
-  controlsContainer.innerHTML = '<button onclick="downloadCSV()">download CSV</button>'
-} else {
-  controlsContainer.innerHTML = '<button onclick="downloadJSON()">download JSON</button>'
-}
-
 Object.keys(params).forEach(function (key) {
   if (params[key] === '') {
     delete params[key]
@@ -36,18 +26,32 @@ Object.keys(params).forEach(function (key) {
   }
 })
 
-hlib.getById('title').innerHTML += `${JSON.stringify(params)}`
-
-const nonEmptyParams = Object.values(params).filter(x => x != '')
-if (nonEmptyParams.length == 0) {
-  params.max = 100
-}
+showParams()
 
 hlib.getById('progress').innerText = 'fetching annotations '
 hlib.search(params, 'progress')
   .then( data => {
     processSearchResults(data[0], data[1])
   })
+
+function showParams() {
+  const excluded = ['service', 'subjectUserTokens', '_separate_replies']
+  if (params.max == hlib.defaultMax) {
+    excluded.push('max')
+  }
+  ['searchReplies', 'exactTagSearch', 'expanded'].forEach(key => {
+    if (params[key] === 'false') {
+      excluded.push(key)
+    }
+  })
+  let title = hlib.syntaxColorParams(params, excluded)
+  title = title.slice(0, -1)
+  if (title) {
+    hlib.getById('title').innerHTML += title
+  } else {
+    hlib.getById('title').style.dispay = 'none'
+  }
+}
 
 function exactTagSearch(annos:any[])  {
   if (params.exactTagSearch==='false') {
@@ -88,20 +92,16 @@ function processSearchResults (annos:any[], replies:any[]) {
     renderCardsForUrl(url)
   })
 
-  if (format === 'html') {
-    hlib.getById('widget').innerHTML = htmlBuffer
-  } else if (format === 'csv') {
-    widget.style.whiteSpace = 'pre'
-    widget.style.overflowX = 'scroll'
-    widget.innerText = csv
-  } else if (format === 'json') {
-    widget.style.whiteSpace = 'pre'
-    widget.innerText = JSON.stringify(json, null, 2)
-  } 
+  styleWidget(csv, json)
 
-  if (! params.expand) {
+  showButtons()
+
+  if (isExpanded()) {
+    hlib.expandAll()
+  } else {
     hlib.collapseAll()
   }
+
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
@@ -147,31 +147,74 @@ function processSearchResults (annos:any[], replies:any[]) {
     }
     return _replies
   }
-}
 
-function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
-  const headingCounter = `counter_${counter}`
-  let output = `<h1 id="heading_${headingCounter}" class="urlHeading">
-    <a title="collapse" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">\u{25bc}</span></a>
-    <span class="counter">&nbsp;${count}&nbsp;</span>
-    <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
-    </h1>
-    <div id="cards_${headingCounter}">
-      CARDS_${counter}
-    </div>`
-  return output
-}
-
-function reverseChronUrls (urlUpdates:any) {
-  let reverseChronUrls = []
-  for (let urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
-    reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
+  function styleWidget(csv: string, json: any[]) {
+    if (format === 'html') {
+      hlib.getById('widget').innerHTML = htmlBuffer
+    }
+    else if (format === 'csv') {
+      widget.style.whiteSpace = 'pre'
+      widget.style.overflowX = 'scroll'
+      widget.innerText = csv
+    }
+    else if (format === 'json') {
+      widget.style.whiteSpace = 'pre'
+      widget.innerText = JSON.stringify(json, null, 2)
+    }
   }
-  reverseChronUrls.sort(function (a:string[], b:string[]) {
-    return new Date(b[1]).getTime() - new Date(a[1]).getTime()
-  })
-  return reverseChronUrls.map(item => item[0])
+  
+  function isExpanded() {
+    return hlib.getSettings().expanded === 'true'
+  }
+  
+  function showButtons() {
+    if (format === 'html') {
+      controlsContainer.innerHTML = `
+        <button id="expander"></button>
+        <button id="downloadHTML">downloadHTML</button>`
+      const expander = hlib.getById('expander')  
+      expander.innerText = isExpanded() ? 'collapse' : 'expand'
+      expander.onclick = isExpanded() ? hlib.collapseAll : hlib.expandAll
+      hlib.getById('downloadHTML').onclick = downloadHTML
+    }
+    else if (format === 'csv') {
+      controlsContainer.innerHTML = '<button id="downloadCSV">download CSV</button>'
+      hlib.getById('downloadCSV').onclick = downloadCSV
+    }
+    else {
+      controlsContainer.innerHTML = '<button id="downloadJSON">download JSON</button>'
+      hlib.getById('downloadJSON').onclick = downloadJSON
+      hlib.getById
+    }
+  }
+
+  function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
+    const headingCounter = `counter_${counter}`
+    const togglerTitle = isExpanded() ? 'collapse' : 'expand'
+    const togglerChar = isExpanded() ?  '\u{25bc}' : '\u{25b6}'
+    let output = `<h1 id="heading_${headingCounter}" class="urlHeading">
+      <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerChar}</span></a>
+      <span class="counter">&nbsp;${count}&nbsp;</span>
+      <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+      </h1>
+      <div id="cards_${headingCounter}">
+        CARDS_${counter}
+      </div>`
+    return output
+  }
+  
+  function reverseChronUrls (urlUpdates:any) {
+    let reverseChronUrls = []
+    for (let urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
+      reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
+    }
+    reverseChronUrls.sort(function (a:string[], b:string[]) {
+      return new Date(b[1]).getTime() - new Date(a[1]).getTime()
+    })
+    return reverseChronUrls.map(item => item[0])
+  }
 }
+
 
 function downloadHTML () {
   const html = `

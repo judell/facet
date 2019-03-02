@@ -1,6 +1,14 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-hlib.createUserInputForm(hlib.getById('userContainer'), 'Not needed for authentication, use only as a search term')
+if ( ! localStorage.getItem('h_settings') ) {
+  hlib.settingsToLocalStorage(hlib.getSettings()) // initialize settings
+}
+
+updateSettingsFromUrl() // incoming url params override remembered params
+
+hlib.settingsToUrl(hlib.getSettings()) // add non-overridden remembered params to url
+
+hlib.createUserInputForm(hlib.getById('userContainer'))
 
 function groupChangeHandler() {
   hlib.setSelectedGroup()
@@ -20,15 +28,21 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
   
   })
 
-hlib.createFacetInputForm(hlib.getById('urlContainer'), 'url', 'URL of annotated document')
+hlib.createUrlInputForm(hlib.getById('urlContainer'))
 
-hlib.createFacetInputForm(hlib.getById('wildcard_uriContainer'), 'wildcard_uri', 'Example: https://www.nytimes.com/*')
+hlib.createWildcardUriInputForm(hlib.getById('wildcard_uriContainer'))
 
-hlib.createFacetInputForm(hlib.getById('tagContainer'), 'tag', '')
+hlib.createTagInputForm(hlib.getById('tagContainer'))
 
-hlib.createFacetInputForm(hlib.getById('anyContainer'), 'any', 'freetext search')
+hlib.createAnyInputForm(hlib.getById('anyContainer'))
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'max annotations to fetch', '100')
+hlib.createMaxInputForm(hlib.getById('maxContainer'))
+
+hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
+
+hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
+
+hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
 
 const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
 let subjectUserTokens:any = {} 
@@ -55,7 +69,7 @@ const subjectUserTokenArgs = {
   value: `{}`,
   onchange: 'saveSubjectUserTokens',
   type: '',
-  msg: 'subject user tokens'
+  msg: ''
 }
 
 hlib.createNamedInputForm(subjectUserTokenArgs)
@@ -71,13 +85,18 @@ function saveSubjectUserTokens() {
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
-let facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
-facets.forEach(facet => {
-  if (hlib.gup(facet) !== '') {
-    let inputElement = document.querySelector(`#${facet}Container input`) as HTMLInputElement
-    inputElement.value = decodeURIComponent(hlib.gup(facet))
-  }
-})
+function updateSettingsFromUrl() {
+  const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
+  const settings = ['max', 'subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch']
+  const params = facets.concat(settings)
+  params.forEach(param => {
+    if (hlib.gup(param) !== '') {
+      const value = decodeURIComponent(hlib.gup(param))
+      hlib.updateSetting(param, value)
+      hlib.settingsToLocalStorage(hlib.getSettings())
+    }
+  })
+}
 
 function getCSV () {
   search('csv')
@@ -91,29 +110,18 @@ function getJSON () {
   search('json')
 }
 
-function inputQuerySelector(query:string) : HTMLInputElement {
-  return document.querySelector(query) as HTMLInputElement
-}
-
-
 function search (format:string) {
-  let repliesOnlyCheckbox = hlib.getById('searchReplies') as HTMLInputElement
-  let exactTagSearch = hlib.getById('exactTagSearch') as HTMLInputElement
-  let params:any = {
-    user: inputQuerySelector('#userContainer input').value,
-    group: hlib.getSelectedGroup(),
-    url: inputQuerySelector('#urlContainer input').value,
-    wildcard_uri: inputQuerySelector('#wildcard_uriContainer input').value,
-    tag: inputQuerySelector('#tagContainer input').value,
-    any: inputQuerySelector('#anyContainer input').value,
-    max: inputQuerySelector('#maxContainer input').value,
-    expand: hlib.gup('expand') === 'true',
-    format: format,
-    _separate_replies: repliesOnlyCheckbox.checked ? 'false' : 'true',
-    exactTagSearch: exactTagSearch.checked ? 'true' : 'false'
-  }
+  const settings = hlib.getSettings()
+  let params:any = {}
+  params = Object.assign(params, hlib.getSettings())
+  params['format'] = format
+  params['_separate_replies'] = settings.searchReplies
+  params['group'] = hlib.getSelectedGroup('groupsList')
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))
   const iframeUrl = `iframe.html?params=${params}`
   hlib.getById('iframe').setAttribute('src', iframeUrl)
 }
+
+
+

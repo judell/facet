@@ -71,6 +71,7 @@ function exactTagSearch(annos:any[])  {
 }
 
 function processSearchResults (annos:any[], replies:any[]) {
+
   if ( annos.length == 0 && replies.length == 0 ) {
     hlib.getById('progress').innerText = ''
     hlib.getById('widget').innerHTML = `
@@ -96,12 +97,17 @@ function processSearchResults (annos:any[], replies:any[]) {
 
   showButtons()
 
-  if (isExpanded()) {
-    hlib.expandAll()
-  } else {
-    hlib.collapseAll()
+  if (format === 'html') {
+    const expanded = isExpanded()
+    if (expanded) {
+      setExpanderCollapse()
+      hlib.getById('expander').click()
+    } else {
+      hlib.collapseAll()
+    }
   }
 
+  
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
@@ -163,31 +169,6 @@ function processSearchResults (annos:any[], replies:any[]) {
     }
   }
   
-  function isExpanded() {
-    return hlib.getSettings().expanded === 'true'
-  }
-  
-  function showButtons() {
-    if (format === 'html') {
-      controlsContainer.innerHTML = `
-        <button id="expander"></button>
-        <button id="downloadHTML">downloadHTML</button>`
-      const expander = hlib.getById('expander')  
-      expander.innerText = isExpanded() ? 'collapse' : 'expand'
-      expander.onclick = isExpanded() ? hlib.collapseAll : hlib.expandAll
-      hlib.getById('downloadHTML').onclick = downloadHTML
-    }
-    else if (format === 'csv') {
-      controlsContainer.innerHTML = '<button id="downloadCSV">download CSV</button>'
-      hlib.getById('downloadCSV').onclick = downloadCSV
-    }
-    else {
-      controlsContainer.innerHTML = '<button id="downloadJSON">download JSON</button>'
-      hlib.getById('downloadJSON').onclick = downloadJSON
-      hlib.getById
-    }
-  }
-
   function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
     const headingCounter = `counter_${counter}`
     const togglerTitle = isExpanded() ? 'collapse' : 'expand'
@@ -215,6 +196,51 @@ function processSearchResults (annos:any[], replies:any[]) {
   }
 }
 
+function isExpanded() {
+  return hlib.getSettings().expanded === 'true'
+}
+
+function setExpanderExpand() {
+  const expander = hlib.getById('expander')
+  expander.onclick = setExpanderCollapse
+  expander.innerText = 'collapse'
+  hlib.expandAll()
+}
+
+function setExpanderCollapse() {
+  const expander = hlib.getById('expander')
+  expander.onclick = setExpanderExpand
+  expander.innerText = 'expand'
+  hlib.collapseAll()
+}
+
+function showButtons() {
+  if (format === 'html') {
+    controlsContainer.innerHTML = `
+      <button id="expander"></button>
+      <button id="downloadHTML">downloadHTML</button>`
+    const expander = hlib.getById('expander') as HTMLButtonElement
+    const expanded = hlib.getSettings().expanded === 'true'
+    expander.onclick = expanded
+      ? setExpanderCollapse
+      : setExpanderExpand
+    if (expanded) {
+      expander.innerText = 'collapse'
+    } else {
+      expander.innerText = 'expand'
+    }
+    hlib.getById('downloadHTML').onclick = downloadHTML
+  }
+  else if (format === 'csv') {
+    controlsContainer.innerHTML = '<button id="downloadCSV">download CSV</button>'
+    hlib.getById('downloadCSV').onclick = downloadCSV
+  }
+  else {
+    controlsContainer.innerHTML = '<button id="downloadJSON">download JSON</button>'
+    hlib.getById('downloadJSON').onclick = downloadJSON
+    hlib.getById
+  }
+}
 
 function downloadHTML () {
   const html = `

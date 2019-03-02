@@ -67,7 +67,7 @@ const subjectUserTokenArgs = {
   name: 'subject user tokens',
   id: 'subjectUserTokens',
   value: `{}`,
-  onchange: 'saveSubjectUserTokens',
+  onchange: saveSubjectUserTokens,
   type: '',
   msg: ''
 }

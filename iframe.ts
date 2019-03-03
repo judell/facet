@@ -243,16 +243,22 @@ function showButtons() {
 }
 
 function downloadHTML () {
+  function rebaseLinks(links: NodeListOf<HTMLAnchorElement>) {
+    links.forEach(link => {
+      link.href = link.href
+    })
+  }
   const head = document.head
   let body = document.body
   const controlsContainer = body.querySelector('#controlsContainer') as HTMLElement
   controlsContainer.remove()
   const pencils = body.querySelectorAll('.icon-pencil')
-  pencils.forEach(pencil => {
-    pencil.remove()
-  })
+  pencils.forEach(pencil => { pencil.remove() })
+  rebaseLinks(body.querySelectorAll('.user a'))
+  rebaseLinks(body.querySelectorAll('.annotationTags a'))
   const html = `<html>${head.outerHTML}${body.outerHTML}</html>`
   hlib.download(html, 'html')
+  body.innerHTML = 'done'
 }
 
 function downloadCSV () {

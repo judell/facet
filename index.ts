@@ -83,7 +83,7 @@ function saveSubjectUserTokens() {
     subjectUserTokensForm.value = subjectUserHiddenTokens()
   } catch (e) {
     alert(`Please provide a valid JSON like { "user1":"123", "user2":"abc"}`)
-    subjectUserTokensForm.value = JSON.stringify(hlib.defaultSubjectUserTokens)
+    subjectUserTokensForm.value = '{}'
   }
 }
 

@@ -3,8 +3,8 @@ import * as hlib from '../../hlib/hlib' // this will be commented out in the shi
 let params:any = decodeURIComponent(hlib.gup('params'))
 params = JSON.parse(params)
 
-let widget = hlib.getById('widget') as HTMLElement
-let controlsContainer = hlib.getById('controlsContainer') as HTMLElement
+const widget = hlib.getById('widget') as HTMLElement
+const controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 
 const format = params['format']
 delete params['format']
@@ -60,8 +60,8 @@ function exactTagSearch(annos:any[])  {
   if (!params.tag) {
     return annos
   }
-  let checkedAnnos:any[] = []
-  let queryTag = params.tag
+  const checkedAnnos:any[] = []
+  const queryTag = params.tag
   annos.forEach(anno => {
     if (anno.tags.indexOf(queryTag) != -1) {
       checkedAnnos.push(anno)
@@ -84,9 +84,9 @@ function processSearchResults (annos:any[], replies:any[]) {
   }
   annos = exactTagSearch(annos)
   let csv = ''
-  let json:any[] = []
-  let gathered = hlib.gatherAnnotationsByUrl(annos)
-  let reversedUrls = reverseChronUrls(gathered.urlUpdates)
+  const json:any[] = []
+  const gathered = hlib.gatherAnnotationsByUrl(annos)
+  const reversedUrls = reverseChronUrls(gathered.urlUpdates)
   let counter = 0
   
   reversedUrls.forEach(url => {
@@ -113,8 +113,8 @@ function processSearchResults (annos:any[], replies:any[]) {
 
   function renderCardsForUrl(url: any) {
     counter++
-    let perUrlCount = gathered.urls[url]
-    let idsForUrl: string[] = gathered.ids[url]
+    const perUrlCount = gathered.urls[url]
+    const idsForUrl: string[] = gathered.ids[url]
     if (format === 'html') {
       htmlBuffer += showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
     }
@@ -173,7 +173,7 @@ function processSearchResults (annos:any[], replies:any[]) {
     const headingCounter = `counter_${counter}`
     const togglerTitle = isExpanded() ? 'collapse' : 'expand'
     const togglerChar = isExpanded() ?  '\u{25bc}' : '\u{25b6}'
-    let output = `<h1 id="heading_${headingCounter}" class="urlHeading">
+    const output = `<h1 id="heading_${headingCounter}" class="urlHeading">
       <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerChar}</span></a>
       <span class="counter">&nbsp;${count}&nbsp;</span>
       <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
@@ -185,8 +185,8 @@ function processSearchResults (annos:any[], replies:any[]) {
   }
   
   function reverseChronUrls (urlUpdates:any) {
-    let reverseChronUrls = []
-    for (let urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
+    const reverseChronUrls = []
+    for (const urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
       reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
     }
     reverseChronUrls.sort(function (a:string[], b:string[]) {
@@ -249,7 +249,7 @@ function downloadHTML () {
     })
   }
   const head = document.head
-  let body = document.body
+  const body = document.body
   const controlsContainer = body.querySelector('#controlsContainer') as HTMLElement
   controlsContainer.remove()
   const pencils = body.querySelectorAll('.icon-pencil')
@@ -275,16 +275,14 @@ function downloadJSON () {
 function enableEditing(cardsHTML:string) {
   const cardsElement = document.createElement('div')
   cardsElement.innerHTML = cardsHTML
-  let cardElements = cardsElement.querySelectorAll('.annotationCard')
+  const cardElements = cardsElement.querySelectorAll('.annotationCard')
   for (let i = 0; i < cardElements.length; i++ ) {
-    let cardElement = cardElements[i]
-    let userElement
-    userElement! = cardElement.querySelector('.user')
-    let username = userElement.innerText.trim()
-    let textElement
-    textElement! = cardElement.querySelector('.annotationText') 
+    const cardElement = cardElements[i]
+    let userElement = cardElement.querySelector('.user') as HTMLElement
+    const username = userElement.innerText.trim()
+    let textElement = cardElement.querySelector('.annotationText') as HTMLElement
     // create wrapper container
-    let wrapper = document.createElement('div')
+    const wrapper = document.createElement('div')
     wrapper.setAttribute('class', 'textEditor')
     let display
     if (subjectUserTokens.hasOwnProperty(username)) {
@@ -294,7 +292,7 @@ function enableEditing(cardsHTML:string) {
       <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
           <svg style="display:${display}" class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
       </div>`
-    textElement.parentNode.insertBefore(wrapper, textElement)
+    textElement.parentNode!.insertBefore(wrapper, textElement)
     // move elmement into wrapper
     wrapper.appendChild(textElement)
   }
@@ -302,7 +300,7 @@ function enableEditing(cardsHTML:string) {
 }
 
 async function makeHtmlContentEditable(annoId:string) {
-  let editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
+  const editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
   editor.setAttribute('contentEditable','true')
   const textElement = editor.querySelector('.annotationText') as HTMLElement
   const r = await hlib.getAnnotation(annoId.replace(/^_/,''), hlib.getToken())
@@ -314,28 +312,26 @@ async function makeHtmlContentEditable(annoId:string) {
 }
 
 async function saveHtmlFromContentEditable(e:Event) {
-  let annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
-  let userElement = this.closest('.annotationCard').querySelector('.user')
-  let username = userElement.innerText.trim() 
-  let body = this.closest('.annotationBody')
-  let editor = body.querySelector('.annotationText')
+  const annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
+  const userElement = this.closest('.annotationCard').querySelector('.user')
+  const username = userElement.innerText.trim() 
+  const body = this.closest('.annotationBody')
+  const editor = body.querySelector('.annotationText')
   editor.setAttribute('class', 'annotationText')
-  let text = editor.innerHTML
-  text = text.replace(/&lt;/g, '<')
-  text = text.replace(/&gt;/g, '>')
+  let text = editor.innerText
   this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
   this.parentElement.innerHTML = renderIcon('icon-pencil')
   this.onclick = makeHtmlContentEditable
   e.stopPropagation()
-  let payload = JSON.stringify( { text: text } )
-  let token = subjectUserTokens[username]
+  const payload = JSON.stringify( { text: text } )
+  const token = subjectUserTokens[username]
   const r = await hlib.updateAnnotation(annoId, token, payload)
   let updatedText = JSON.parse(r.response).text
   if ( updatedText !== text) {
     alert (`unable to update, ${r.response}`)
   }
-  let converter = new showdown.Converter()
-  let html = converter.makeHtml(text)
+  const converter = new showdown.Converter()
+  const html = converter.makeHtml(text)
   body.querySelector('.annotationText').innerHTML = html
   body.querySelector('.icon-pencil').style.display = 'block'
 }

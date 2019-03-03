@@ -301,13 +301,14 @@ function enableEditing(cardsHTML:string) {
   return cardsElement.outerHTML
 }
 
-function makeHtmlContentEditable(annoId:string) {
+async function makeHtmlContentEditable(annoId:string) {
   let editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
   editor.setAttribute('contentEditable','true')
-  let text = editor.querySelector('.annotationText') as HTMLElement
-  text.setAttribute('class', text.getAttribute('class') + ' preformatted')
-  text.innerHTML = text.innerHTML.replace(/</g, '&lt;') 
-  let iconContainer = editor.querySelector('.icon-pencil') as HTMLElement
+  const textElement = editor.querySelector('.annotationText') as HTMLElement
+  const r = await hlib.getAnnotation(annoId.replace(/^_/,''), hlib.getToken())
+  const text = JSON.parse(r.response).text
+  textElement.innerText = text
+  const iconContainer = editor.querySelector('.icon-pencil') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveHtmlFromContentEditable
 }

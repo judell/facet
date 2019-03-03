@@ -78,10 +78,15 @@ subjectUserTokensForm.value = subjectUserHiddenTokens()
 
 function saveSubjectUserTokens() {
   let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-  subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
-  hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')
-  subjectUserTokensForm.value = subjectUserHiddenTokens()
+  try {
+    subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
+    hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')
+    subjectUserTokensForm.value = subjectUserHiddenTokens()
+  } catch (e) {
+    alert(`Please provide a valid JSON like { "user1":"123", "user2":"abc"}`)
+    subjectUserTokensForm.value = JSON.stringify(hlib.defaultSubjectUserTokens)
   }
+}
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 

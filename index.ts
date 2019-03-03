@@ -18,14 +18,13 @@ function groupChangeHandler() {
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
     let select = hlib.getById('groupsList')
-    select.onchange = function() {
-      hlib.getById('buttonHTML').click()
-    }
     let option = new Option('All','all')
     select.insertBefore(option, select.firstChild)
-    let groupsList = hlib.getById('groupsList')
-    groupsList.setAttribute('onchange', 'groupChangeHandler()')
-  
+    let groupsList = hlib.getById('groupsList') as HTMLSelectElement
+    groupsList.onchange = groupChangeHandler
+    if (hlib.getSettings().group === 'all') {
+      groupsList.selectedIndex = 0
+    }
   })
 
 hlib.createUrlInputForm(hlib.getById('urlContainer'))
@@ -57,7 +56,7 @@ function subjectUserHiddenTokens() {
       subjectUserHiddenTokens[key] = '***'
     })
   } else {
-    subjectUserHiddenTokens = {"user1":"***", "user2":"***"}
+    subjectUserHiddenTokens = {}
   }
   return JSON.stringify(subjectUserHiddenTokens)
 }

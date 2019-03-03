@@ -17,10 +17,10 @@ function groupChangeHandler() {
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
-    let select = hlib.getById('groupsList')
-    let option = new Option('All','all')
+    const select = hlib.getById('groupsList')
+    const option = new Option('All','all')
     select.insertBefore(option, select.firstChild)
-    let groupsList = hlib.getById('groupsList') as HTMLSelectElement
+    const groupsList = hlib.getById('groupsList') as HTMLSelectElement
     groupsList.onchange = groupChangeHandler
     if (hlib.getSettings().group === 'all') {
       groupsList.selectedIndex = 0
@@ -72,11 +72,11 @@ const subjectUserTokenArgs = {
 }
 
 hlib.createNamedInputForm(subjectUserTokenArgs)
-let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
 subjectUserTokensForm.value = subjectUserHiddenTokens()
 
 function saveSubjectUserTokens() {
-  let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+  const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
   try {
     subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
     hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')

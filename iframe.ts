@@ -217,7 +217,7 @@ function setExpanderCollapse() {
 function showButtons() {
   if (format === 'html') {
     controlsContainer.innerHTML = `
-      <button id="expander"></button>
+      <button class="expander" id="expander"></button>
       <button id="downloadHTML">downloadHTML</button>`
     const expander = hlib.getById('expander') as HTMLButtonElement
     const expanded = hlib.getSettings().expanded === 'true'
@@ -243,11 +243,15 @@ function showButtons() {
 }
 
 function downloadHTML () {
-  const html = `
-<html>
-${document.head.outerHTML}
-${document.body.outerHTML}
-</html>`
+  const head = document.head
+  let body = document.body
+  const controlsContainer = body.querySelector('#controlsContainer') as HTMLElement
+  controlsContainer.remove()
+  const pencils = body.querySelectorAll('.icon-pencil')
+  pencils.forEach(pencil => {
+    pencil.remove()
+  })
+  const html = `<html>${head.outerHTML}${body.outerHTML}</html>`
   hlib.download(html, 'html')
 }
 

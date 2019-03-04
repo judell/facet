@@ -17,10 +17,9 @@ function groupChangeHandler() {
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
-    const select = hlib.getById('groupsList')
-    const option = new Option('All','all')
-    select.insertBefore(option, select.firstChild)
     const groupsList = hlib.getById('groupsList') as HTMLSelectElement
+    const option = new Option('All','all')
+    groupsList.insertBefore(option, groupsList.firstChild)
     groupsList.onchange = groupChangeHandler
     if (hlib.getSettings().group === 'all') {
       groupsList.selectedIndex = 0
@@ -72,8 +71,15 @@ const subjectUserTokenArgs = {
 }
 
 hlib.createNamedInputForm(subjectUserTokenArgs)
+
 const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
 subjectUserTokensForm.value = subjectUserHiddenTokens()
+const anchor = document.querySelector('#subjectsContainer a') as HTMLElement
+anchor.setAttribute('title', 'edit')
+anchor.onclick = function() { alert('click')}
+anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>`
+
+hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
 function saveSubjectUserTokens() {
   let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
@@ -86,8 +92,6 @@ function saveSubjectUserTokens() {
     subjectUserTokensForm.value = '{}'
   }
 }
-
-hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
 function updateSettingsFromUrl() {
   const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']

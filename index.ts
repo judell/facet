@@ -36,48 +36,13 @@ hlib.createAnyInputForm(hlib.getById('anyContainer'))
 
 hlib.createMaxInputForm(hlib.getById('maxContainer'))
 
+createSubjectUserTokensForm()
+
 hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
 
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
-
-const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
-let subjectUserTokens:any = {} 
-if (_subjectUserTokens) {
-  subjectUserTokens = JSON.parse(_subjectUserTokens) 
-}
-
-function subjectUserHiddenTokens() {
-  let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
-  if (Object.keys(subjectUserHiddenTokens).length) {
-    Object.keys(subjectUserHiddenTokens).forEach( function(key) {
-      subjectUserHiddenTokens[key] = '***'
-    })
-  } else {
-    subjectUserHiddenTokens = {}
-  }
-  return JSON.stringify(subjectUserHiddenTokens)
-}
-
-const subjectUserTokenArgs = {
-  element: hlib.getById('subjectsContainer'),
-  name: 'subject user tokens',
-  id: 'subjectUserTokens',
-  value: `{}`,
-  onchange: saveSubjectUserTokens,
-  type: '',
-  msg: ''
-}
-
-hlib.createNamedInputForm(subjectUserTokenArgs)
-
-const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-subjectUserTokensForm.value = subjectUserHiddenTokens()
-const anchor = document.querySelector('#subjectsContainer a') as HTMLElement
-anchor.setAttribute('title', 'edit')
-anchor.onclick = function() { alert('click')}
-anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>`
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
@@ -131,5 +96,42 @@ function search (format:string) {
   hlib.getById('iframe').setAttribute('src', iframeUrl)
 }
 
-
+function createSubjectUserTokensForm() {
+  const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
+  let subjectUserTokens:any = {} 
+  if (_subjectUserTokens) {
+    subjectUserTokens = JSON.parse(_subjectUserTokens) 
+  }
+  
+  function subjectUserHiddenTokens() {
+    let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
+    if (Object.keys(subjectUserHiddenTokens).length) {
+      Object.keys(subjectUserHiddenTokens).forEach( function(key) {
+        subjectUserHiddenTokens[key] = '***'
+      })
+    } else {
+      subjectUserHiddenTokens = {}
+    }
+    return JSON.stringify(subjectUserHiddenTokens)
+  }
+  
+  const subjectUserTokenArgs = {
+    element: hlib.getById('subjectsContainer'),
+    name: 'subject user tokens',
+    id: 'subjectUserTokens',
+    value: `{}`,
+    onchange: saveSubjectUserTokens,
+    type: '',
+    msg: ''
+  }
+  
+  hlib.createNamedInputForm(subjectUserTokenArgs)
+  
+  const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+  subjectUserTokensForm.value = subjectUserHiddenTokens()
+  const anchor = document.querySelector('#subjectsContainer a') as HTMLElement
+  anchor.setAttribute('title', 'edit')
+  anchor.onclick = function() { alert('click')}
+  anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>`
+}
 

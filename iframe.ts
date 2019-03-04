@@ -309,6 +309,9 @@ async function makeHtmlContentEditable(annoId:string) {
   const iconContainer = editor.querySelector('.icon-pencil') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveHtmlFromContentEditable
+  editor.style.setProperty('margin-top', '16px')
+  editor.style.setProperty('margin-bottom', '16px')
+  editor.style.setProperty('background-color', '#f1eeea')
 }
 
 async function saveHtmlFromContentEditable(e:Event) {
@@ -316,9 +319,8 @@ async function saveHtmlFromContentEditable(e:Event) {
   const userElement = this.closest('.annotationCard').querySelector('.user')
   const username = userElement.innerText.trim() 
   const body = this.closest('.annotationBody')
-  const editor = body.querySelector('.annotationText')
-  editor.setAttribute('class', 'annotationText')
-  let text = editor.innerText
+  const annotationText = body.querySelector('.annotationText')
+  let text = annotationText.innerText
   this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
   this.parentElement.innerHTML = renderIcon('icon-pencil')
   this.onclick = makeHtmlContentEditable
@@ -332,8 +334,13 @@ async function saveHtmlFromContentEditable(e:Event) {
   }
   const converter = new showdown.Converter()
   const html = converter.makeHtml(text)
-  body.querySelector('.annotationText').innerHTML = html
+  annotationText.innerHTML = html
   body.querySelector('.icon-pencil').style.display = 'block'
+  body.querySelector('.textEditor').style.setProperty('margin-top', '0')
+  const editor = body.querySelector('.textEditor')
+  editor.style.setProperty('margin-top', '0')
+  editor.style.setProperty('margin-bottom', '0')
+  editor.style.removeProperty('background-color')
 }
 
 function renderIcon(iconClass:string) {

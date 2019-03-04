@@ -76,7 +76,7 @@ const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjec
 subjectUserTokensForm.value = subjectUserHiddenTokens()
 
 function saveSubjectUserTokens() {
-  const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
+  let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
   try {
     subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
     hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')

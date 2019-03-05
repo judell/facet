@@ -285,9 +285,9 @@ function enableEditing(cardsHTML:string) {
     const deleteButton = document.createElement('span')
     deleteButton.setAttribute('class', 'deleteButton')
     if (subjectUserTokens.hasOwnProperty(username)) {
-      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')"> X</a>`
+      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')">&nbsp;X</a>`
     } else {
-      deleteButton.innerHTML = `&nbsp;`
+      deleteButton.innerHTML = ``
     }
     const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
     userElement.parentNode!.insertBefore(deleteButton, externalLink.nextSibling)

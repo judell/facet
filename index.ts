@@ -36,6 +36,8 @@ hlib.createAnyInputForm(hlib.getById('anyContainer'))
 
 hlib.createMaxInputForm(hlib.getById('maxContainer'))
 
+hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
+
 createSubjectUserTokensForm()
 
 hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
@@ -43,8 +45,6 @@ hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
-
-hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
 function updateSettingsFromUrl() {
   const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']

@@ -282,15 +282,14 @@ function enableEditing(cardsHTML:string) {
     wrapper.setAttribute('class', 'textEditor')
     let display
     if (subjectUserTokens.hasOwnProperty(username)) {
-      display = 'block'
-    } 
-    wrapper.innerHTML = `
-      <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
-        ${renderIcon('icon-pencil')}
-      </div>`
-    textElement.parentNode!.insertBefore(wrapper, textElement)
-    // move elmement into wrapper
-    wrapper.appendChild(textElement)
+      wrapper.innerHTML = `
+        <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
+          ${renderIcon('icon-pencil')}
+        </div>`
+      textElement.parentNode!.insertBefore(wrapper, textElement)
+      // move elmement into wrapper
+      wrapper.appendChild(textElement)
+    }
   }
   return cardsElement.outerHTML
 }

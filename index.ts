@@ -96,13 +96,14 @@ function createSubjectUserTokensForm() {
   anchor.onclick = makeSubjectUsersEditable
 }
 
-function getSubjectUserTokensFromLocalStorage() {
+function getSubjectUserTokensFromLocalStorage(): Map<string,string> {
   let subjectUserTokens = {} as Map<string,string>
   const _subjectUserTokens = localStorage.getItem('h_subjectUserTokens') as string
   if (_subjectUserTokens) {
-    subjectUserTokens = JSON.parse(_subjectUserTokens) 
+    return JSON.parse(_subjectUserTokens) 
+  } else {
+    return JSON.parse(`{"user1" : "token1", "user2" : "token2"}`)
   }
-  return subjectUserTokens 
 }
 
 function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
@@ -114,15 +115,15 @@ function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
   } else {
     subjectUserHiddenTokens = {}
   }
-  return JSON.stringify(subjectUserHiddenTokens)
+  return JSON.stringify(subjectUserHiddenTokens).slice(0,30) + ' ...'
 }
 
 function makeSubjectUsersEditable() {
-  let data = localStorage.getItem('h_subjectUserTokens') as string
-  data = JSON.stringify(JSON.parse(data), null, 2).trim()  
+  const data = getSubjectUserTokensFromLocalStorage()
+  const text = JSON.stringify(data, null, 2).trim()
   hlib.getById('subjectsContainer').innerHTML = `
       <div class="formLabel">subject user tokens</div>
-      <textarea>${data}</textarea>
+      <textarea>${text}</textarea>
       <a title="save" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
       <span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>
     </a>`
@@ -139,13 +140,12 @@ function makeSubjectUsersEditable() {
 function saveSubjectUserTokens() {
   const textarea = document.querySelector('#subjectsContainer textarea') as HTMLTextAreaElement
   try {
-    //let value = textarea.value.replace(/,\n}$/, '\n}') // silently fix most likely error
-    const value = textarea.value
+    const value = textarea.value.replace(/[,\n}]+$/, '\n}') // silently fix most likely error
     JSON.parse(value)
     localStorage.setItem('h_subjectUserTokens', value)
     createSubjectUserTokensForm()
   } catch (e) {
-    alert(`That is not valid JSON. Format is "name":"value" pairs, comma-separated. Please check your input at https://jsoneditoronline.org/`)
+    alert(`That is not valid JSON. Format is "name" : "token" pairs, comma-separated. Please check your input at https://jsoneditoronline.org/`)
   }
 }
 

@@ -96,16 +96,6 @@ function createSubjectUserTokensForm() {
   anchor.onclick = makeSubjectUsersEditable
 }
 
-function getSubjectUserTokensFromLocalStorage(): Map<string,string> {
-  let subjectUserTokens = {} as Map<string,string>
-  const _subjectUserTokens = localStorage.getItem('h_subjectUserTokens') as string
-  if (_subjectUserTokens) {
-    return JSON.parse(_subjectUserTokens) 
-  } else {
-    return JSON.parse(`{"user1" : "token1", "user2" : "token2"}`)
-  }
-}
-
 function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
   let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
   if (Object.keys(subjectUserHiddenTokens).length) {
@@ -119,7 +109,7 @@ function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
 }
 
 function makeSubjectUsersEditable() {
-  const data = getSubjectUserTokensFromLocalStorage()
+  const data = hlib.getSubjectUserTokensFromLocalStorage()
   const text = JSON.stringify(data, null, 2).trim()
   hlib.getById('subjectsContainer').innerHTML = `
       <div class="formLabel">subject user tokens</div>

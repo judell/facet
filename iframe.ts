@@ -11,11 +11,7 @@ delete params['format']
 
 let htmlBuffer = ''
 
-const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
-let subjectUserTokens = {} as string[]
-if (_subjectUserTokens) {
-  subjectUserTokens = JSON.parse(_subjectUserTokens) 
-}
+const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
 
 Object.keys(params).forEach(function (key) {
   if (params[key] === '') {

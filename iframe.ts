@@ -275,23 +275,26 @@ function enableEditing(cardsHTML:string) {
   for (let i = 0; i < cardElements.length; i++ ) {
     const cardElement = cardElements[i]
     let userElement = cardElement.querySelector('.user') as HTMLElement
-    const username = userElement.innerText.trim()
-    let textElement = cardElement.querySelector('.annotationText') as HTMLElement
-    // create wrapper container
-    const wrapper = document.createElement('div')
-    wrapper.setAttribute('class', 'textEditor')
-    let display
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      wrapper.innerHTML = `
-        <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil')}
-        </div>`
-      textElement.parentNode!.insertBefore(wrapper, textElement)
-      // move elmement into wrapper
-      wrapper.appendChild(textElement)
-    }
+    maybeCreateTextEditor(userElement, cardElement)
   }
   return cardsElement.outerHTML
+
+  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: Element) {
+    const username = userElement.innerText.trim()
+    let textElement = cardElement.querySelector('.annotationText') as HTMLElement;
+    // create wrapper container
+    const editorContainer = document.createElement('div')
+    editorContainer.setAttribute('class', 'textEditor')
+    if (subjectUserTokens.hasOwnProperty(username)) {
+      editorContainer.innerHTML = `
+        <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
+          ${renderIcon('icon-pencil')}
+        </div>`;
+      textElement.parentNode!.insertBefore(editorContainer, textElement);
+      // move elmement into wrapper
+      editorContainer.appendChild(textElement)
+    }
+  }
 }
 
 async function makeHtmlContentEditable(annoId:string) {

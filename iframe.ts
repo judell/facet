@@ -279,8 +279,12 @@ function enableEditing(cardsHTML:string) {
   }
   return cardsElement.outerHTML
 
+  function getUserName(userElement: HTMLElement) {
+    return userElement.innerText.trim()
+  }
+
   function maybeCreateTextEditor(userElement: HTMLElement, cardElement: Element) {
-    const username = userElement.innerText.trim()
+    const username = getUserName(userElement)
     let textElement = cardElement.querySelector('.annotationText') as HTMLElement;
     // create wrapper container
     const editorContainer = document.createElement('div')

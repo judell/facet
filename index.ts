@@ -10,10 +10,6 @@ hlib.settingsToUrl(hlib.getSettings()) // add non-overridden remembered params t
 
 hlib.createUserInputForm(hlib.getById('userContainer'))
 
-function groupChangeHandler() {
-  hlib.setSelectedGroup()
-  hlib.getById('buttonHTML').click()
-}
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
@@ -23,6 +19,10 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
     groupsList.onchange = groupChangeHandler
     if (hlib.getSettings().group === 'all') {
       groupsList.selectedIndex = 0
+    }
+    function groupChangeHandler() {
+      hlib.setSelectedGroup()
+      hlib.getById('buttonHTML').click()
     }
   })
 

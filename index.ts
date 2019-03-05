@@ -85,10 +85,11 @@ function search (format:string) {
 }
 
 function createSubjectUserTokensForm() {
-  const userTokens = getSubjectUserHiddenTokens(getSubjectUserTokensFromLocalStorage())
+  const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
+  const hiddenUserTokens = getSubjectUserHiddenTokens(subjectUserTokens)
   hlib.getById('subjectsContainer').innerHTML = `
     <div class="formLabel">subject user tokens</div>
-    <span style="word-break: break-all" class="subjectUserTokensForm">${userTokens}</span>
+    <span style="word-break: break-all" class="subjectUserTokensForm">${hiddenUserTokens}</span>
     <a title="edit" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
           <span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
     </a>`

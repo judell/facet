@@ -286,7 +286,7 @@ function enableEditing(cardsHTML:string) {
     } 
     wrapper.innerHTML = `
       <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
-          <svg style="display:${display}" class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
+        ${renderIcon('icon-pencil')}
       </div>`
     textElement.parentNode!.insertBefore(wrapper, textElement)
     // move elmement into wrapper
@@ -302,7 +302,7 @@ async function makeHtmlContentEditable(annoId:string) {
   const r = await hlib.getAnnotation(annoId.replace(/^_/,''), hlib.getToken())
   const text = JSON.parse(r.response).text
   textElement.innerText = text
-  const iconContainer = editor.querySelector('.icon-pencil') as HTMLElement
+  const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveHtmlFromContentEditable
   editor.style.setProperty('margin-top', '16px')
@@ -311,16 +311,17 @@ async function makeHtmlContentEditable(annoId:string) {
 }
 
 async function saveHtmlFromContentEditable(e:Event) {
-  const annoId = this.closest('.annotationCard').getAttribute('id').replace(/^_/,'')
+  const domAnnoId = this.closest('.annotationCard').getAttribute('id')
+  const annoId = domAnnoId.replace(/^_/,'')
   const userElement = this.closest('.annotationCard').querySelector('.user')
   const username = userElement.innerText.trim() 
   const body = this.closest('.annotationBody')
   const annotationText = body.querySelector('.annotationText')
   let text = annotationText.innerText
   this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
-  this.parentElement.innerHTML = renderIcon('icon-pencil')
-  this.onclick = makeHtmlContentEditable
-  e.stopPropagation()
+  this.innerHTML = renderIcon('icon-pencil')
+  this.onclick = wrappedMakeHtmlContentEditable
+  //e.stopPropagation()
   const payload = JSON.stringify( { text: text } )
   const token = subjectUserTokens[username]
   const r = await hlib.updateAnnotation(annoId, token, payload)
@@ -328,18 +329,28 @@ async function saveHtmlFromContentEditable(e:Event) {
   if ( updatedText !== text) {
     alert (`unable to update, ${r.response}`)
   }
-  const converter = new showdown.Converter()
-  const html = converter.makeHtml(text)
-  annotationText.innerHTML = html
-  body.querySelector('.icon-pencil').style.display = 'block'
-  body.querySelector('.textEditor').style.setProperty('margin-top', '0')
-  const editor = body.querySelector('.textEditor')
-  editor.style.setProperty('margin-top', '0')
-  editor.style.setProperty('margin-bottom', '0')
-  editor.style.removeProperty('background-color')
+  
+  convertToHtml();
+
+  body.querySelector('.icon-pencil').style.display = 'block';
+  body.querySelector('.textEditor').style.setProperty('margin-top', '0');
+  const editor = body.querySelector('.textEditor');
+  editor.style.setProperty('margin-top', '0');
+  editor.style.setProperty('margin-bottom', '0');
+  editor.style.removeProperty('background-color');  
+
+  function wrappedMakeHtmlContentEditable() {
+    return makeHtmlContentEditable(domAnnoId)
+  }
+
+  function convertToHtml() {
+    const converter = new showdown.Converter();
+    const html = converter.makeHtml(text);
+    annotationText.innerHTML = html;
+  }
 }
 
 function renderIcon(iconClass:string) {
-return `<svg class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
+  return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
 }
 

@@ -297,7 +297,7 @@ function enableEditing(cardsHTML:string) {
 
 async function makeHtmlContentEditable(annoId:string) {
   const editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
-  editor.setAttribute('contentEditable','true')
+  editor.style.setProperty('margin-top','16px')
   const textElement = editor.querySelector('.annotationText') as HTMLElement
   const r = await hlib.getAnnotation(annoId.replace(/^_/,''), hlib.getToken())
   const text = JSON.parse(r.response).text
@@ -305,9 +305,8 @@ async function makeHtmlContentEditable(annoId:string) {
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveHtmlFromContentEditable
-  editor.style.setProperty('margin-top', '16px')
-  editor.style.setProperty('margin-bottom', '16px')
   editor.style.setProperty('background-color', '#f1eeea')
+  editor.setAttribute('contentEditable','true')
 }
 
 async function saveHtmlFromContentEditable(e:Event) {
@@ -321,7 +320,6 @@ async function saveHtmlFromContentEditable(e:Event) {
   this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
   this.innerHTML = renderIcon('icon-pencil')
   this.onclick = wrappedMakeHtmlContentEditable
-  //e.stopPropagation()
   const payload = JSON.stringify( { text: text } )
   const token = subjectUserTokens[username]
   const r = await hlib.updateAnnotation(annoId, token, payload)
@@ -335,8 +333,6 @@ async function saveHtmlFromContentEditable(e:Event) {
   body.querySelector('.icon-pencil').style.display = 'block';
   body.querySelector('.textEditor').style.setProperty('margin-top', '0');
   const editor = body.querySelector('.textEditor');
-  editor.style.setProperty('margin-top', '0');
-  editor.style.setProperty('margin-bottom', '0');
   editor.style.removeProperty('background-color');  
 
   function wrappedMakeHtmlContentEditable() {

@@ -277,6 +277,7 @@ function enableEditing(cardsHTML:string) {
     let userElement = cardElement.querySelector('.user') as HTMLElement
     maybeCreateDeleteButton(userElement, cardElement)
     maybeCreateTextEditor(userElement, cardElement)
+    maybeCreateTagEditor(userElement, cardElement)
   }
   return cardsElement.outerHTML
 
@@ -292,29 +293,49 @@ function enableEditing(cardsHTML:string) {
     const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
     userElement.parentNode!.insertBefore(deleteButton, externalLink.nextSibling)
   }
-  
-  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    let textElement = cardElement.querySelector('.annotationText') as HTMLElement;
-    // create wrapper container
+
+  function maybeCreateEditor(username: string, cardId: string, targetElement:HTMLElement, editFunctionName: string) {
     const editorContainer = document.createElement('div')
     editorContainer.setAttribute('class', 'textEditor')
     if (subjectUserTokens.hasOwnProperty(username)) {
       editorContainer.innerHTML = `
-        <div onclick="makeHtmlContentEditable('${cardElement.id}')" class="editOrSaveIcon">
+        <div onclick="${editFunctionName}('${cardId}')" class="editOrSaveIcon">
           ${renderIcon('icon-pencil')}
         </div>`;
-      textElement.parentNode!.insertBefore(editorContainer, textElement);
-      // move elmement into wrapper
-      editorContainer.appendChild(textElement)
+      targetElement.parentNode!.insertBefore(editorContainer, targetElement);
+      editorContainer.appendChild(targetElement)
     }
   }
+  
+  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: HTMLElement) {
+    const username = getUserName(userElement)
+    let targetElement = cardElement.querySelector('.annotationText') as HTMLElement;
+    const editFunctionName = 'makeHtmlContentEditable'
+    maybeCreateEditor(username, cardElement.id, targetElement, editFunctionName)
+  }
+
+  function maybeCreateTagEditor(userElement: HTMLElement, cardElement: HTMLElement) {
+    const username = getUserName(userElement)
+    let tagsElement = cardElement.querySelector('.annotationTags') as HTMLElement;
+    const editorContainer = document.createElement('div')
+    editorContainer.setAttribute('class', 'tagEditor')
+    if (subjectUserTokens.hasOwnProperty(username)) {
+      editorContainer.innerHTML = `
+        <div onclick="makeTagsControlledEditable('${cardElement.id}')" class="editOrSaveIcon">
+          ${renderIcon('icon-pencil')}
+        </div>`;
+      tagsElement.parentNode!.insertBefore(editorContainer, tagsElement);
+      editorContainer.appendChild(tagsElement)
+    }
+  }  
+
 }
 
 async function makeHtmlContentEditable(domAnnoId:string) {
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const editor = document.querySelector(`#${domAnnoId} .textEditor`) as HTMLElement
-  editor.style.setProperty('margin-top','16px')
+  const header = document.querySelector(`#${domAnnoId} .annotationHeader`) as HTMLElement
+  header.style.setProperty('margin-bottom','16px')
   const textElement = editor.querySelector('.annotationText') as HTMLElement
   const r = await hlib.getAnnotation(annoId, hlib.getToken())
   const text = JSON.parse(r.response).text
@@ -328,7 +349,7 @@ async function makeHtmlContentEditable(domAnnoId:string) {
 
 async function saveHtmlFromContentEditable(e:Event) {
   const domAnnoId = this.closest('.annotationCard').getAttribute('id')
-  const annoId = domAnnoId.replace(/^_/,'')
+  const annoId = annoIdFromDomAnnoId(domAnnoId)
   const userElement = this.closest('.annotationCard').querySelector('.user')
   const username = userElement.innerText.trim() 
   const body = this.closest('.annotationBody')
@@ -345,12 +366,13 @@ async function saveHtmlFromContentEditable(e:Event) {
     alert (`unable to update, ${r.response}`)
   }
   
-  convertToHtml();
+  convertToHtml()
 
-  body.querySelector('.icon-pencil').style.display = 'block';
-  body.querySelector('.textEditor').style.setProperty('margin-top', '0');
-  const editor = body.querySelector('.textEditor');
-  editor.style.removeProperty('background-color');  
+  const cardElement = hlib.getById(domAnnoId) as HTMLElement
+  const header = cardElement.querySelector('.annotationHeader') as HTMLElement
+  header.style.setProperty('margin-bottom', '0')
+  const editor = body.querySelector('.textEditor')
+  editor.style.removeProperty('background-color'); 
 
   function wrappedMakeHtmlContentEditable() {
     return makeHtmlContentEditable(domAnnoId)

@@ -56,24 +56,30 @@ e
 
     .textEditor {
       display: flex;
+      line-height: 1;
+    }
+
+    .tagEditor {
+      display: flex;
     }
 
     .icon-floppy, .icon-pencil {
       font-size: x-small;
-      width: 1.5em;
-      height: 1.5em;
+      width: 1.2em;
+      height: 1.2em;
       margin-left: -24px;
       padding-right: 2px;
       cursor: pointer;
     }
 
-    .icon-pencil {
-      display:none; 
-      padding-top: 16px;
+    .textEditor .editOrSaveIcon .icon-pencil {
+      margin-top: 16px;
     }
 
-    .editOrSaveIcon {
+    .tagEditor .editOrSaveIcon .icon-pencil {
+      margin-top: 6px;
     }
+
 
     .preformatted {
       white-space: pre;

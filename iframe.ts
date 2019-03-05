@@ -273,17 +273,27 @@ function enableEditing(cardsHTML:string) {
   cardsElement.innerHTML = cardsHTML
   const cardElements = cardsElement.querySelectorAll('.annotationCard')
   for (let i = 0; i < cardElements.length; i++ ) {
-    const cardElement = cardElements[i]
+    const cardElement = cardElements[i] as HTMLElement
     let userElement = cardElement.querySelector('.user') as HTMLElement
+    maybeCreateDeleteButton(userElement, cardElement)
     maybeCreateTextEditor(userElement, cardElement)
   }
   return cardsElement.outerHTML
 
-  function getUserName(userElement: HTMLElement) {
-    return userElement.innerText.trim()
+  function maybeCreateDeleteButton(userElement: HTMLElement, cardElement: HTMLElement) {
+    const username = getUserName(userElement)
+    const deleteButton = document.createElement('span')
+    deleteButton.setAttribute('class', 'deleteButton')
+    if (subjectUserTokens.hasOwnProperty(username)) {
+      deleteButton.innerHTML = `<a title="delete" onclick="deleteAnnotation('${cardElement.id}')"> X</a>`
+    } else {
+      deleteButton.innerHTML = `&nbsp;`
+    }
+    const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
+    userElement.parentNode!.insertBefore(deleteButton, externalLink.nextSibling)
   }
-
-  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: Element) {
+  
+  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: HTMLElement) {
     const username = getUserName(userElement)
     let textElement = cardElement.querySelector('.annotationText') as HTMLElement;
     // create wrapper container
@@ -301,11 +311,12 @@ function enableEditing(cardsHTML:string) {
   }
 }
 
-async function makeHtmlContentEditable(annoId:string) {
-  const editor = document.querySelector(`#${annoId} .textEditor`) as HTMLElement
+async function makeHtmlContentEditable(domAnnoId:string) {
+  const annoId = annoIdFromDomAnnoId(domAnnoId)
+  const editor = document.querySelector(`#${domAnnoId} .textEditor`) as HTMLElement
   editor.style.setProperty('margin-top','16px')
   const textElement = editor.querySelector('.annotationText') as HTMLElement
-  const r = await hlib.getAnnotation(annoId.replace(/^_/,''), hlib.getToken())
+  const r = await hlib.getAnnotation(annoId, hlib.getToken())
   const text = JSON.parse(r.response).text
   textElement.innerText = text
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
@@ -356,3 +367,30 @@ function renderIcon(iconClass:string) {
   return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
 }
 
+function deleteAnnotation(domAnnoId: string) {
+  if (! window.confirm("Really delete this annotation?")) {
+    return
+  }
+  const userElement = hlib.getById(domAnnoId).querySelector('.user') as HTMLElement
+  const username = getUserName(userElement)
+  const token = subjectUserTokens[username]
+  async function _delete() {
+    const annoId = annoIdFromDomAnnoId(domAnnoId)
+    const r = await hlib.deleteAnnotation(annoId, token)
+    const response = JSON.parse(r.response)
+    if (response.deleted) {
+      hlib.getById(domAnnoId).remove()
+    } else {
+      alert (`unable to delete, ${r.response}`)
+    }
+  }
+  _delete()
+}
+
+function annoIdFromDomAnnoId(domAnnoId:string) {
+  return domAnnoId.replace(/^_/,'')  
+}
+
+function getUserName(userElement: HTMLElement) {
+  return userElement.innerText.trim()
+}

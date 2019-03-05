@@ -45,7 +45,7 @@ function showParams() {
   if (title) {
     hlib.getById('title').innerHTML += title
   } else {
-    hlib.getById('title').style.dispay = 'none'
+    hlib.getById('title').style.display = 'none'
   }
 }
 
@@ -321,14 +321,13 @@ function enableEditing(cardsHTML:string) {
     editorContainer.setAttribute('class', 'tagEditor')
     if (subjectUserTokens.hasOwnProperty(username)) {
       editorContainer.innerHTML = `
-        <div onclick="makeTagsControlledEditable('${cardElement.id}')" class="editOrSaveIcon">
+        <div onclick="makeTagsEditable('${cardElement.id}')" class="editOrSaveIcon">
           ${renderIcon('icon-pencil')}
         </div>`;
       tagsElement.parentNode!.insertBefore(editorContainer, tagsElement);
       editorContainer.appendChild(tagsElement)
     }
   }  
-
 }
 
 async function makeHtmlContentEditable(domAnnoId:string) {
@@ -384,6 +383,12 @@ async function saveHtmlFromContentEditable(e:Event) {
     annotationText.innerHTML = html;
   }
 }
+
+function makeTagsEditable() {
+
+}
+
+
 
 function renderIcon(iconClass:string) {
   return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`

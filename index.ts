@@ -40,6 +40,8 @@ hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
 createSubjectUserTokensForm()
 
+createControlledTagsForm()
+
 hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
 
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
@@ -140,3 +142,18 @@ function saveSubjectUserTokens() {
   }
 }
 
+function createControlledTagsForm() {
+  const controlledTags = JSON.stringify(hlib.getControlledTagsFromLocalStorage())
+  hlib.getById('controlledTagsContainer').innerHTML = `
+    <div class="formLabel">controlled tags</div>
+    <span style="word-break: break-all" class="controlledTagsForm">${controlledTags}</span>
+    <a title="edit" style="cursor:pointer" class="iconEditOrSaveControlledTags">
+          <span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
+    </a>`
+  const anchor = document.querySelector('.iconEditOrSaveControlledTags') as HTMLAnchorElement
+  anchor.onclick = makeControlledTagsEditable
+}
+
+function makeControlledTagsEditable() {
+
+}

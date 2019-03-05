@@ -46,18 +46,6 @@ hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
-function saveSubjectUserTokens() {
-  let subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-  try {
-    subjectUserTokens = JSON.parse(subjectUserTokensForm.value)
-    hlib.setLocalStorageFromForm('subjectUserTokensForm', 'h_subjectUsers')
-    subjectUserTokensForm.value = subjectUserHiddenTokens()
-  } catch (e) {
-    alert(`Please provide a valid JSON like { "user1":"123", "user2":"abc"}`)
-    subjectUserTokensForm.value = '{}'
-  }
-}
-
 function updateSettingsFromUrl() {
   const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
   const settings = ['max', 'subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch']
@@ -97,41 +85,67 @@ function search (format:string) {
 }
 
 function createSubjectUserTokensForm() {
-  const _subjectUserTokens = localStorage.getItem('h_subjectUsers')
-  let subjectUserTokens:any = {} 
+  const userTokens = getSubjectUserHiddenTokens(getSubjectUserTokensFromLocalStorage())
+  hlib.getById('subjectsContainer').innerHTML = `
+    <div class="formLabel">subject user tokens</div>
+    <span style="word-break: break-all" class="subjectUserTokensForm">${userTokens}</span>
+    <a title="edit" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
+          <span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
+    </a>`
+  const anchor = document.querySelector('.iconEditOrSaveSubjectUserTokens') as HTMLAnchorElement
+  anchor.onclick = makeSubjectUsersEditable
+}
+
+function getSubjectUserTokensFromLocalStorage() {
+  let subjectUserTokens = {} as Map<string,string>
+  const _subjectUserTokens = localStorage.getItem('h_subjectUserTokens') as string
   if (_subjectUserTokens) {
     subjectUserTokens = JSON.parse(_subjectUserTokens) 
   }
-  
-  function subjectUserHiddenTokens() {
-    let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
-    if (Object.keys(subjectUserHiddenTokens).length) {
-      Object.keys(subjectUserHiddenTokens).forEach( function(key) {
-        subjectUserHiddenTokens[key] = '***'
-      })
-    } else {
-      subjectUserHiddenTokens = {}
-    }
-    return JSON.stringify(subjectUserHiddenTokens)
+  return subjectUserTokens 
+}
+
+function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
+  let subjectUserHiddenTokens = Object.assign( {}, subjectUserTokens)
+  if (Object.keys(subjectUserHiddenTokens).length) {
+    Object.keys(subjectUserHiddenTokens).forEach( function(key) {
+      subjectUserHiddenTokens[key] = '***'
+    })
+  } else {
+    subjectUserHiddenTokens = {}
   }
-  
-  const subjectUserTokenArgs = {
-    element: hlib.getById('subjectsContainer'),
-    name: 'subject user tokens',
-    id: 'subjectUserTokens',
-    value: `{}`,
-    onchange: saveSubjectUserTokens,
-    type: '',
-    msg: ''
+  return JSON.stringify(subjectUserHiddenTokens)
+}
+
+function makeSubjectUsersEditable() {
+  let data = localStorage.getItem('h_subjectUserTokens') as string
+  data = JSON.stringify(JSON.parse(data), null, 2).trim()  
+  hlib.getById('subjectsContainer').innerHTML = `
+      <div class="formLabel">subject user tokens</div>
+      <textarea>${data}</textarea>
+      <a title="save" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
+      <span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>
+    </a>`
+  const textarea = document.querySelector('#subjectsContainer textarea') as HTMLTextAreaElement
+  textarea.style.width = '42em' 
+  textarea.style.height = '6em'
+  textarea.style.position = 'relative'
+  const anchor = document.querySelector('.iconEditOrSaveSubjectUserTokens') as HTMLAnchorElement
+  anchor.setAttribute('title', 'save')
+  anchor.onclick = saveSubjectUserTokens
+  anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>`
+}
+
+function saveSubjectUserTokens() {
+  const textarea = document.querySelector('#subjectsContainer textarea') as HTMLTextAreaElement
+  try {
+    //let value = textarea.value.replace(/,\n}$/, '\n}') // silently fix most likely error
+    const value = textarea.value
+    JSON.parse(value)
+    localStorage.setItem('h_subjectUserTokens', value)
+    createSubjectUserTokensForm()
+  } catch (e) {
+    alert(`That is not valid JSON. Format is "name":"value" pairs, comma-separated. Please check your input at https://jsoneditoronline.org/`)
   }
-  
-  hlib.createNamedInputForm(subjectUserTokenArgs)
-  
-  const subjectUserTokensForm = document.querySelector('#subjectsContainer .subjectUserTokensForm input') as HTMLInputElement
-  subjectUserTokensForm.value = subjectUserHiddenTokens()
-  const anchor = document.querySelector('#subjectsContainer a') as HTMLElement
-  anchor.setAttribute('title', 'edit')
-  anchor.onclick = function() { alert('click')}
-  anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>`
 }
 

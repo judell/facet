@@ -384,21 +384,36 @@ async function saveHtmlFromContentEditable(e:Event) {
   }
 }
 
-function makeTagsEditable(domAnnoId: string) {
+async function makeTagsEditable(domAnnoId: string) {
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const editor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
   const controlledTags:string[] = hlib.getControlledTagsFromLocalStorage().split(',')
   const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
   const select = document.createElement('select') as HTMLSelectElement
-  controlledTags.forEach(tag => {
+  const r = await hlib.getAnnotation(annoId, hlib.getToken())  
+  const existingTags = JSON.parse(r.response).tags
+  let existingTag:string = ''
+  if (existingTags.length) {
+    existingTag = existingTags[0]
+  }
+  for (let i = 0; i < controlledTags.length; i++ {
+    let controlledTag = controlledTags[i]
     let option = document.createElement('option') as HTMLOptionElement
-    tag = tag.trim()
-    option.value = tag
-    option.innerText = tag
+    controlledTag = controlledTag.trim()
+    option.value = controlledTag
+    option.innerText = controlledTag
+    if (existingTag === controlledTag) {
+      option.setAttribute('selected', 'true')
+    }
     select.options.add(option)
-  })
-  tagsElement.innerHTML = ''
-  tagsElement.appendChild(select)
+  }
+  const anchors = tagsElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>
+  if (anchors.length) {
+    const firstAnchor = anchors[0] as HTMLAnchorElement
+    firstAnchor.parentNode.replaceChild(select, firstAnchor)
+  } else {
+    tagsElement.appendChild(select)
+  }
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveControlledTag
@@ -412,13 +427,20 @@ async function saveControlledTag(e:Event) {
   const body = this.closest('.annotationBody')
   const select = body.querySelector('.annotationTags select') as HTMLSelectElement
   const selected = select[select.selectedIndex] as HTMLOptionElement
-  let tags = [ selected.value ]
+  const tags = [ selected.value ]
+  const r1 = await hlib.getAnnotation(annoId, hlib.getToken())
+  let newTags = JSON.parse(r1.response).tags as string[]
+  if (newTags.length) {
+    newTags[0] = selected.value
+  } else {
+    newTags = [ selected.value ]
+  }
   this.innerHTML = renderIcon('icon-pencil')
   this.onclick = wrappedMakeTagsEditable
-  const payload = JSON.stringify( { tags: tags } )
+  const payload = JSON.stringify( { tags: newTags } )
   const token = subjectUserTokens[username]
-  const r = await hlib.updateAnnotation(annoId, token, payload)
-  let updatedTags = JSON.parse(r.response).tags
+  const r2 = await hlib.updateAnnotation(annoId, token, payload)
+  let updatedTags = JSON.parse(r2.response).tags
   if ( JSON.stringify(updatedTags) !== JSON.stringify(tags) ) {
     alert (`unable to update, ${r.response}`)
   }

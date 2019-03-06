@@ -279,7 +279,7 @@ function enableEditing(cardsHTML:string) {
     maybeCreateTextEditor(userElement, cardElement)
     maybeCreateTagEditor(userElement, cardElement)
   }
-  return cardsElement.outerHTML
+  return cardsElement.innerHTML
 
   function maybeCreateDeleteButton(userElement: HTMLElement, cardElement: HTMLElement) {
     const username = getUserName(userElement)
@@ -414,6 +414,14 @@ async function makeTagsEditable(domAnnoId: string) {
   } else {
     tagsElement.appendChild(select)
   }
+
+  for (let i = 1; i < anchors.length; i++) {
+    let input = document.createElement('input') as HTMLInputElement
+    input.value = anchors[i].innerText
+    input.style.width = '6em'
+    anchors[i].parentNode.replaceChild(input, anchors[i])
+  }
+
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveControlledTag
@@ -428,22 +436,21 @@ async function saveControlledTag(e:Event) {
   const select = body.querySelector('.annotationTags select') as HTMLSelectElement
   const selected = select[select.selectedIndex] as HTMLOptionElement
   const tags = [ selected.value ]
-  const r1 = await hlib.getAnnotation(annoId, hlib.getToken())
-  let newTags = JSON.parse(r1.response).tags as string[]
-  if (newTags.length) {
-    newTags[0] = selected.value
-  } else {
-    newTags = [ selected.value ]
-  }
+  let newTags = [ selected.value ]
+  const inputs = body.querySelectorAll('input') as NodeListOf<HTMLInputElement>
+  inputs.forEach(input => {
+    newTags.push(input.value)
+  })
   this.innerHTML = renderIcon('icon-pencil')
   this.onclick = wrappedMakeTagsEditable
   const payload = JSON.stringify( { tags: newTags } )
   const token = subjectUserTokens[username]
   const r2 = await hlib.updateAnnotation(annoId, token, payload)
   let updatedTags = JSON.parse(r2.response).tags
-  if ( JSON.stringify(updatedTags) !== JSON.stringify(tags) ) {
-    alert (`unable to update, ${r.response}`)
+  if ( JSON.stringify(updatedTags) !== JSON.stringify(newTags) ) {
+    alert (`unable to update, ${r2.response}`)
   }
+  body.querySelector('.annotationTags').innerHTML = hlib.formatTags(newTags)
 
   function wrappedMakeTagsEditable() {
     return makeTagsEditable(domAnnoId)

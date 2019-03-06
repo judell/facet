@@ -396,7 +396,7 @@ async function makeTagsEditable(domAnnoId: string) {
   if (existingTags.length) {
     existingTag = existingTags[0]
   }
-  for (let i = 0; i < controlledTags.length; i++ {
+  for (let i = 0; i < controlledTags.length; i++) {
     let controlledTag = controlledTags[i]
     let option = document.createElement('option') as HTMLOptionElement
     controlledTag = controlledTag.trim()
@@ -459,7 +459,7 @@ async function saveControlledTag(e:Event) {
 
 
 function renderIcon(iconClass:string) {
-  return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
+  return `<svg style="display:block; fill:#582108b5" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
 }
 
 function deleteAnnotation(domAnnoId: string) {

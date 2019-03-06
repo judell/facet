@@ -404,9 +404,30 @@ function makeTagsEditable(domAnnoId: string) {
   iconContainer.onclick = saveControlledTag
 }
 
-function saveControlledTag() {
-  alert('save!')
+async function saveControlledTag(e:Event) {
+  const domAnnoId = this.closest('.annotationCard').getAttribute('id')
+  const annoId = annoIdFromDomAnnoId(domAnnoId)
+  const userElement = this.closest('.annotationCard').querySelector('.user')
+  const username = userElement.innerText.trim() 
+  const body = this.closest('.annotationBody')
+  const select = body.querySelector('.annotationTags select') as HTMLSelectElement
+  const selected = select[select.selectedIndex] as HTMLOptionElement
+  let tags = [ selected.value ]
+  this.innerHTML = renderIcon('icon-pencil')
+  this.onclick = wrappedMakeTagsEditable
+  const payload = JSON.stringify( { tags: tags } )
+  const token = subjectUserTokens[username]
+  const r = await hlib.updateAnnotation(annoId, token, payload)
+  let updatedTags = JSON.parse(r.response).tags
+  if ( JSON.stringify(updatedTags) !== JSON.stringify(tags) ) {
+    alert (`unable to update, ${r.response}`)
+  }
+
+  function wrappedMakeTagsEditable() {
+    return makeTagsEditable(domAnnoId)
+  }
 }
+
 
 function renderIcon(iconClass:string) {
   return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`

@@ -10,7 +10,6 @@ hlib.settingsToUrl(hlib.getSettings()) // add non-overridden remembered params t
 
 hlib.createUserInputForm(hlib.getById('userContainer'))
 
-
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
     const groupsList = hlib.getById('groupsList') as HTMLSelectElement
@@ -115,11 +114,11 @@ function makeSubjectUsersEditable() {
   const data = hlib.getSubjectUserTokensFromLocalStorage()
   const text = JSON.stringify(data, null, 2).trim()
   hlib.getById('subjectsContainer').innerHTML = `
-      <div class="formLabel">subject user tokens</div>
-      <textarea>${text}</textarea>
-      <a title="save" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
-      <span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>
-    </a>`
+  <div class="formLabel">subject user tokens</div>
+  <textarea>${text}</textarea>
+  <a title="save" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
+    <span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>
+  </a>`
   const textarea = document.querySelector('#subjectsContainer textarea') as HTMLTextAreaElement
   textarea.style.width = '42em' 
   textarea.style.height = '6em'
@@ -143,7 +142,7 @@ function saveSubjectUserTokens() {
 }
 
 function createControlledTagsForm() {
-  const controlledTags = JSON.stringify(hlib.getControlledTagsFromLocalStorage())
+  const controlledTags = JSON.stringify(hlib.getControlledTagsFromLocalStorage()).slice(0,30) + ' ...'
   hlib.getById('controlledTagsContainer').innerHTML = `
     <div class="formLabel">controlled tags</div>
     <span style="word-break: break-all" class="controlledTagsForm">${controlledTags}</span>
@@ -155,5 +154,25 @@ function createControlledTagsForm() {
 }
 
 function makeControlledTagsEditable() {
+  const editableTags = hlib.getControlledTagsFromLocalStorage()
+  hlib.getById('controlledTagsContainer').innerHTML = `
+    <div class="formLabel">controlled tags</div>
+    <textarea>${editableTags}</textarea>
+    <a title="save" style="cursor:pointer" class="iconEditOrSaveControlledTags">
+      <span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>
+    </a>`
+  const textarea = document.querySelector('#controlledTagsContainer textarea') as HTMLTextAreaElement
+  textarea.style.width = '42em' 
+  textarea.style.height = '2em'
+  textarea.style.position = 'relative'
+  const anchor = document.querySelector('.iconEditOrSaveControlledTags') as HTMLAnchorElement
+  anchor.setAttribute('title', 'save')
+  anchor.onclick = saveControlledTags
+  anchor.innerHTML = `<span>&nbsp;</span><svg class="icon-floppy"><use xlink:href="#icon-floppy"></use></svg>`
+}
 
+function saveControlledTags() {
+  const textarea = document.querySelector('#controlledTagsContainer textarea') as HTMLTextAreaElement
+  localStorage.setItem('h_controlledTags', textarea.value)
+  createControlledTagsForm()
 }

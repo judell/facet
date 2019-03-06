@@ -384,11 +384,29 @@ async function saveHtmlFromContentEditable(e:Event) {
   }
 }
 
-function makeTagsEditable() {
-
+function makeTagsEditable(domAnnoId: string) {
+  const annoId = annoIdFromDomAnnoId(domAnnoId)
+  const editor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
+  const controlledTags:string[] = hlib.getControlledTagsFromLocalStorage().split(',')
+  const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
+  const select = document.createElement('select') as HTMLSelectElement
+  controlledTags.forEach(tag => {
+    let option = document.createElement('option') as HTMLOptionElement
+    tag = tag.trim()
+    option.value = tag
+    option.innerText = tag
+    select.options.add(option)
+  })
+  tagsElement.innerHTML = ''
+  tagsElement.appendChild(select)
+  const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
+  iconContainer.innerHTML = renderIcon('icon-floppy')
+  iconContainer.onclick = saveControlledTag
 }
 
-
+function saveControlledTag() {
+  alert('save!')
+}
 
 function renderIcon(iconClass:string) {
   return `<svg style="display:block" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`

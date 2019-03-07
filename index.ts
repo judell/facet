@@ -1,5 +1,8 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
+const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any'] as string[]
+const settings = ['max', 'subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch'] as string[]
+
 if ( ! localStorage.getItem('h_settings') ) {
   hlib.settingsToLocalStorage(hlib.getSettings()) // initialize settings
 }
@@ -48,8 +51,6 @@ hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
 
 function updateSettingsFromUrl() {
-  const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any']
-  const settings = ['max', 'subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch']
   const params = facets.concat(settings)
   params.forEach(param => {
     if (hlib.gup(param) !== '') {
@@ -185,9 +186,15 @@ function dropHandler(e:DragEvent) {
   //getHTML()
 }
 
-document.addEventListener('formUrlStorageSync', function (e) {
-  getHTML()
+const activeFields = facets.concat('max').filter(x => {return x !== 'group'})
+activeFields.forEach(field => {
+  const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement
+  fieldElement.addEventListener('formUrlStorageSync', function (e) {
+    console.log(e)
+    getHTML()
+  })
+  fieldElement.addEventListener('clearInput', function (e) {
+    console.log(e)
+    getHTML()
+  })
 })
-
-})
-

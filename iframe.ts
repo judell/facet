@@ -379,6 +379,7 @@ async function saveHtmlFromContentEditable(e:Event) {
 
   function convertToHtml() {
     const converter = new showdown.Converter();
+    converter.setFlavor('gitHub')
     const html = converter.makeHtml(text);
     annotationText.innerHTML = html;
   }

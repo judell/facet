@@ -182,19 +182,17 @@ function dropHandler(e:DragEvent) {
   const element = e.target as HTMLInputElement
   element.focus()
   element.click()
-  hlib.getById('groupsList').focus()
-  //getHTML()
+  hlib.getById('refocuser').focus()
+  hlib.getById('refocuser').click()
 }
 
 const activeFields = facets.concat('max').filter(x => {return x !== 'group'})
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement
   fieldElement.addEventListener('formUrlStorageSync', function (e) {
-    console.log(e)
     getHTML()
   })
   fieldElement.addEventListener('clearInput', function (e) {
-    console.log(e)
     getHTML()
   })
 })

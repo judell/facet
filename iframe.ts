@@ -418,7 +418,6 @@ async function makeTagsEditable(domAnnoId: string) {
   for (let i = 1; i < anchors.length; i++) {
     let input = document.createElement('input') as HTMLInputElement
     input.value = anchors[i].innerText
-    input.style.width = '6em'
     anchors[i].parentNode.replaceChild(input, anchors[i])
   }
 
@@ -489,3 +488,4 @@ function annoIdFromDomAnnoId(domAnnoId:string) {
 function getUserName(userElement: HTMLElement) {
   return userElement.innerText.trim()
 }
+

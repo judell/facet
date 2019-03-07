@@ -176,3 +176,18 @@ function saveControlledTags() {
   localStorage.setItem('h_controlledTags', textarea.value)
   createControlledTagsForm()
 }
+
+function dropHandler(e:DragEvent) {
+  const element = e.target as HTMLInputElement
+  element.focus()
+  element.click()
+  hlib.getById('groupsList').focus()
+  //getHTML()
+}
+
+document.addEventListener('formUrlStorageSync', function (e) {
+  getHTML()
+})
+
+})
+

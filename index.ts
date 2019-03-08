@@ -179,13 +179,11 @@ function saveControlledTags() {
 }
 
 function dropHandler(e:DragEvent) {
-  const element = e.target as HTMLInputElement
-  element.focus()
-  element.click()
-  hlib.getById('refocuser').focus()
-  hlib.getById('refocuser').click()
+  const target = e.target as HTMLInputElement
+  target.focus()
+  target.click()
 }
-
+  
 const activeFields = facets.concat('max').filter(x => {return x !== 'group'})
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement

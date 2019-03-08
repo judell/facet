@@ -31,7 +31,7 @@ hlib.search(params, 'progress')
   })
 
 function showParams() {
-  const excluded = ['service', 'subjectUserTokens', '_separate_replies']
+  const excluded = ['service', 'subjectUserTokens', '_separate_replies', 'controlledTags']
   if (params.max == hlib.defaultMax) {
     excluded.push('max')
   }
@@ -67,6 +67,8 @@ function exactTagSearch(annos:any[])  {
 }
 
 function processSearchResults (annos:any[], replies:any[]) {
+
+  hlib.getById('title').innerHTML += ` ${annos.length} annotations, ${replies.length} replies`
 
   if ( annos.length == 0 && replies.length == 0 ) {
     hlib.getById('progress').innerText = ''

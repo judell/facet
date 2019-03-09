@@ -352,7 +352,9 @@ async function saveHtmlFromContentEditable(e:Event) {
   const body = this.closest('.annotationBody')
   const annotationText = body.querySelector('.annotationText')
   let text = annotationText.innerText
-  this.closest('.textEditor').removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
+  const editor = this.closest('.textEditor') as HTMLElement
+  editor.removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
+  editor.style.removeProperty('background-color')
   this.innerHTML = renderIcon('icon-pencil')
   this.onclick = wrappedMakeHtmlContentEditable
   const payload = JSON.stringify( { text: text } )
@@ -368,9 +370,7 @@ async function saveHtmlFromContentEditable(e:Event) {
   const cardElement = hlib.getById(domAnnoId) as HTMLElement
   const header = cardElement.querySelector('.annotationHeader') as HTMLElement
   header.style.setProperty('margin-bottom', '0')
-  const editor = body.querySelector('.textEditor')
-  editor.style.removeProperty('background-color'); 
-
+  
   function wrappedMakeHtmlContentEditable() {
     return makeHtmlContentEditable(domAnnoId)
   }

@@ -339,6 +339,9 @@ async function makeHtmlContentEditable(domAnnoId:string) {
   iconContainer.onclick = saveHtmlFromContentEditable
   editor.style.setProperty('background-color', '#f1eeea')
   editor.setAttribute('contentEditable','true')
+  const card = hlib.getById(domAnnoId) as HTMLElement
+  const icon = card.querySelector('.tagEditor .editOrSaveIcon') as HTMLElement
+  icon.style.display = 'block'
 }
 
 async function saveHtmlFromContentEditable(e:Event) {

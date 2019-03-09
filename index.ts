@@ -15,7 +15,8 @@ hlib.createUserInputForm(hlib.getById('userContainer'))
 
 hlib.createGroupInputForm(hlib.getById('groupContainer'))
   .then( _ => {
-    const groupsList = hlib.getById('groupsList') as HTMLSelectElement
+    const selectId = 'groupsList'
+    const groupsList = hlib.getById(selectId) as HTMLSelectElement
     const option = new Option('All','all')
     groupsList.insertBefore(option, groupsList.firstChild)
     groupsList.onchange = groupChangeHandler
@@ -23,7 +24,7 @@ hlib.createGroupInputForm(hlib.getById('groupContainer'))
       groupsList.selectedIndex = 0
     }
     function groupChangeHandler() {
-      hlib.setSelectedGroup()
+      hlib.setSelectedGroup(selectId)
       hlib.getById('buttonHTML').click()
     }
   })
@@ -37,6 +38,8 @@ hlib.createTagInputForm(hlib.getById('tagContainer'))
 hlib.createAnyInputForm(hlib.getById('anyContainer'))
 
 hlib.createMaxInputForm(hlib.getById('maxContainer'))
+const maxClearInput = document.querySelector('#maxContainer .clearInput') as HTMLElement
+maxClearInput.remove()
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
@@ -106,7 +109,7 @@ function getSubjectUserHiddenTokens(subjectUserTokens: Map<string,string>) {
       subjectUserHiddenTokens[key] = '***'
     })
   } else {
-    subjectUserHiddenTokens = {}
+    subjectUserHiddenTokens = {} as Map<string,string>
   }
   return JSON.stringify(subjectUserHiddenTokens).slice(0,30) + ' ...'
 }
@@ -182,9 +185,17 @@ function dropHandler(e:DragEvent) {
   const target = e.target as HTMLInputElement
   target.focus()
   target.click()
+  setTimeout( _ => {
+    if (target.id === 'urlForm' || target.id === 'wildcard_uriForm') {
+      target.value = target.value.replace('https://hyp.is/go?url=','')
+      if (target.id === 'wildcard_uriForm') {
+        target.value += '/*'
+      }
+    }
+  }, 0)
 }
   
-const activeFields = facets.concat('max').filter(x => {return x !== 'group'})
+const activeFields = facets.filter(x => {return x !== 'group'})
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement
   fieldElement.addEventListener('formUrlStorageSync', function (e) {

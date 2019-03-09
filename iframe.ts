@@ -64,7 +64,7 @@ function exactTagSearch(annos:any[])  {
       checkedAnnos.push(anno)
     } else {
       const counterId = anno.isReply ? 'replyCount' : 'annoCount'
-      decrementCount(counterId)
+      decrementAnnoOrReplyCount(counterId)
     }
   })
   return checkedAnnos
@@ -464,7 +464,8 @@ function deleteAnnotation(domAnnoId: string) {
   if (! window.confirm("Really delete this annotation?")) {
     return
   }
-  const userElement = hlib.getById(domAnnoId).querySelector('.user') as HTMLElement
+  const card = hlib.getById(domAnnoId) as HTMLElement
+  const userElement = card.querySelector('.user') as HTMLElement
   const username = getUserName(userElement)
   const token = subjectUserTokens[username]
   async function _delete() {
@@ -472,7 +473,10 @@ function deleteAnnotation(domAnnoId: string) {
     const r = await hlib.deleteAnnotation(annoId, token)
     const response = JSON.parse(r.response)
     if (response.deleted) {
+      const cardCounter = card.closest('div[id*="cards_counter"') as HTMLElement    
+      const urlCounter = cardCounter.previousElementSibling as HTMLHeadingElement
       hlib.getById(domAnnoId).remove()
+      decrementPerUrlCount(urlCounter.id)
     } else {
       alert (`unable to delete, ${r.response}`)
     }
@@ -488,9 +492,21 @@ function getUserName(userElement: HTMLElement) {
   return userElement.innerText.trim()
 }
 
-function decrementCount(id:string) {
+function decrementAnnoOrReplyCount(id:string) {
   const counterElement = hlib.getById(id) as HTMLSpanElement
   let count:number = parseInt(counterElement.innerText)
   count--
   counterElement.innerText = count.toString()
+}
+
+function decrementPerUrlCount(urlCounterId:string) {
+  const urlHeading = hlib.getById(urlCounterId)
+  const counterElement = urlHeading.querySelector('.counter') as HTMLElement
+  let counter = parseInt(counterElement.innerText)
+  counter--
+  if (counter == 0) {
+    urlHeading.remove()
+  } else {
+    counterElement.innerText = ` ${counter}`
+  }
 }

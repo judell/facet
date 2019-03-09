@@ -44,7 +44,7 @@ createSubjectUserTokensForm()
 
 createControlledTagsForm()
 
-hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
+//hlib.createSearchRepliesCheckbox(hlib.getById('searchRepliesContainer'))
 
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 
@@ -78,7 +78,7 @@ function search (format:string) {
   let params:any = {}
   params = Object.assign(params, hlib.getSettings())
   params['format'] = format
-  params['_separate_replies'] = settings.searchReplies
+  params['_separate_replies'] = 'false'
   params['group'] = hlib.getSelectedGroup('groupsList')
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))

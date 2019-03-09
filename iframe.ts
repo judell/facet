@@ -59,8 +59,12 @@ function exactTagSearch(annos:any[])  {
   const checkedAnnos:any[] = []
   const queryTag = params.tag
   annos.forEach(anno => {
-    if (anno.tags.indexOf(queryTag) != -1) {
+    const _tags = anno.tags.map(t => { return t.toLowerCase() })
+    if (_tags.indexOf(queryTag.toLowerCase()) > -1) {
       checkedAnnos.push(anno)
+    } else {
+      const counterId = anno.isReply ? 'replyCount' : 'annoCount'
+      decrementCount(counterId)
     }
   })
   return checkedAnnos
@@ -68,7 +72,7 @@ function exactTagSearch(annos:any[])  {
 
 function processSearchResults (annos:any[], replies:any[]) {
 
-  hlib.getById('title').innerHTML += ` ${annos.length} annotations, ${replies.length} replies`
+  hlib.getById('title').innerHTML += ` annotations <span id="annoCount">${annos.length}</span>, replies <span id="replyCount">${replies.length}</span>`
 
   if ( annos.length == 0 && replies.length == 0 ) {
     hlib.getById('progress').innerText = ''
@@ -78,15 +82,19 @@ function processSearchResults (annos:any[], replies:any[]) {
       <p>If you still find nothing, try ticking <i>search replies</i>.
       `
     hlib.getById('widget').style.display= 'block'
-    return 
+    return
   }
+  
   annos = exactTagSearch(annos)
+  replies = exactTagSearch(replies)
+  
   let csv = ''
   const json:any[] = []
-  const gathered = hlib.gatherAnnotationsByUrl(annos)
-  const reversedUrls = reverseChronUrls(gathered.urlUpdates)
-  let counter = 0
+  const gatheredResults = hlib.gatherAnnotationsByUrl(annos.concat(replies))
+  const reversedUrls = reverseChronUrls(gatheredResults)
   
+  let cardCounter = 0
+
   reversedUrls.forEach(url => {
     renderCardsForUrl(url)
   })
@@ -104,52 +112,39 @@ function processSearchResults (annos:any[], replies:any[]) {
       hlib.collapseAll()
     }
   }
-
-  
+   
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
   function renderCardsForUrl(url: any) {
-    counter++
-    const perUrlCount = gathered.urls[url]
-    const idsForUrl: string[] = gathered.ids[url]
+    cardCounter++
+    const annosForUrl: hlib.annotation[] = gatheredResults[url].annos
+    const repliesForUrl: hlib.annotation[] = gatheredResults[url].replies
+    const perUrlCount = annosForUrl.length + repliesForUrl.length
     if (format === 'html') {
-      htmlBuffer += showUrlResults(counter, 'widget', url, perUrlCount, gathered.titles[url])
+      htmlBuffer += showUrlResults(cardCounter, 'widget', url, perUrlCount, gatheredResults[url].title)
     }
     let cardsHTMLBuffer = ''
-    idsForUrl.forEach(idForUrl => {
-      let _replies = handleSeparateReplies(idForUrl)
-      let all = [gathered.annos[idForUrl]].concat(_replies.reverse())
-      all.forEach(anno => {
-        let level = params._separate_replies === 'false' ? 0 : anno.refs.length
-        if (format === 'html') {
-          let cardsHTML = hlib.showAnnotation(anno, level)
-          cardsHTML = enableEditing(cardsHTML)
-          cardsHTMLBuffer += cardsHTML
-        }
-        else if (format === 'csv') {
-          let _row = document.createElement('div')
-          _row.innerHTML = hlib.csvRow(level, anno)
-          csv += _row.innerText + '\n'
-        }
-        else if (format === 'json') {
-          anno.text = anno.text.replace(/</g, '&lt')
-          json.push(anno)
-        }
-      })
+    let all = annosForUrl.concat(repliesForUrl)
+    all.forEach(anno => {
+      //let level = params._separate_replies === 'false' ? 0 : anno.refs.length
+      let level = anno.isReply ? anno.refs.length : 0
+      if (format === 'html') {
+        let cardsHTML = hlib.showAnnotation(anno, level)
+        cardsHTML = enableEditing(cardsHTML)
+        cardsHTMLBuffer += cardsHTML
+      }
+      else if (format === 'csv') {
+        let _row = document.createElement('div')
+        _row.innerHTML = hlib.csvRow(level, anno)
+        csv += _row.innerText + '\n'
+      }
+      else if (format === 'json') {
+        anno.text = anno.text.replace(/</g, '&lt')
+        json.push(anno)
+      }
     })
-    htmlBuffer = htmlBuffer.replace(`CARDS_${counter}`, cardsHTMLBuffer)
-  }
-
-  function handleSeparateReplies(idForUrl: string) {
-    let _replies = replies
-    if (params._separate_replies === 'true') {
-      _replies = hlib.findRepliesForId(idForUrl, replies)
-      _replies = _replies.map(r => {
-        return hlib.parseAnnotation(r)
-      })
-    }
-    return _replies
+    htmlBuffer = htmlBuffer.replace(`CARDS_${cardCounter}`, cardsHTMLBuffer)
   }
 
   function styleWidget(csv: string, json: any[]) {
@@ -182,15 +177,13 @@ function processSearchResults (annos:any[], replies:any[]) {
     return output
   }
   
-  function reverseChronUrls (urlUpdates:any) {
-    const reverseChronUrls = []
-    for (const urlUpdate in urlUpdates) { // sort urls in reverse chron of recent update
-      reverseChronUrls.push([urlUpdate, urlUpdates[urlUpdate]])
+  function reverseChronUrls (results: hlib.gatheredResults) {
+    const urls = Object.keys(results)
+    function reverseByUpdate(a:string, b:string) {
+      return new Date(results[b].updated).getTime() - new Date(results[a].updated).getTime()
     }
-    reverseChronUrls.sort(function (a:string[], b:string[]) {
-      return new Date(b[1]).getTime() - new Date(a[1]).getTime()
-    })
-    return reverseChronUrls.map(item => item[0])
+    urls.sort()
+    return urls
   }
 }
 
@@ -492,3 +485,9 @@ function getUserName(userElement: HTMLElement) {
   return userElement.innerText.trim()
 }
 
+function decrementCount(id:string) {
+  const counterElement = hlib.getById(id) as HTMLSpanElement
+  let count:number = parseInt(counterElement.innerText)
+  count--
+  counterElement.innerText = count.toString()
+}

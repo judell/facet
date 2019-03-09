@@ -328,8 +328,10 @@ function enableEditing(cardsHTML:string) {
 async function makeHtmlContentEditable(domAnnoId:string) {
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const editor = document.querySelector(`#${domAnnoId} .textEditor`) as HTMLElement
-  const header = document.querySelector(`#${domAnnoId} .annotationHeader`) as HTMLElement
-  header.style.setProperty('margin-bottom','16px')
+  editor.style.setProperty('margin-top', '16px')
+  editor.style.setProperty('margin-bottom', '16px')
+  editor.style.setProperty('background-color', '#f1eeea')
+  editor.setAttribute('contentEditable','true')
   const textElement = editor.querySelector('.annotationText') as HTMLElement
   const r = await hlib.getAnnotation(annoId, hlib.getToken())
   const text = JSON.parse(r.response).text
@@ -337,8 +339,6 @@ async function makeHtmlContentEditable(domAnnoId:string) {
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveHtmlFromContentEditable
-  editor.style.setProperty('background-color', '#f1eeea')
-  editor.setAttribute('contentEditable','true')
   const card = hlib.getById(domAnnoId) as HTMLElement
   const icon = card.querySelector('.tagEditor .editOrSaveIcon') as HTMLElement
   icon.style.display = 'block'
@@ -356,6 +356,8 @@ async function saveHtmlFromContentEditable(e:Event) {
   editor.removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
   editor.style.removeProperty('background-color')
   this.innerHTML = renderIcon('icon-pencil')
+  const icon = editor.querySelector('.icon-pencil') as HTMLElement
+  icon.style.setProperty('margin-top', '0')
   this.onclick = wrappedMakeHtmlContentEditable
   const payload = JSON.stringify( { text: text } )
   const token = subjectUserTokens[username]
@@ -366,10 +368,6 @@ async function saveHtmlFromContentEditable(e:Event) {
   }
   
   convertToHtml()
-
-  const cardElement = hlib.getById(domAnnoId) as HTMLElement
-  const header = cardElement.querySelector('.annotationHeader') as HTMLElement
-  header.style.setProperty('margin-bottom', '0')
   
   function wrappedMakeHtmlContentEditable() {
     return makeHtmlContentEditable(domAnnoId)

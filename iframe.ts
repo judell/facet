@@ -384,43 +384,54 @@ async function saveHtmlFromContentEditable(e:Event) {
 async function makeTagsEditable(domAnnoId: string) {
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const editor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
-  const controlledTags:string[] = hlib.getControlledTagsFromLocalStorage().split(',')
+  const _controlledTags = hlib.getControlledTagsFromLocalStorage()
+  const useControlledTags = _controlledTags !== hlib.defaultControlledTags
   const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
-  const select = document.createElement('select') as HTMLSelectElement
-  const r = await hlib.getAnnotation(annoId, hlib.getToken())  
+  const r = await hlib.getAnnotation(annoId, hlib.getToken())
   const existingTags = JSON.parse(r.response).tags
-  let existingTag:string = ''
-  if (existingTags.length) {
-    existingTag = existingTags[0]
-  }
-  for (let i = 0; i < controlledTags.length; i++) {
-    let controlledTag = controlledTags[i]
-    let option = document.createElement('option') as HTMLOptionElement
-    controlledTag = controlledTag.trim()
-    option.value = controlledTag
-    option.innerText = controlledTag
-    if (existingTag === controlledTag) {
-      option.setAttribute('selected', 'true')
-    }
-    select.options.add(option)
-  }
+  const firstTag:string = existingTags.length ? existingTags[0] : ''
   const anchors = tagsElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>
-  if (anchors.length) {
-    const firstAnchor = anchors[0] as HTMLAnchorElement
-    firstAnchor.parentNode.replaceChild(select, firstAnchor)
-  } else {
-    tagsElement.appendChild(select)
-  }
-
-  for (let i = 1; i < anchors.length; i++) {
+  if (useControlledTags) {
+    const select = createPicklist(firstTag, _controlledTags)
+    insertPicklist(select)
+  } 
+  const start = useControlledTags ? 1 : 0  // if controlled, skip first
+  for (let i = start; i < anchors.length; i++) {
     let input = document.createElement('input') as HTMLInputElement
     input.value = anchors[i].innerText
     anchors[i].parentNode.replaceChild(input, anchors[i])
   }
-
+  
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy')
   iconContainer.onclick = saveControlledTag
+
+  function insertPicklist(select: HTMLSelectElement) {
+    if (anchors.length) {
+      const firstAnchor = anchors[0] as HTMLAnchorElement;
+      firstAnchor.parentNode.replaceChild(select, firstAnchor)
+    }
+    else {
+      tagsElement.appendChild(select)
+    }
+  }
+
+  function createPicklist(firstTag:string, _controlledTags:string) {
+    const controlledTags:string[] = _controlledTags.split(',')
+    const select = document.createElement('select') as HTMLSelectElement
+    for (let i = 0; i < controlledTags.length; i++) {
+      let controlledTag = controlledTags[i]
+      let option = document.createElement('option') as HTMLOptionElement
+      controlledTag = controlledTag.trim()
+      option.value = controlledTag
+      option.innerText = controlledTag;
+      if (firstTag === controlledTag) {
+        option.setAttribute('selected', 'true')
+      }
+      select.options.add(option)
+    }
+    return select
+  }
 }
 
 async function saveControlledTag(e:Event) {
@@ -430,9 +441,11 @@ async function saveControlledTag(e:Event) {
   const username = userElement.innerText.trim() 
   const body = this.closest('.annotationBody')
   const select = body.querySelector('.annotationTags select') as HTMLSelectElement
-  const selected = select[select.selectedIndex] as HTMLOptionElement
-  const tags = [ selected.value ]
-  let newTags = [ selected.value ]
+  const newTags = [] as string[]
+  if (select) {
+    const selected = select[select.selectedIndex] as HTMLOptionElement
+    newTags.push(selected.value)
+  }
   const inputs = body.querySelectorAll('input') as NodeListOf<HTMLInputElement>
   inputs.forEach(input => {
     newTags.push(input.value)

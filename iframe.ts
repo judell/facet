@@ -90,7 +90,9 @@ function processSearchResults (annos:any[], replies:any[]) {
   
   let csv = ''
   const json:any[] = []
-  const gatheredResults = hlib.gatherAnnotationsByUrl(annos.concat(replies))
+  const combined = annos.concat(replies)
+
+  const gatheredResults = hlib.gatherAnnotationsByUrl(combined)
   const reversedUrls = reverseChronUrls(gatheredResults)
   
   let cardCounter = 0
@@ -127,7 +129,6 @@ function processSearchResults (annos:any[], replies:any[]) {
     let cardsHTMLBuffer = ''
     let all = annosForUrl.concat(repliesForUrl)
     all.forEach(anno => {
-      //let level = params._separate_replies === 'false' ? 0 : anno.refs.length
       let level = anno.isReply ? anno.refs.length : 0
       if (format === 'html') {
         let cardsHTML = hlib.showAnnotation(anno, level)
@@ -182,7 +183,7 @@ function processSearchResults (annos:any[], replies:any[]) {
     function reverseByUpdate(a:string, b:string) {
       return new Date(results[b].updated).getTime() - new Date(results[a].updated).getTime()
     }
-    urls.sort()
+    urls.sort(reverseByUpdate)
     return urls
   }
 }

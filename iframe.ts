@@ -70,11 +70,11 @@ function exactTagSearch(annos:any[])  {
   return checkedAnnos
 }
 
-function processSearchResults (annos:any[], replies:any[]) {
+function processSearchResults (annoRows:any[], replyRows:any[]) {
 
-  hlib.getById('title').innerHTML += ` annotations <span id="annoCount">${annos.length}</span>, replies <span id="replyCount">${replies.length}</span>`
+  hlib.getById('title').innerHTML += ` annotations <span id="annoCount">${annoRows.length}</span>, replies <span id="replyCount">${replyRows.length}</span>`
 
-  if ( annos.length == 0 && replies.length == 0 ) {
+  if ( annoRows.length == 0 && replyRows.length == 0 ) {
     hlib.getById('progress').innerText = ''
     hlib.getById('widget').innerHTML = `
       <p>Nothing found for this query. 
@@ -85,12 +85,12 @@ function processSearchResults (annos:any[], replies:any[]) {
     return
   }
   
-  annos = exactTagSearch(annos)
-  replies = exactTagSearch(replies)
+  annoRows = exactTagSearch(annoRows)
+  replyRows = exactTagSearch(replyRows)
   
   let csv = ''
   const json:any[] = []
-  const combined = annos.concat(replies)
+  const combined = annoRows.concat(replyRows)
 
   const gatheredResults = hlib.gatherAnnotationsByUrl(combined)
   const reversedUrls = reverseChronUrls(gatheredResults)
@@ -118,7 +118,7 @@ function processSearchResults (annos:any[], replies:any[]) {
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
-  function renderCardsForUrl(url: any) {
+  function renderCardsForUrl(url: string) {
     cardCounter++
     const annosForUrl: hlib.annotation[] = gatheredResults[url].annos
     const repliesForUrl: hlib.annotation[] = gatheredResults[url].replies
@@ -127,7 +127,7 @@ function processSearchResults (annos:any[], replies:any[]) {
       htmlBuffer += showUrlResults(cardCounter, 'widget', url, perUrlCount, gatheredResults[url].title)
     }
     let cardsHTMLBuffer = ''
-    let all = annosForUrl.concat(repliesForUrl)
+    let all = organizeReplies(annosForUrl, repliesForUrl)
     all.forEach(anno => {
       let level = anno.isReply ? anno.refs.length : 0
       if (format === 'html') {
@@ -179,13 +179,47 @@ function processSearchResults (annos:any[], replies:any[]) {
   }
   
   function reverseChronUrls (results: hlib.gatheredResults) {
-    const urls = Object.keys(results)
     function reverseByUpdate(a:string, b:string) {
       return new Date(results[b].updated).getTime() - new Date(results[a].updated).getTime()
     }
+    const urls = Object.keys(results)
     urls.sort(reverseByUpdate)
     return urls
   }
+}
+
+function findRepliesForId(id: string, replies: any[]) {
+  const _replies = replies.filter( _reply => {
+    return _reply.refs.indexOf(id) != -1 
+  })
+  return _replies
+}    
+
+function organizeReplies(annosForUrl:hlib.annotation[], repliesForUrl:hlib.annotation[]) : hlib.annotation[] {
+  function ascendingByUpdate(a:hlib.annotation, b:hlib.annotation) {
+    return new Date(a.updated).getTime() - new Date(b.updated).getTime()
+  }
+  function reverseByUpdate(a:hlib.annotation, b:hlib.annotation) {
+    return new Date(b.updated).getTime() - new Date(a.updated).getTime()
+  }
+  annosForUrl.sort(reverseByUpdate)
+  const _annos = [] as hlib.annotation[]
+  annosForUrl.forEach(function (annoForUrl) {
+    _annos.push(annoForUrl)
+    const repliesForAnno = findRepliesForId(annoForUrl.id, repliesForUrl)
+    repliesForAnno.sort(ascendingByUpdate)
+    repliesForAnno.forEach(function (reply:hlib.annotation) {
+      _annos.push(reply)
+    })
+  })
+  repliesForUrl.forEach(function (reply:hlib.annotation) {
+    const ids = _annos.map(_anno => { return _anno.id } )
+    const index = ids.indexOf(reply.id)
+    if ( index < 0 ) {
+      _annos.splice(index, 0, reply)
+    }
+  })
+  return _annos
 }
 
 function isExpanded() {

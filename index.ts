@@ -38,7 +38,7 @@ hlib.createTagInputForm(hlib.getById('tagContainer'))
 
 hlib.createAnyInputForm(hlib.getById('anyContainer'))
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'only for large downloads')
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max')
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 

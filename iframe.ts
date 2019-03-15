@@ -13,6 +13,16 @@ let htmlBuffer = ''
 
 const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
 
+enum annoOrReplyCounterId {
+  annoCount = 'annoCount',
+  replyCount = 'replyCount'
+}
+
+enum counterDirection {
+  up,
+  down
+}
+
 Object.keys(params).forEach(function (key) {
   if (params[key] === '') {
     delete params[key]
@@ -63,16 +73,18 @@ function exactTagSearch(annos:any[])  {
     if (_tags.indexOf(queryTag.toLowerCase()) > -1) {
       checkedAnnos.push(anno)
     } else {
-      const counterId = anno.isReply ? 'replyCount' : 'annoCount'
+      const counterId = anno.isReply ? annoOrReplyCounterId.replyCount : annoOrReplyCounterId.annoCount
       decrementAnnoOrReplyCount(counterId)
     }
   })
   return checkedAnnos
 }
 
-function processSearchResults (annoRows:any[], replyRows:any[]) {
+async function processSearchResults (annoRows:any[], replyRows:any[]) {
 
-  hlib.getById('title').innerHTML += ` annotations <span id="annoCount">${annoRows.length}</span>, replies <span id="replyCount">${replyRows.length}</span>`
+  hlib.getById('title').innerHTML += ` 
+    annotations <span id="${annoOrReplyCounterId.annoCount}">${annoRows.length}</span>, 
+    replies <span id="${annoOrReplyCounterId.replyCount}">${replyRows.length}</span>`
 
   if ( annoRows.length == 0 && replyRows.length == 0 ) {
     hlib.getById('progress').innerText = ''
@@ -97,9 +109,10 @@ function processSearchResults (annoRows:any[], replyRows:any[]) {
   
   let cardCounter = 0
 
-  reversedUrls.forEach(url => {
-    renderCardsForUrl(url)
-  })
+  for (let i = 0; i < reversedUrls.length; i++ ) {
+    const url = reversedUrls[i]
+    await renderCardsForUrl(url)
+  }
 
   styleWidget(csv, json)
 
@@ -118,7 +131,7 @@ function processSearchResults (annoRows:any[], replyRows:any[]) {
   widget.style.display = 'block'
   hlib.getById('progress').innerHTML = ''
 
-  function renderCardsForUrl(url: string) {
+  async function renderCardsForUrl(url: string) {
     cardCounter++
     const annosForUrl: hlib.annotation[] = gatheredResults[url].annos
     const repliesForUrl: hlib.annotation[] = gatheredResults[url].replies
@@ -127,6 +140,16 @@ function processSearchResults (annoRows:any[], replyRows:any[]) {
       htmlBuffer += showUrlResults(cardCounter, 'widget', url, perUrlCount, gatheredResults[url].title)
     }
     let cardsHTMLBuffer = ''
+    let promises = missingReplyPromises(annosForUrl.concat(repliesForUrl))
+    promises = promises.map(p => p.catch(() => undefined))
+    let missingReplyResults:hlib.httpResponse[] = await Promise.all(promises)
+    missingReplyResults.forEach(result => {
+      if (result && result.status == 200 ) { 
+        const reply = JSON.parse(result.response)
+        repliesForUrl.push(hlib.parseAnnotation(reply))
+        adjustAnnoOrReplyCount(annoOrReplyCounterId.replyCount, counterDirection.up)
+      }
+    })
     let all = organizeReplies(annosForUrl, repliesForUrl)
     all.forEach(anno => {
       let level = anno.isReply ? anno.refs.length : 0
@@ -146,6 +169,29 @@ function processSearchResults (annoRows:any[], replyRows:any[]) {
       }
     })
     htmlBuffer = htmlBuffer.replace(`CARDS_${cardCounter}`, cardsHTMLBuffer)
+  }
+
+  function missingReplyPromises(all: hlib.annotation[]) : Promise<hlib.httpResponse>[] {
+    const allIds:string[] = all.map(function (anno: hlib.annotation) {
+      return anno.id
+    }) 
+    let refIds = [] as string[]
+    all.forEach(function (anno: hlib.annotation) {
+      anno.refs.forEach(refId =>{
+        if (refIds.indexOf(refId) < 0) {
+          refIds.push(refId)
+        }
+      })
+    })
+    
+    const promises = [] as Promise<hlib.httpResponse>[]
+    for (let i = 0; i < refIds.length; i++) {
+      const refId = refIds[i]
+      if (allIds.indexOf(refId) < 0) {
+        promises.push(hlib.getAnnotation(refId, hlib.getToken()))
+      }
+    }
+    return promises
   }
 
   function styleWidget(csv: string, json: any[]) {
@@ -186,41 +232,43 @@ function processSearchResults (annoRows:any[], replyRows:any[]) {
     urls.sort(reverseByUpdate)
     return urls
   }
-}
 
-function findRepliesForId(id: string, replies: any[]) {
-  const _replies = replies.filter( _reply => {
-    return _reply.refs.indexOf(id) != -1 
-  })
-  return _replies
-}    
-
-function organizeReplies(annosForUrl:hlib.annotation[], repliesForUrl:hlib.annotation[]) : hlib.annotation[] {
-  function ascendingByUpdate(a:hlib.annotation, b:hlib.annotation) {
-    return new Date(a.updated).getTime() - new Date(b.updated).getTime()
-  }
-  function reverseByUpdate(a:hlib.annotation, b:hlib.annotation) {
-    return new Date(b.updated).getTime() - new Date(a.updated).getTime()
-  }
-  annosForUrl.sort(reverseByUpdate)
-  const _annos = [] as hlib.annotation[]
-  annosForUrl.forEach(function (annoForUrl) {
-    _annos.push(annoForUrl)
-    const repliesForAnno = findRepliesForId(annoForUrl.id, repliesForUrl)
-    repliesForAnno.sort(ascendingByUpdate)
-    repliesForAnno.forEach(function (reply:hlib.annotation) {
-      _annos.push(reply)
+  function findRepliesForId(id: string, replies: any[]) {
+    const _replies = replies.filter( _reply => {
+      return _reply.refs.indexOf(id) != -1 
     })
-  })
-  repliesForUrl.forEach(function (reply:hlib.annotation) {
-    const ids = _annos.map(_anno => { return _anno.id } )
-    const index = ids.indexOf(reply.id)
-    if ( index < 0 ) {
-      _annos.splice(index, 0, reply)
+    return _replies
+  }    
+  
+  function organizeReplies(annosForUrl:hlib.annotation[], repliesForUrl:hlib.annotation[]) : hlib.annotation[] {
+    function ascendingByUpdate(a:hlib.annotation, b:hlib.annotation) {
+      return new Date(a.updated).getTime() - new Date(b.updated).getTime()
     }
-  })
-  return _annos
+    function reverseByUpdate(a:hlib.annotation, b:hlib.annotation) {
+      return new Date(b.updated).getTime() - new Date(a.updated).getTime()
+    }
+    annosForUrl.sort(reverseByUpdate)
+    const _annos = [] as hlib.annotation[]
+    annosForUrl.forEach(function (annoForUrl) {
+      _annos.push(annoForUrl)
+      const repliesForAnno = findRepliesForId(annoForUrl.id, repliesForUrl)
+      repliesForAnno.sort(ascendingByUpdate)
+      repliesForAnno.forEach(function (reply:hlib.annotation) {
+        _annos.push(reply)
+      })
+    })
+    repliesForUrl.forEach(function (reply:hlib.annotation) {
+      const ids = _annos.map(_anno => { return _anno.id } )
+      const index = ids.indexOf(reply.id)
+      if ( index < 0 ) {
+        _annos.splice(index, 0, reply)
+      }
+    })
+    return _annos
+  }
+  
 }
+
 
 function isExpanded() {
   return hlib.getSettings().expanded === 'true'
@@ -538,21 +586,45 @@ function getUserName(userElement: HTMLElement) {
   return userElement.innerText.trim()
 }
 
-function decrementAnnoOrReplyCount(id:string) {
+function adjustAnnoOrReplyCount(id:annoOrReplyCounterId, direction:counterDirection) {
   const counterElement = hlib.getById(id) as HTMLSpanElement
   let count:number = parseInt(counterElement.innerText)
-  count--
+  if (direction === counterDirection.up) {
+    count++
+  } else {
+    count--
+  }
   counterElement.innerText = count.toString()
 }
 
-function decrementPerUrlCount(urlCounterId:string) {
+function incrementAnnoOrReplyCount(id:annoOrReplyCounterId) {
+  adjustAnnoOrReplyCount(id, counterDirection.up)
+}
+
+function decrementAnnoOrReplyCount(id:annoOrReplyCounterId) {
+  adjustAnnoOrReplyCount(id, counterDirection.down)
+}
+
+function adjustPerUrlCount(urlCounterId:string, direction:counterDirection) {
   const urlHeading = hlib.getById(urlCounterId)
   const counterElement = urlHeading.querySelector('.counter') as HTMLElement
   let counter = parseInt(counterElement.innerText)
-  counter--
+  if (direction === counterDirection.up) {
+    counter++
+  } else {
+    counter--
+  }
   if (counter == 0) {
     urlHeading.remove()
   } else {
     counterElement.innerText = ` ${counter}`
   }
+}
+
+function incrementPerUrlCount(urlCounterId:string) {
+  adjustPerUrlCount(urlCounterId, counterDirection.up)
+}
+
+function decrementPerUrlCount(urlCounterId:string) {
+  adjustPerUrlCount(urlCounterId, counterDirection.down)
 }

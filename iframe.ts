@@ -142,12 +142,18 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     let cardsHTMLBuffer = ''
     let promises = missingReplyPromises(annosForUrl.concat(repliesForUrl))
     promises = promises.map(p => p.catch(() => undefined))
-    let missingReplyResults:hlib.httpResponse[] = await Promise.all(promises)
-    missingReplyResults.forEach(result => {
+    let missingAnnoOrReplyResults:hlib.httpResponse[] = await Promise.all(promises)
+    missingAnnoOrReplyResults.forEach(result => {
       if (result && result.status == 200 ) { 
-        const reply = JSON.parse(result.response)
-        repliesForUrl.push(hlib.parseAnnotation(reply))
-        adjustAnnoOrReplyCount(annoOrReplyCounterId.replyCount, counterDirection.up)
+        const annoOrReply = hlib.parseAnnotation(JSON.parse(result.response))
+        if ( annoOrReply.isReply) {
+          repliesForUrl.push(annoOrReply)
+          adjustAnnoOrReplyCount(annoOrReplyCounterId.replyCount, counterDirection.up)
+        } else {
+          annosForUrl.push(annoOrReply)
+          adjustAnnoOrReplyCount(annoOrReplyCounterId.annoCount, counterDirection.up)
+        }
+
       }
     })
     let all = organizeReplies(annosForUrl, repliesForUrl)

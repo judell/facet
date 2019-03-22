@@ -47,7 +47,7 @@ hlib.search(params, 'progress')
 
 function showParams() {
   let _params = Object.assign({}, params)
-  const excluded = ['group', 'service', 'subjectUserTokens', '_separate_replies', 'controlledTags', 'expanded', 'exactTagSearch']
+  const excluded = ['group', 'service', 'subjectUserTokens', '_separate_replies', 'searchReplies', 'controlledTags', 'expanded', 'exactTagSearch']
   excluded.forEach(param => {
     delete _params[param]
   })

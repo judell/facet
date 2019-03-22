@@ -47,13 +47,20 @@ hlib.search(params, 'progress')
 
 function showParams() {
   let _params = Object.assign({}, params)
-  const excluded = ['group', 'service', 'subjectUserTokens', '_separate_replies', 'searchReplies', 'controlledTags', 'expanded', 'exactTagSearch']
+  const excluded = [
+    '_separate_replies', 
+    'controlledTags', 
+    'exactTagSearch',
+    'expanded', 
+    'group', 
+    'max', 
+    'searchReplies', 
+    'service', 
+    'subjectUserTokens', 
+  ]
   excluded.forEach(param => {
     delete _params[param]
   })
-  if (_params.max == hlib.defaultMax) {
-    delete _params.max
-  }
   let title = hlib.syntaxColorParams(_params, excluded)
   title = title.slice(0, -1)
   if (title) {

@@ -2,7 +2,6 @@ import * as hlib from '../../hlib/hlib' // this will be commented out in the shi
 
 const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any'] as string[]
 const settings = ['subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch'] as string[]
-const defaultMax = '100'
 
 if ( ! localStorage.getItem('h_settings') ) {
   hlib.settingsToLocalStorage(hlib.getSettings()) // initialize settings
@@ -38,7 +37,7 @@ hlib.createTagInputForm(hlib.getById('tagContainer'))
 
 hlib.createAnyInputForm(hlib.getById('anyContainer'), 'Freetext search')
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'Approximate limit')
+hlib.createMaxInputForm(hlib.getById('maxContainer'), 'Approximate limit')
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
@@ -81,7 +80,7 @@ function search (format:string) {
   params['group'] = hlib.getSelectedGroup('groupsList')
   params['groupName'] = hlib.getSelectedGroupName('groupsList')
   const maxInput = document.querySelector('#maxForm') as HTMLInputElement
-  params.max = maxInput.value ? maxInput.value : defaultMax
+  params.max = maxInput.value ? maxInput.value : hlib.getDefaultSettings().max
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))
   const iframeUrl = `iframe.html?params=${params}`
@@ -193,6 +192,10 @@ function dropHandler(e:DragEvent) {
       }
     }
   }, 0)
+}
+
+function resetToken() {
+  localStorage.setItem('h_token', '')
 }
   
 const activeFields = facets.filter(x => {return x !== 'group'})

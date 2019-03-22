@@ -53,7 +53,6 @@ function showParams() {
     'exactTagSearch',
     'expanded', 
     'group', 
-    'max', 
     'searchReplies', 
     'service', 
     'subjectUserTokens', 
@@ -388,7 +387,7 @@ function enableEditing(cardsHTML:string) {
       deleteButton.innerHTML = ``
     }
     const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
-    userElement.parentNode!.insertBefore(deleteButton, externalLink.nextSibling)
+    hlib.insertNodeAfter(deleteButton, externalLink)
   }
 
   function maybeCreateEditor(username: string, cardId: string, targetElement:HTMLElement, editFunctionName: string) {

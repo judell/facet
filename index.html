@@ -85,6 +85,12 @@
       fill:#582108b5;
     }
 
+    .tokenReset {
+      font-size:small;
+      cursor: pointer;
+      display: none;
+    }
+
   </style>
 </head>
 
@@ -157,9 +163,10 @@
             <div class="formField" id="expandedContainer"></div>
             <div class="formField" id="searchRepliesContainer"></div>
             <div class="formField" id="exactTagSearchContainer"></div>
-            <div class="formField" id="tokenContainer"></div>
             <div class="formField" id="subjectsContainer"></div>
             <div class="formField" id="controlledTagsContainer"></div>
+            <div class="formField" id="tokenContainer"></div>
+            <div class="tokenReset"><a title="click to reset">reset API token</a></div>
           </div>
       
       </div>
@@ -204,11 +211,21 @@
   <script>
     setTimeout(_ => {
       let token = hlib.getToken()
+      const tokenContainer = hlib.getById('tokenContainer')
+      const tokenResetter = document.querySelector('.tokenReset')
       if (token) {
-        hlib.getById('tokenContainer').style.display = 'none'
-        hlib.getById('buttonHTML').click()
+        tokenContainer.style.display = 'none'
+        tokenResetter.style.display = 'block'
+      } else {
+        tokenContainer.style.display = 'block'
+        tokenResetter.style.display = 'none'
       }
-    }, 500)
+      hlib.getById('buttonHTML').click()
+      tokenResetter.onclick = function() {
+        resetToken()
+        location.href = location.href
+      }
+    }, 300)
   </script>
 
 </body>

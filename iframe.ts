@@ -9,6 +9,11 @@ const controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 const format = params['format']
 delete params['format']
 
+const iconColor = '#2c1409b5'
+const baseIconStyle = `style="fill:${iconColor}"`
+const externalLinkStyle = `style="display:inline;width:.8em;height:.8em;margin-left:2px;margin-top:3px;fill:${iconColor}"`
+const deleteButtonStyle = `style="display:inline;width:10px;height:10px;fill:${iconColor};margin-left:2px"`
+
 let htmlBuffer = ''
 
 const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
@@ -160,7 +165,9 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     all.forEach(anno => {
       let level = anno.isReply ? anno.refs.length : 0
       if (format === 'html') {
-        let cardsHTML = hlib.showAnnotation(anno, level)
+        const externalLinkIcon = renderIcon('icon-external-link', externalLinkStyle)
+        const externalLink = `<a target="_standalone" href="https://hypothes.is/a/${anno.id}" title="view/edit/reply">${externalLinkIcon}</a>`
+        let cardsHTML = hlib.showAnnotation(anno, level, '', externalLink)
         cardsHTML = enableEditing(cardsHTML)
         cardsHTMLBuffer += cardsHTML
       }
@@ -370,7 +377,8 @@ function enableEditing(cardsHTML:string) {
     const deleteButton = document.createElement('span')
     deleteButton.setAttribute('class', 'deleteButton')
     if (subjectUserTokens.hasOwnProperty(username)) {
-      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')">&nbsp;X</a>`
+      const icon = renderIcon('icon-delete', deleteButtonStyle)
+      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')">${icon}</a>`
     } else {
       deleteButton.innerHTML = ``
     }
@@ -384,7 +392,7 @@ function enableEditing(cardsHTML:string) {
     if (subjectUserTokens.hasOwnProperty(username)) {
       editorContainer.innerHTML = `
         <div onclick="${editFunctionName}('${cardId}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil')}
+          ${renderIcon('icon-pencil', baseIconStyle)}
         </div>`;
       targetElement.parentNode!.insertBefore(editorContainer, targetElement);
       editorContainer.appendChild(targetElement)
@@ -406,7 +414,7 @@ function enableEditing(cardsHTML:string) {
     if (subjectUserTokens.hasOwnProperty(username)) {
       editorContainer.innerHTML = `
         <div onclick="makeTagsEditable('${cardElement.id}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil')}
+          ${renderIcon('icon-pencil', baseIconStyle)}
         </div>`;
       tagsElement.parentNode!.insertBefore(editorContainer, tagsElement);
       editorContainer.appendChild(tagsElement)
@@ -426,7 +434,7 @@ async function makeHtmlContentEditable(domAnnoId:string) {
   const text = JSON.parse(r.response).text
   textElement.innerText = text
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
-  iconContainer.innerHTML = renderIcon('icon-floppy')
+  iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
   iconContainer.onclick = saveHtmlFromContentEditable
   const card = hlib.getById(domAnnoId) as HTMLElement
   const icon = card.querySelector('.tagEditor .editOrSaveIcon') as HTMLElement
@@ -444,7 +452,7 @@ async function saveHtmlFromContentEditable(e:Event) {
   const editor = this.closest('.textEditor') as HTMLElement
   editor.removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
   editor.style.removeProperty('background-color')
-  this.innerHTML = renderIcon('icon-pencil')
+  this.innerHTML = renderIcon('icon-pencil', baseIconStyle)
   const icon = editor.querySelector('.icon-pencil') as HTMLElement
   icon.style.setProperty('margin-top', '0')
   this.onclick = wrappedMakeHtmlContentEditable
@@ -492,7 +500,7 @@ async function makeTagsEditable(domAnnoId: string) {
   }
   
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
-  iconContainer.innerHTML = renderIcon('icon-floppy')
+  iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
   iconContainer.onclick = saveControlledTag
 
   function insertPicklist(select: HTMLSelectElement) {
@@ -539,7 +547,7 @@ async function saveControlledTag(e:Event) {
   inputs.forEach(input => {
     newTags.push(input.value)
   })
-  this.innerHTML = renderIcon('icon-pencil')
+  this.innerHTML = renderIcon('icon-pencil', 'style="display:inline;width:12px;height:12px;fill:#2c1409b5"')
   this.onclick = wrappedMakeTagsEditable
   const payload = JSON.stringify( { tags: newTags } )
   const token = subjectUserTokens[username]
@@ -556,8 +564,9 @@ async function saveControlledTag(e:Event) {
 }
 
 
-function renderIcon(iconClass:string) {
-  return `<svg style="display:block; fill:#582108b5" class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
+function renderIcon(iconClass:string, style?: string) {
+  const _style = style ? style : `style="display:block"`
+  return `<svg ${style} class="${iconClass}"><use xlink:href="#${iconClass}"></use></svg>`
 }
 
 function deleteAnnotation(domAnnoId: string) {

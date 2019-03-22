@@ -36,9 +36,9 @@ hlib.createWildcardUriInputForm(hlib.getById('wildcard_uriContainer'))
 
 hlib.createTagInputForm(hlib.getById('tagContainer'))
 
-hlib.createAnyInputForm(hlib.getById('anyContainer'))
+hlib.createAnyInputForm(hlib.getById('anyContainer'), 'Freetext search')
 
-hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max')
+hlib.createFacetInputForm(hlib.getById('maxContainer'), 'max', 'Approximate limit')
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
@@ -135,7 +135,8 @@ function makeSubjectUsersEditable() {
 function saveSubjectUserTokens() {
   const textarea = document.querySelector('#subjectsContainer textarea') as HTMLTextAreaElement
   try {
-    const value = textarea.value.replace(/[,\n}]+$/, '\n}') // silently fix most likely error
+    let value = textarea.value.replace(/[,\n}]+$/, '\n}') // silently fix most likely error
+    if (value === '') { value = '{}' }
     JSON.parse(value)
     localStorage.setItem('h_subjectUserTokens', value)
     createSubjectUserTokensForm()

@@ -79,6 +79,7 @@ function search (format:string) {
   params['format'] = format
   params['_separate_replies'] = 'false'
   params['group'] = hlib.getSelectedGroup('groupsList')
+  params['groupName'] = hlib.getSelectedGroupName('groupsList')
   const maxInput = document.querySelector('#maxForm') as HTMLInputElement
   params.max = maxInput.value ? maxInput.value : defaultMax
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)

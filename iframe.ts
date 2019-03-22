@@ -6,8 +6,8 @@ params = JSON.parse(params)
 const widget = hlib.getById('widget') as HTMLElement
 const controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 
-const format = params['format']
-delete params['format']
+const format = params.format
+delete params.format
 
 const iconColor = '#2c1409b5'
 const baseIconStyle = `style="fill:${iconColor}"`
@@ -46,16 +46,15 @@ hlib.search(params, 'progress')
   })
 
 function showParams() {
-  const excluded = ['service', 'subjectUserTokens', '_separate_replies', 'controlledTags']
-  if (params.max == hlib.defaultMax) {
-    excluded.push('max')
-  }
-  ['searchReplies', 'exactTagSearch', 'expanded'].forEach(key => {
-    if (params[key] === 'false') {
-      excluded.push(key)
-    }
+  let _params = Object.assign({}, params)
+  const excluded = ['group', 'service', 'subjectUserTokens', '_separate_replies', 'controlledTags', 'expanded', 'exactTagSearch']
+  excluded.forEach(param => {
+    delete _params[param]
   })
-  let title = hlib.syntaxColorParams(params, excluded)
+  if (_params.max == hlib.defaultMax) {
+    delete _params.max
+  }
+  let title = hlib.syntaxColorParams(_params, excluded)
   title = title.slice(0, -1)
   if (title) {
     hlib.getById('title').innerHTML += title
@@ -281,7 +280,6 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
   }
   
 }
-
 
 function isExpanded() {
   return hlib.getSettings().expanded === 'true'

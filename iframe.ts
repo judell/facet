@@ -44,6 +44,9 @@ hlib.search(params, 'progress')
   .then( data => {
     processSearchResults(data[0], data[1])
   })
+  .catch( reason => {
+    alert('Cannot search for those parameters')
+  })
 
 function showParams() {
   let _params = Object.assign({}, params)

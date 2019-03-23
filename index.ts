@@ -187,7 +187,7 @@ function dropHandler(e:DragEvent) {
   setTimeout( _ => {
     if (target.id === 'urlForm' || target.id === 'wildcard_uriForm') {
       target.value = target.value.replace('https://hyp.is/go?url=','')
-      if (target.id === 'wildcard_uriForm') {
+      if (target.id === 'wildcard_uriForm' && ! target.value.endsWith('/*') ) {
         target.value += '/*'
       }
     }

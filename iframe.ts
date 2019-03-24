@@ -11,8 +11,8 @@ delete params.format
 
 const iconColor = '#2c1409b5'
 const baseIconStyle = `style="fill:${iconColor}"`
-const externalLinkStyle = `style="display:inline;width:.8em;height:.8em;margin-left:2px;margin-top:3px;fill:${iconColor}"`
-const deleteButtonStyle = `style="display:inline;width:10px;height:10px;fill:${iconColor};margin-left:2px"`
+const externalLinkStyle = `style="display:inline;width:.6em;height:.6em;margin-left:2px;margin-top:3px;fill:${iconColor}"`
+const deleteButtonStyle = `style="display:inline;width:8px;height:8px;fill:${iconColor};margin-left:2px"`
 
 let htmlBuffer = ''
 
@@ -104,7 +104,6 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     hlib.getById('widget').innerHTML = `
       <p>Nothing found for this query. 
       <p>Please try removing or altering one or more filters. 
-      <p>If you still find nothing, try ticking <i>search replies</i>.
       `
     hlib.getById('widget').style.display= 'block'
     return
@@ -479,7 +478,6 @@ async function saveHtmlFromContentEditable(e:Event) {
 
   function convertToHtml() {
     const converter = new showdown.Converter();
-    converter.setFlavor('gitHub')
     const html = converter.makeHtml(text);
     annotationText.innerHTML = html;
   }

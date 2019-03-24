@@ -11,41 +11,14 @@
       margin: 0;
       border-width: thin;
       background-color: #f3f1ee;
-      color: #532510;
+      color:#170802
     }
 
-    .expander {
-      width: 5em;
-    }
-
-    .url {
-      font-family: italic;
-      margin-bottom: 10px;
-      color: gray;
-    }
-
-    .urlHeading {
-      font-size: 10pt;
-    }
-
-    img {
-      width: 90%;
-      margin: 8px
-    }
-
-    .controlsContainer {
-      display: flex;
-      font-size: smaller;
-    }
-
-    .toggle, .counter {
-      color: #472e078a;
-    }
-
-    .csvRow {
-      display: none;
-    }
-
+    iframe {
+      width: 100%;
+      height: 100%;
+    }   
+    
     #widget {
       display: none;
     }
@@ -54,50 +27,13 @@
       font-size: smaller;
     }
 
-    .textEditor {
+    .controlsContainer {
       display: flex;
-      line-height: 1;
+      font-size: smaller;
     }
 
-    .tagEditor {
-      display: flex;
-    }
-
-    .icon-floppy, .icon-pencil {
-      font-size: x-small;
-      width: 1.2em;
-      height: 1.2em;
-      margin-left: -24px;
-      padding-right: 2px;
-      cursor: pointer;
-    }
-
-    .icon-delete {
-      font-size: x-small;
-      cursor: pointer;
-      display: inline;
-    }
-
-    .textEditor .editOrSaveIcon .icon-pencil {
-      margin-top: 16px;
-    }
-
-    .tagEditor .editOrSaveIcon .icon-pencil {
-      margin-top: 6px;
-    }
-
-    .tagEditor .editOrSaveIcon {
-      display: none;
-    }    
-
-    .preformatted {
-      white-space: pre;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      white-space: -moz-pre-wrap;
-      white-space: -pre-wrap;
-      white-space: -o-pre-wrap;
-      word-wrap: break-word;
+    .counter {
+      color: #795548;
     }
 
     .deleteButton {
@@ -112,17 +48,60 @@
       margin-left: 4px;
     }
 
-    .annotationTags input {
-      width: 12makeem;
+    .expander {
+      width: 5em;
     }
 
-    .annotationText, .annotationQuote {
-      font-size: smaller;
+    .icon-floppy, .icon-pencil {
+      font-size: x-small;
+      width: 1em;
+      height: 1em;
+      margin-left: -18px;
+      padding-right: 2px;
+      cursor: pointer;      
     }
 
-    .annotationHeader {
+    .icon-delete {
+      font-size: x-small;
+      cursor: pointer;
+      display: inline;
+    }    
+
+    .tagEditor .editOrSaveIcon .icon-pencil {
+      margin-top: 6px;
+    }
+
+    .tagEditor .editOrSaveIcon {
+      display: none;
+    }
+    
+    .textEditor {
+      display: flex;
+      line-height: 1;
+    }
+
+    .tagEditor {
       display: flex;
     }
+
+    .textEditor .editOrSaveIcon .icon-pencil {
+      margin-top: 16px;
+    }
+
+    .preformatted {
+      white-space: pre;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      white-space: -moz-pre-wrap;
+      white-space: -pre-wrap;
+      white-space: -o-pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .urlHeading {
+      font-size: 10pt;
+    }
+
 
   </style>
   <script src="https://jonudell.info/hlib/hlib2.bundle.js" charset="utf-8"></script>

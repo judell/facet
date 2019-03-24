@@ -9,25 +9,26 @@
     body {
       margin-top: 20px;
     }
+
     button {
       margin: 0;
       border-width: thin;
       background-color: #f3f1ee;
-      color: #532510;
+      color: #170802
     }
+
     #container {
       display: flex;
       flex-direction: row;
       width: 100%;
     }
-    .formContainer {
-      margin-top: 12px;
-    }
+
     #leftbarContainer {
-      width: 30%;
+      width: 18em;
       display: flex;
       flex-direction: column;
     }
+
     #iframeContainer {
       width: 100%;
     }
@@ -38,37 +39,44 @@
       border-style: none;
       margin-left: -20px;
     }
-    .help {
-      font-size: smaller;
-      margin-top:12px;
-    }
-
-    .facets, .settings {
-      border-style: solid;
-      border-width: thin;
-      padding-left: 1em;
-      border-color: lightgray;
-      margin-bottom: 20px;
-    }
-
-    .formField {
-      margin-bottom: 8px;
-    }
-
+   
     #buttonsContainer {
       display: flex;
       flex-direction: row;
       justify-content: flex-end;
     }
 
+    .formContainer {
+      margin-top: 12px;
+    }
+
+    .facets, .settings {
+      border-style: solid;
+      border-width: thin;
+      padding-left: 1em;
+      padding-right: 2px;
+      border-color: lightgray;
+      margin-bottom: 20px;
+      background-color: #efeeeb4f
+    }
+
+    .formField {
+      margin-bottom: 8px;
+    }
+
     .formLabel {
       font-size: smaller;
-      color: #532510;
+      color: #36180a
     }
 
     .formMessage {
       font-size: smaller;
       font-weight: normal;
+    }
+    
+    .help {
+      font-size: smaller;
+      margin-top:12px;
     }
 
     .icon-pencil, .icon-floppy {
@@ -186,10 +194,10 @@
       Fill in one or more <i>facets</i> to filter results. The facets are
       <b>username</b>, <b>group</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. 
       
-      If you need more than 100 results, set <b>max</b> to a larger number. 
+      If you need more than 50 results, set <b>max</b> to a larger number. 
       
-      If you specify no facets other than the default group All, you'll get the most recent 100 Hypothesis 
-      annotations in any group you're authorized to see. 
+      If you specify no facets other than the default group All, you'll get recent Hypothesis 
+      annotations and replies in any group you're authorized to see.
 
       Use <svg style="display:inline;height:12px;width:12px;" class="icon-external-link"><use xlink:href="#icon-external-link"></use></svg> to launch the Hypothesis thread viewer/editor. 
 

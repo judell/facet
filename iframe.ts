@@ -483,15 +483,35 @@ async function saveHtmlFromContentEditable(e:Event) {
   }
 }
 
+function appendTagAdder(domAnnoId: string) {
+  const tagEditor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
+  const adder = document.createElement('div')
+  adder.setAttribute('class', 'tagAdder')
+  adder.setAttribute('title', 'add a tag')
+  adder.innerHTML = ' + '
+  adder.onclick = addTag
+  tagEditor.appendChild(adder)
+}
+
+function addTag(e: Event) {
+  const adder = e.target as HTMLElement
+  const tagEditor = adder.closest('.tagEditor') as HTMLElement
+  const tags = tagEditor.querySelector('.annotationTags') as HTMLElement
+  const newInput = document.createElement('input')
+  newInput.style.marginLeft = '4px'
+  tags.appendChild(newInput)
+}
+
 async function makeTagsEditable(domAnnoId: string) {
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const editor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
   const _controlledTags = hlib.getControlledTagsFromLocalStorage()
   const useControlledTags = _controlledTags !== hlib.defaultControlledTags
-  const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
   const r = await hlib.getAnnotation(annoId, hlib.getToken())
   const existingTags = JSON.parse(r.response).tags
   const firstTag:string = existingTags.length ? existingTags[0] : ''
+  const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
+  appendTagAdder(domAnnoId)
   const anchors = tagsElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>
   if (useControlledTags) {
     const select = createPicklist(firstTag, _controlledTags)
@@ -501,12 +521,12 @@ async function makeTagsEditable(domAnnoId: string) {
   for (let i = start; i < anchors.length; i++) {
     let input = document.createElement('input') as HTMLInputElement
     input.value = anchors[i].innerText
-    anchors[i].parentNode.replaceChild(input, anchors[i])
+    const anchor = anchors[i] as HTMLAnchorElement
+    anchor.parentNode!.replaceChild(input, anchors[i])
   }
-  
   const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
   iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
-  iconContainer.onclick = saveControlledTag
+  iconContainer.onclick = saveTags
 
   function insertPicklist(select: HTMLSelectElement) {
     if (anchors.length) {
@@ -536,8 +556,11 @@ async function makeTagsEditable(domAnnoId: string) {
   }
 }
 
-async function saveControlledTag(e:Event) {
-  const domAnnoId = this.closest('.annotationCard').getAttribute('id')
+async function saveTags(e:Event) {
+  const card = this.closest('.annotationCard') as HTMLElement
+  const adder = card.querySelector('.tagAdder') as HTMLElement
+  adder.remove()
+  const domAnnoId = card.getAttribute('id') as string
   const annoId = annoIdFromDomAnnoId(domAnnoId)
   const userElement = this.closest('.annotationCard').querySelector('.user')
   const username = userElement.innerText.trim() 
@@ -550,7 +573,9 @@ async function saveControlledTag(e:Event) {
   }
   const inputs = body.querySelectorAll('input') as NodeListOf<HTMLInputElement>
   inputs.forEach(input => {
-    newTags.push(input.value)
+    if (input.value) {
+      newTags.push(input.value)
+    }
   })
   this.innerHTML = renderIcon('icon-pencil', 'style="display:inline;width:12px;height:12px;fill:#2c1409b5"')
   this.onclick = wrappedMakeTagsEditable

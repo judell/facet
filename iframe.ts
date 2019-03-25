@@ -577,7 +577,7 @@ async function saveTags(e:Event) {
       newTags.push(input.value)
     }
   })
-  this.innerHTML = renderIcon('icon-pencil', 'style="display:inline;width:12px;height:12px;fill:#2c1409b5"')
+  this.innerHTML = renderIcon('icon-pencil', 'style="display:inline;height:12px;fill:#2c1409b5"')
   this.onclick = wrappedMakeTagsEditable
   const payload = JSON.stringify( { tags: newTags } )
   const token = subjectUserTokens[username]

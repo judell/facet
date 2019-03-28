@@ -17,7 +17,6 @@ python comment-out-imports.py
 # For local testing, three files need reference adjustment:
 #   index.html
 #   iframe.html
-#   showAnnotation.js
 # 
 # These are the options:
 #   dev: http://10.0.0.9:8000/hlib.bundle.js

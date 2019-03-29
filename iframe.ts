@@ -230,6 +230,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
   }
   
   function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
+    const host = new URL(url).host
     const headingCounter = `counter_${counter}`
     const togglerTitle = isExpanded() ? 'collapse' : 'expand'
     const togglerChar = isExpanded() ?  '\u{25bc}' : '\u{25b6}'
@@ -237,6 +238,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
       <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerChar}</span></a>
       <span class="counter">&nbsp;${count}&nbsp;</span>
       <a title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+      <span class="host">${host}</span>
       </h1>
       <div id="cards_${headingCounter}">
         CARDS_${counter}

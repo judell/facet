@@ -194,10 +194,6 @@ function dropHandler(e:DragEvent) {
   }, 0)
 }
 
-function resetToken() {
-  localStorage.setItem('h_token', '')
-}
-  
 const activeFields = facets.filter(x => {return x !== 'group'})
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement

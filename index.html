@@ -218,22 +218,9 @@
 
   <script>
     setTimeout(_ => {
-      let token = hlib.getToken()
-      const tokenContainer = hlib.getById('tokenContainer')
-      const tokenResetter = document.querySelector('.tokenReset')
-      if (token) {
-        tokenContainer.style.display = 'none'
-        tokenResetter.style.display = 'block'
-      } else {
-        tokenContainer.style.display = 'block'
-        tokenResetter.style.display = 'none'
-      }
+      hlib.manageTokenDisplayAndReset()
       hlib.getById('buttonHTML').click()
-      tokenResetter.onclick = function() {
-        resetToken()
-        location.href = location.href
-      }
-    }, 300)
+    }, 200)
   </script>
 
 </body>

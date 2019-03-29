@@ -311,7 +311,7 @@ function showButtons() {
   if (format === 'html') {
     controlsContainer.innerHTML = `
       <button class="expander" id="expander"></button>
-      <button id="downloadHTML">downloadHTML</button>`
+      <button id="downloadHTML">download HTML</button>`
     const expander = hlib.getById('expander') as HTMLButtonElement
     const expanded = hlib.getSettings().expanded === 'true'
     expander.onclick = expanded

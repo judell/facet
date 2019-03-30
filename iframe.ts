@@ -44,7 +44,7 @@ hlib.search(params, 'progress')
   .then( data => {
     processSearchResults(data[0], data[1])
   })
-  .catch( reason => {
+  .catch( _ => {
     alert('Cannot search for those parameters')
   })
 
@@ -82,7 +82,7 @@ function exactTagSearch(annos:any[])  {
   const checkedAnnos:any[] = []
   const queryTag = params.tag
   annos.forEach(anno => {
-    const _tags = anno.tags.map(t => { return t.toLowerCase() })
+    const _tags = anno.tags.map(function(t:string) { return t.toLowerCase() })
     if (_tags.indexOf(queryTag.toLowerCase()) > -1) {
       checkedAnnos.push(anno)
     } else {
@@ -532,8 +532,8 @@ async function makeTagsEditable(domAnnoId: string) {
 
   function insertPicklist(select: HTMLSelectElement) {
     if (anchors.length) {
-      const firstAnchor = anchors[0] as HTMLAnchorElement;
-      firstAnchor.parentNode.replaceChild(select, firstAnchor)
+      const firstAnchor = anchors[0] as HTMLAnchorElement
+      firstAnchor.parentNode!.replaceChild(select, firstAnchor)
     }
     else {
       tagsElement.appendChild(select)

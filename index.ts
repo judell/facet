@@ -94,7 +94,7 @@ function createSubjectUserTokensForm() {
     <div class="formLabel">subject user tokens</div>
     <span style="word-break: break-all" class="subjectUserTokensForm">${hiddenUserTokens}</span>
     <a title="edit" style="cursor:pointer" class="iconEditOrSaveSubjectUserTokens">
-          <span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
+      <span>&nbsp;</span><svg class="icon-pencil"><use xlink:href="#icon-pencil"></use></svg>
     </a>`
   const anchor = document.querySelector('.iconEditOrSaveSubjectUserTokens') as HTMLAnchorElement
   anchor.onclick = makeSubjectUsersEditable
@@ -140,7 +140,8 @@ function saveSubjectUserTokens() {
     localStorage.setItem('h_subjectUserTokens', value)
     createSubjectUserTokensForm()
   } catch (e) {
-    alert(`That is not valid JSON. Format is "name" : "token" pairs, comma-separated. Please check your input at https://jsoneditoronline.org/`)
+    alert(`That is not valid JSON. Format is "name" : "token" pairs, comma-separated.
+     Please check your input at https://jsoneditoronline.org/`)
   }
 }
 

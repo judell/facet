@@ -190,6 +190,9 @@ function dropHandler(e:DragEvent) {
       if (target.id === 'wildcard_uriForm' && ! target.value.endsWith('/*') ) {
         target.value += '/*'
       }
+      if (target.id === 'wildcard_uriForm' && ! target.value.startsWith('http') ) {
+        target.value = `http://${target.value}`
+      }
     }
   }, 0)
 }

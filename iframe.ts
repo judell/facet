@@ -11,8 +11,9 @@ delete params.format
 
 const iconColor = '#2c1409b5'
 const baseIconStyle = `style="fill:${iconColor}"`
-const externalLinkStyle = `style="display:inline;width:.6em;height:.6em;margin-left:2px;margin-top:3px;fill:${iconColor}"`
-const deleteButtonStyle = `style="display:inline;width:8px;height:8px;fill:${iconColor};margin-left:2px"`
+const exportControlStyle = `style="display:inline; width:2em; height:2em; margin-left:1em; fill:${iconColor}"`
+const externalLinkStyle = `style="display:inline; width:.6em; height:.6em; margin-left:2px;margin-top:3px; fill:${iconColor}"`
+const deleteButtonStyle = `style="display:inline; width:8px; height:8px; fill:${iconColor}; margin-left:2px"`
 
 let htmlBuffer = ''
 
@@ -128,7 +129,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
 
   styleWidget(csv, json)
 
-  showButtons()
+  showToggleAndDownloadControls()
 
   if (format === 'html') {
     const expanded = isExpanded()
@@ -319,26 +320,21 @@ function getToggler() : hlib.toggler {
   }
 }
 
-function showButtons() {
+function showToggleAndDownloadControls() {
+  const downloaderIcon = renderIcon('icon-floppy', exportControlStyle)
   if (format === 'html') {
-    const { togglerTitle, togglerUnicodeChar} = getToggler()
+    const { togglerTitle, togglerUnicodeChar } = getToggler()
     controlsContainer.innerHTML = `
       <span title="${togglerTitle}" class="toggleMajor" id="expander">${togglerUnicodeChar}</span>
-      <button id="downloadHTML">download HTML</button>`
-    const expander = hlib.getById('expander') as HTMLButtonElement
-    expander.onclick = isExpanded()
-      ? setExpanderCollapse
-      : setExpanderExpand
-    hlib.getById('downloadHTML').onclick = downloadHTML
-  }
-  else if (format === 'csv') {
-    controlsContainer.innerHTML = '<button id="downloadCSV">download CSV</button>'
-    hlib.getById('downloadCSV').onclick = downloadCSV
-  }
-  else {
-    controlsContainer.innerHTML = '<button id="downloadJSON">download JSON</button>'
-    hlib.getById('downloadJSON').onclick = downloadJSON
-    hlib.getById
+      <span class="downloader">${downloaderIcon}</span>`
+    const expander = hlib.getById('expander') as HTMLSpanElement
+    expander.onclick = isExpanded() ? setExpanderCollapse : setExpanderExpand
+    const downloader = document.querySelector('.downloader') as HTMLSpanElement
+    downloader.onclick = downloadHTML
+  } else {
+    controlsContainer.innerHTML = `<span class="downloader">${downloaderIcon}</span>`
+    const downloader = document.querySelector('.downloader') as HTMLSpanElement
+    downloader.onclick = format === 'csv' ? downloadCSV : downloadJSON
   }
 }
 
@@ -358,7 +354,7 @@ function downloadHTML () {
   rebaseLinks(body.querySelectorAll('.annotationTags a'))
   const html = `<html>${head.outerHTML}${body.outerHTML}</html>`
   hlib.download(html, 'html')
-  body.innerHTML = 'done'
+  location.href = location.href
 }
 
 function downloadCSV () {

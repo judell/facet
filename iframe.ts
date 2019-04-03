@@ -11,7 +11,7 @@ delete params.format
 
 const iconColor = '#2c1409b5'
 const baseIconStyle = `style="fill:${iconColor}"`
-const exportControlStyle = `style="display:inline; width:2em; height:2em; margin-left:1em; fill:${iconColor}"`
+const exportControlStyle = `style="display:inline; width:1.8em; height:1.8em; margin-left:1em; fill:${iconColor}"`
 const externalLinkStyle = `style="display:inline; width:.6em; height:.6em; margin-left:2px;margin-top:3px; fill:${iconColor}"`
 const deleteButtonStyle = `style="display:inline; width:8px; height:8px; fill:${iconColor}; margin-left:2px"`
 

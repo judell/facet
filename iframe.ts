@@ -232,10 +232,9 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
   function showUrlResults (counter:number, eltId:string, url:string, count:number, doctitle:string):string {
     const host = new URL(url).host
     const headingCounter = `counter_${counter}`
-    const togglerTitle = isExpanded() ? 'collapse' : 'expand'
-    const togglerChar = isExpanded() ?  '\u{25bc}' : '\u{25b6}'
+    const { togglerTitle, togglerUnicodeChar } = getToggler()
     const output = `<h1 id="heading_${headingCounter}" class="urlHeading">
-      <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerChar}</span></a>
+      <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerUnicodeChar}</span></a>
       <span class="counter">&nbsp;${count}&nbsp;</span>
       <a class="urlTitle" title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
       <span class="host">${host}</span>
@@ -298,32 +297,38 @@ function isExpanded() {
 function setExpanderExpand() {
   const expander = hlib.getById('expander')
   expander.onclick = setExpanderCollapse
-  expander.innerText = 'collapse'
+  expander.innerText = hlib.expandToggler.togglerUnicodeChar
+  expander.title = hlib.expandToggler.togglerTitle
   hlib.expandAll()
 }
 
 function setExpanderCollapse() {
   const expander = hlib.getById('expander')
   expander.onclick = setExpanderExpand
-  expander.innerText = 'expand'
+  expander.innerText = hlib.collapseToggler.togglerUnicodeChar
+  expander.title = hlib.collapseToggler.togglerTitle
   hlib.collapseAll()
+}
+
+function getToggler() : hlib.toggler {
+  const togglerTitle = isExpanded() ? hlib.expandToggler.togglerTitle : hlib.collapseToggler.togglerTitle
+  const togglerUnicodeChar = isExpanded() ? hlib.expandToggler.togglerUnicodeChar : hlib.collapseToggler.togglerUnicodeChar
+  return {
+    togglerTitle: togglerTitle,
+    togglerUnicodeChar: togglerUnicodeChar
+  }
 }
 
 function showButtons() {
   if (format === 'html') {
+    const { togglerTitle, togglerUnicodeChar} = getToggler()
     controlsContainer.innerHTML = `
-      <button class="expander" id="expander"></button>
+      <span title="${togglerTitle}" class="toggleMajor" id="expander">${togglerUnicodeChar}</span>
       <button id="downloadHTML">download HTML</button>`
     const expander = hlib.getById('expander') as HTMLButtonElement
-    const expanded = hlib.getSettings().expanded === 'true'
-    expander.onclick = expanded
+    expander.onclick = isExpanded()
       ? setExpanderCollapse
       : setExpanderExpand
-    if (expanded) {
-      expander.innerText = 'collapse'
-    } else {
-      expander.innerText = 'expand'
-    }
     hlib.getById('downloadHTML').onclick = downloadHTML
   }
   else if (format === 'csv') {

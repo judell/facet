@@ -237,7 +237,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     const output = `<h1 id="heading_${headingCounter}" class="urlHeading">
       <a title="${togglerTitle}" href="javascript:hlib.toggle('${headingCounter}')"> <span class="toggle">${togglerUnicodeChar}</span></a>
       <span class="counter">&nbsp;${count}&nbsp;</span>
-      <a class="urlTitle" title="visit annotated page" target="annotatedPage" href="https://hyp.is/go?url=${url}">${doctitle}</a> 
+      <a class="urlTitle" title="visit annotated page" target="annotatedPage" href="${url}">${doctitle}</a> 
       <span class="host">${host}</span>
       </h1>
       <div id="cards_${headingCounter}">

@@ -33,7 +33,7 @@ hlib.createUrlInputForm(hlib.getById('urlContainer'))
 
 hlib.createWildcardUriInputForm(hlib.getById('wildcard_uriContainer'))
 
-hlib.createTagInputForm(hlib.getById('tagContainer'))
+hlib.createTagInputForm(hlib.getById('tagContainer'), 'View/rename tags <a href="https://jonudell.info/h/TagRename/">here</a>')
 
 hlib.createAnyInputForm(hlib.getById('anyContainer'), 'Freetext search')
 
@@ -187,7 +187,6 @@ function dropHandler(e:DragEvent) {
   target.click()
   setTimeout( _ => {
     if (target.id === 'urlForm' || target.id === 'wildcard_uriForm') {
-      target.value = target.value.replace('https://hyp.is/go?url=','')
       if (target.id === 'wildcard_uriForm' && ! target.value.endsWith('/*') ) {
         target.value += '/*'
       }

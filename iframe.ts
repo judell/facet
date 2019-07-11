@@ -358,7 +358,7 @@ function downloadHTML () {
 }
 
 function downloadCSV () {
-  let csvOutput = '"level","updated","url","user","id","group","tags","quote","text","relay link", "direct link"\n'
+  let csvOutput = '"level","updated","url","user","id","group","tags","quote","text","relay link","direct link"\n'
   csvOutput += widget.innerText
   hlib.download(csvOutput, 'csv')
 }

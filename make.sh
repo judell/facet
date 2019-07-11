@@ -22,8 +22,10 @@ python comment-out-imports.py
 #   dev: http://10.0.0.9:8000/hlib.bundle.js
 #   prd: https://jonudell.info/hlib/hlib.bundle.js
 
-if [ $1 = "dev" ]; then
+if [[ $1 = "dev" ]]; then
   python use-debug-lib.py
 else
   python use-production-lib.py
 fi
+
+read -rsp $'Press enter to continue...\n'

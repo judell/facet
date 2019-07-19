@@ -112,9 +112,8 @@
       font-size: 10pt;
     }
 
-
   </style>
-  <script src="https://jonudell.info/hlib/hlib2.bundle.js" charset="utf-8"></script>
+  <script src="http://localhost:8000/hlib2.bundle.js" charset="utf-8"></script>
   <script src="https://jonudell.info/hlib/showdown.min.js" charset="utf-8"></script>
 </head>
 <body>
@@ -156,6 +155,14 @@
     </defs>
   </svg>
   
+  <template id="annotationCard">
+    <div class="annotationCard">
+      <slot name="annotationHeader">default header</slot>
+      <slot name="annotationQuote">default quote</slot>
+      <slot name="annotationBody">default body</slot>
+    </div>
+  </template>
+
   <div id="controlsContainer" class="controlsContainer">
   </div>
 
@@ -166,6 +173,7 @@
   <div id="widget"></div>
 
   <script src="./iframe.js" charset="utf-8"></script>
+
 
 </body>
 

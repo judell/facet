@@ -78,9 +78,26 @@
       height: 1em;
     }
 
+    .editOrSaveIcon {
+      font-size: x-small;
+      width: 1em;
+      height: 1em;
+    }
+
     .subjectUserTokensForm, .controlledTagsForm {
       font-size: smaller;
     }
+
+    .subjectUserTokensDisplay {
+      font-size: smaller;
+    }
+
+    .subjectUserTokensInput {
+      width: 42em;
+      height: 6em;
+      position: relative;
+      font-size: smaller;
+    }    
 
     svg {
       fill:#582108b5;
@@ -126,8 +143,8 @@
             c1.101,1.1,1.507,1.129,1.507-0.757L26,3.419C25.999-0.018,26.024-0.001,22.581,0z"/>
       </symbol>       
     </defs>
-  </svg>  
-
+  </svg> 
+  
   <div id="container">
 
     <div id="leftbarContainer">
@@ -158,6 +175,10 @@
             <div class="formField" id="expandedContainer"></div>
             <div class="formField" id="searchRepliesContainer"></div>
             <div class="formField" id="exactTagSearchContainer"></div>
+            <div class="formField" is="subject-user-tokens-editor" state="viewing">
+              <span is="subject-user-tokens-display" class="subjectUserTokensDisplay"></span>
+              <span is="edit-or-save-icon"></span>
+            </div>
             <div class="formField" id="subjectsContainer"></div>
             <div class="formField" id="controlledTagsContainer"></div>
             <div class="formField" id="tokenContainer"></div>

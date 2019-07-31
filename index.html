@@ -10,6 +10,10 @@
       margin-top: 20px;
     }
 
+    *[is="edit-or-save-icon"] {
+      cursor: pointer;
+    }
+
     #container {
       display: flex;
       flex-direction: row;
@@ -89,10 +93,17 @@
     }
 
     .subjectUserTokensInput, .controlledTagsInput {
-      width: 30em;
-      height: 6em;
-      position: relative;
+      width: 100%;
       font-size: smaller;
+      position: relative;
+    }
+
+    .subjectUserTokensInput {
+      height: 8em;
+    }
+
+    .controlledTagsInput {
+      height: 2em;
     }
 
     svg {

@@ -41,8 +41,6 @@ hlib.createMaxInputForm(hlib.getById('maxContainer'), 'Approximate limit')
 
 hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
-createControlledTagsForm()
-
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))

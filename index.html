@@ -84,20 +84,16 @@
       height: 1em;
     }
 
-    .subjectUserTokensForm, .controlledTagsForm {
+    .subjectUserTokensDisplay, .controlledTagsDisplay {
       font-size: smaller;
     }
 
-    .subjectUserTokensDisplay {
-      font-size: smaller;
-    }
-
-    .subjectUserTokensInput {
-      width: 42em;
+    .subjectUserTokensInput, .controlledTagsInput {
+      width: 30em;
       height: 6em;
       position: relative;
       font-size: smaller;
-    }    
+    }
 
     svg {
       fill:#582108b5;
@@ -179,8 +175,10 @@
               <span is="subject-user-tokens-display" class="subjectUserTokensDisplay"></span>
               <span is="edit-or-save-icon"></span>
             </div>
-            <div class="formField" id="subjectsContainer"></div>
-            <div class="formField" id="controlledTagsContainer"></div>
+            <div class="formField" is="controlled-tags-editor" state="viewing">
+              <span is="controlled-tags-display" class="controlledTagsDisplay"></span>
+              <span is="edit-or-save-icon"></span>
+            </div>
             <div class="formField" id="tokenContainer"></div>
             <div class="tokenReset"><a title="click to reset">reset API token</a></div>
           </div>

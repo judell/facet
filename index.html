@@ -4,7 +4,7 @@
 <head>
   <title>View and export Hypothesis annotations</title>
   <link rel="stylesheet" href="https://jonudell.info/hlib/hlib.css">
-  <script src="https://jonudell.info/hlib/hlib2.bundle.js" charset="utf-8"></script>
+  <script src="http://localhost:8000/hlib2.bundle.js" charset="utf-8"></script>
   <style>
     body {
       margin-top: 20px;
@@ -182,11 +182,11 @@
             <div class="formField" id="expandedContainer"></div>
             <div class="formField" id="searchRepliesContainer"></div>
             <div class="formField" id="exactTagSearchContainer"></div>
-            <div class="formField" is="subject-user-tokens-editor" state="viewing">
+            <div class="formField" is="subject-user-tokens-editor" edit-or-save-icon-state="viewing">
               <span is="subject-user-tokens-display" class="subjectUserTokensDisplay"></span>
               <span is="edit-or-save-icon"></span>
             </div>
-            <div class="formField" is="controlled-tags-editor" state="viewing">
+            <div class="formField" is="controlled-tags-editor" edit-or-save-icon-state="viewing">
               <span is="controlled-tags-display" class="controlledTagsDisplay"></span>
               <span is="edit-or-save-icon"></span>
             </div>

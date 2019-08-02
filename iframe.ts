@@ -19,6 +19,8 @@ let htmlBuffer = ''
 
 const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
 
+hlib.getById('icons').outerHTML = hlib.svgIcons
+
 enum annoOrReplyCounterId {
   annoCount = 'annoCount',
   replyCount = 'replyCount'
@@ -176,7 +178,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
         const externalLinkIcon = renderIcon('icon-external-link', externalLinkStyle)
         const externalLink = `<a target="_standalone" href="https://hypothes.is/a/${anno.id}" title="view/edit/reply">${externalLinkIcon}</a>`
         let cardsHTML = hlib.showAnnotation(anno, level, '', externalLink)
-        cardsHTML = enableEditing(cardsHTML)
+        //cardsHTML = enableEditing(cardsHTML)
         cardsHTMLBuffer += cardsHTML
       }
       else if (format === 'csv') {

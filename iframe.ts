@@ -19,7 +19,7 @@ let htmlBuffer = ''
 
 const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
 
-hlib.getById('icons').outerHTML = hlib.svgIcons
+hlib.getById('svgDefs').outerHTML = hlib.svgIcons
 
 enum annoOrReplyCounterId {
   annoCount = 'annoCount',

@@ -377,45 +377,11 @@ function enableEditing(cardsHTML:string) {
   for (let i = 0; i < cardElements.length; i++ ) {
     const cardElement = cardElements[i] as HTMLElement
     let userElement = cardElement.querySelector('.user') as HTMLElement
-    maybeCreateDeleteButton(userElement, cardElement)
-    maybeCreateTextEditor(userElement, cardElement)
-    maybeCreateTagEditor(userElement, cardElement)
+    //maybeCreateDeleteButton(userElement, cardElement)
+    //maybeCreateTextEditor(userElement, cardElement)
+    //maybeCreateTagEditor(userElement, cardElement)
   }
   return cardsElement.innerHTML
-
-  function maybeCreateDeleteButton(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    const deleteButton = document.createElement('span')
-    deleteButton.setAttribute('class', 'deleteButton')
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      const icon = renderIcon('icon-delete', deleteButtonStyle)
-      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')">${icon}</a>`
-    } else {
-      deleteButton.innerHTML = ``
-    }
-    const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
-    hlib.insertNodeAfter(deleteButton, externalLink)
-  }
-
-  function maybeCreateEditor(username: string, cardId: string, targetElement:HTMLElement, editFunctionName: string) {
-    const editorContainer = document.createElement('div')
-    editorContainer.setAttribute('class', 'textEditor')
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      editorContainer.innerHTML = `
-        <div onclick="${editFunctionName}('${cardId}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil', baseIconStyle)}
-        </div>`;
-      targetElement.parentNode!.insertBefore(editorContainer, targetElement);
-      editorContainer.appendChild(targetElement)
-    }
-  }
-  
-  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    let targetElement = cardElement.querySelector('.annotationText') as HTMLElement;
-    const editFunctionName = 'makeHtmlContentEditable'
-    maybeCreateEditor(username, cardElement.id, targetElement, editFunctionName)
-  }
 
   function maybeCreateTagEditor(userElement: HTMLElement, cardElement: HTMLElement) {
     const username = getUserName(userElement)
@@ -423,69 +389,11 @@ function enableEditing(cardsHTML:string) {
     const editorContainer = document.createElement('div')
     editorContainer.setAttribute('class', 'tagEditor')
     if (subjectUserTokens.hasOwnProperty(username)) {
-      editorContainer.innerHTML = `
-        <div onclick="makeTagsEditable('${cardElement.id}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil', baseIconStyle)}
-        </div>`;
+      editorContainer.innerHTML = '<div is="edit-or-save-icon"></div>'
       tagsElement.parentNode!.insertBefore(editorContainer, tagsElement);
       editorContainer.appendChild(tagsElement)
     }
   }  
-}
-
-async function makeHtmlContentEditable(domAnnoId:string) {
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const editor = document.querySelector(`#${domAnnoId} .textEditor`) as HTMLElement
-  editor.style.setProperty('margin-top', '16px')
-  editor.style.setProperty('margin-bottom', '16px')
-  editor.style.setProperty('background-color', '#f1eeea')
-  editor.setAttribute('contentEditable','true')
-  const textElement = editor.querySelector('.annotationText') as HTMLElement
-  const r = await hlib.getAnnotation(annoId, hlib.getToken())
-  const text = JSON.parse(r.response).text
-  textElement.innerText = text
-  const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
-  iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
-  iconContainer.onclick = saveHtmlFromContentEditable
-  const card = hlib.getById(domAnnoId) as HTMLElement
-  const icon = card.querySelector('.tagEditor .editOrSaveIcon') as HTMLElement
-  icon.style.display = 'block'
-}
-
-async function saveHtmlFromContentEditable(e:Event) {
-  const domAnnoId = this.closest('.annotationCard').getAttribute('id')
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const userElement = this.closest('.annotationCard').querySelector('.user')
-  const username = userElement.innerText.trim() 
-  const body = this.closest('.annotationBody')
-  const annotationText = body.querySelector('.annotationText')
-  let text = annotationText.innerText
-  const editor = this.closest('.textEditor') as HTMLElement
-  editor.removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
-  editor.style.removeProperty('background-color')
-  this.innerHTML = renderIcon('icon-pencil', baseIconStyle)
-  const icon = editor.querySelector('.icon-pencil') as HTMLElement
-  icon.style.setProperty('margin-top', '0')
-  this.onclick = wrappedMakeHtmlContentEditable
-  const payload = JSON.stringify( { text: text } )
-  const token = subjectUserTokens[username]
-  const r = await hlib.updateAnnotation(annoId, token, payload)
-  let updatedText = JSON.parse(r.response).text
-  if ( updatedText !== text) {
-    alert (`unable to update, ${r.response}`)
-  }
-  
-  convertToHtml()
-  
-  function wrappedMakeHtmlContentEditable() {
-    return makeHtmlContentEditable(domAnnoId)
-  }
-
-  function convertToHtml() {
-    const converter = new showdown.Converter();
-    const html = converter.makeHtml(text);
-    annotationText.innerHTML = html;
-  }
 }
 
 function appendTagAdder(domAnnoId: string) {

@@ -1,7 +1,8 @@
 <!doctype html>
-<html>
+<html lang="en-US">
 
 <head>
+  <meta charset="utf-8">
   <title>View and export Hypothesis annotations</title>
   <link rel="stylesheet" href="https://jonudell.info/hlib/hlib.css">
   <script src="http://localhost:8000/hlib2.bundle.js" charset="utf-8"></script>
@@ -12,6 +13,10 @@
 
     *[is="edit-or-save-icon"] {
       cursor: pointer;
+    }
+
+    subject-user-tokens-editor {
+      margin-bottom: 8px;
     }
 
     svg {
@@ -47,6 +52,10 @@
       justify-content: flex-end;
     }
 
+    *[is="edit-or-save-icon"] {
+      position: absolute;
+    }
+
     .formContainer {
       margin-top: 12px;
     }
@@ -80,11 +89,14 @@
       margin-top:12px;
     }
 
-    .icon-pencil, .icon-floppy {
+    .icon-floppy, .icon-pencil {
       font-size: x-small;
       width: 1em;
       height: 1em;
-    }
+      margin-left: -14px;
+      padding-right: 4px;
+      cursor: pointer;
+    }    
 
     .editOrSaveIcon {
       font-size: x-small;
@@ -97,8 +109,7 @@
     }
 
     .subjectUserTokensInput, .controlledTagsInput {
-      width: 100%;
-      font-size: smaller;
+      width: 90%;
       position: relative;
     }
 
@@ -170,7 +181,9 @@
 
       <div class="formContainer">
           <div class="facets">
-            <div class="formField" id="userContainer"></div>
+            <form autocomplete="off">
+              <div class="formField" id="userContainer"></div>
+            </form>
             <div class="formField" id="groupContainer"></div>
             <div class="formField" id="urlContainer"></div>
             <div class="formField" id="wildcard_uriContainer"></div>
@@ -182,13 +195,15 @@
             <div class="formField" id="expandedContainer"></div>
             <div class="formField" id="searchRepliesContainer"></div>
             <div class="formField" id="exactTagSearchContainer"></div>
-            <div class="formField" is="subject-user-tokens-editor" edit-or-save-icon-state="viewing">
-              <span is="subject-user-tokens-display" class="subjectUserTokensDisplay"></span>
-              <span is="edit-or-save-icon"></span>
+            <div is="subject-user-tokens-editor" class="formField" state="viewing">
+              <div class="formLabel"></div>
+              <span is="edit-or-save-icon"></span>              
+              <div class="subjectUserTokensDisplay"></div>
             </div>
-            <div class="formField" is="controlled-tags-editor" edit-or-save-icon-state="viewing">
-              <span is="controlled-tags-display" class="controlledTagsDisplay"></span>
-              <span is="edit-or-save-icon"></span>
+            <div is="controlled-tags-editor" class="formField" state="viewing">
+              <div class="formLabel"></div>
+              <span is="edit-or-save-icon"></span>              
+              <div class="controlledTagsDisplay"></div>
             </div>
             <div class="formField" id="tokenContainer"></div>
             <div class="tokenReset"><a title="click to reset">reset API token</a></div>

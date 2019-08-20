@@ -7,6 +7,8 @@ if ( ! localStorage.getItem('h_settings') ) {
   hlib.settingsToLocalStorage(hlib.getSettings()) // initialize settings
 }
 
+hlib.getById('svgDefs').outerHTML = hlib.svgIcons
+
 updateSettingsFromUrl() // incoming url params override remembered params
 
 hlib.settingsToUrl(hlib.getSettings()) // add non-overridden remembered params to url

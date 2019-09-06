@@ -7,6 +7,8 @@ if ( ! localStorage.getItem('h_settings') ) {
   hlib.settingsToLocalStorage(hlib.getSettings()) // initialize settings
 }
 
+hlib.getById('svgDefs').outerHTML = hlib.svgIcons
+
 updateSettingsFromUrl() // incoming url params override remembered params
 
 hlib.settingsToUrl(hlib.getSettings()) // add non-overridden remembered params to url
@@ -71,10 +73,10 @@ function getJSON () {
 function search (format:string) {
   let params:any = {}
   params = Object.assign(params, hlib.getSettings())
-  params['format'] = format
-  params['_separate_replies'] = 'false'
-  params['group'] = hlib.getSelectedGroup('groupsList')
-  params['groupName'] = hlib.getSelectedGroupName('groupsList')
+  params.format = format
+  params._separate_replies = 'false'
+  params.group = hlib.getSelectedGroup('groupsList')
+  params.groupName = hlib.getSelectedGroupName('groupsList')
   const maxInput = document.querySelector('#maxForm') as HTMLInputElement
   params.max = maxInput.value ? maxInput.value : hlib.getDefaultSettings().max
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
@@ -100,6 +102,7 @@ function dropHandler(e:DragEvent) {
 }
 
 const activeFields = facets.filter(x => {return x !== 'group'})
+
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement
   fieldElement.addEventListener('formUrlStorageSync', function (e) {

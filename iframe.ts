@@ -10,14 +10,14 @@ const format = params.format
 delete params.format
 
 const iconColor = '#2c1409b5'
-const baseIconStyle = `style="fill:${iconColor}"`
 const exportControlStyle = `style="display:inline; width:1.8em; height:1.8em; margin-left:1em; fill:${iconColor}"`
 const externalLinkStyle = `style="display:inline; width:.6em; height:.6em; margin-left:2px;margin-top:3px; fill:${iconColor}"`
-const deleteButtonStyle = `style="display:inline; width:8px; height:8px; fill:${iconColor}; margin-left:2px"`
 
 let htmlBuffer = ''
 
 const subjectUserTokens = hlib.getSubjectUserTokensFromLocalStorage()
+
+hlib.getById('svgDefs').outerHTML = hlib.svgIcons
 
 enum annoOrReplyCounterId {
   annoCount = 'annoCount',
@@ -33,8 +33,8 @@ Object.keys(params).forEach(function (key) {
   if (params[key] === '') {
     delete params[key]
   }
-  if (params['group'] && params['group'] === 'all') {
-    delete params['group']
+  if (params.group && params.group === 'all') {
+    delete params.group
   }
 })
 
@@ -46,7 +46,7 @@ hlib.search(params, 'progress')
     processSearchResults(data[0], data[1])
   })
   .catch( _ => {
-    alert('Cannot search for those parameters')
+    alert(`Cannot search for those parameters: ${JSON.stringify(params)}`)
   })
 
 function showParams() {
@@ -166,7 +166,6 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
           annosForUrl.push(annoOrReply)
           adjustAnnoOrReplyCount(annoOrReplyCounterId.annoCount, counterDirection.up)
         }
-
       }
     })
     let all = organizeReplies(annosForUrl, repliesForUrl)
@@ -176,7 +175,6 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
         const externalLinkIcon = renderIcon('icon-external-link', externalLinkStyle)
         const externalLink = `<a target="_standalone" href="https://hypothes.is/a/${anno.id}" title="view/edit/reply">${externalLinkIcon}</a>`
         let cardsHTML = hlib.showAnnotation(anno, level, '', externalLink)
-        cardsHTML = enableEditing(cardsHTML)
         cardsHTMLBuffer += cardsHTML
       }
       else if (format === 'csv') {
@@ -206,8 +204,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     })
     
     const promises = [] as Promise<hlib.httpResponse>[]
-    for (let i = 0; i < refIds.length; i++) {
-      const refId = refIds[i]
+    for (let refId of refIds) {
       if (allIds.indexOf(refId) < 0) {
         promises.push(hlib.getAnnotation(refId, hlib.getToken()))
       }
@@ -367,235 +364,6 @@ function downloadJSON () {
   const jsonOutput = '[' + widget.innerText + ']'
   hlib.download(jsonOutput, 'json')
 }
-
-function enableEditing(cardsHTML:string) {
-  const cardsElement = document.createElement('div')
-  cardsElement.innerHTML = cardsHTML
-  const cardElements = cardsElement.querySelectorAll('.annotationCard')
-  for (let i = 0; i < cardElements.length; i++ ) {
-    const cardElement = cardElements[i] as HTMLElement
-    let userElement = cardElement.querySelector('.user') as HTMLElement
-    maybeCreateDeleteButton(userElement, cardElement)
-    maybeCreateTextEditor(userElement, cardElement)
-    maybeCreateTagEditor(userElement, cardElement)
-  }
-  return cardsElement.innerHTML
-
-  function maybeCreateDeleteButton(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    const deleteButton = document.createElement('span')
-    deleteButton.setAttribute('class', 'deleteButton')
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      const icon = renderIcon('icon-delete', deleteButtonStyle)
-      deleteButton.innerHTML = `<a title="delete annotation" onclick="deleteAnnotation('${cardElement.id}')">${icon}</a>`
-    } else {
-      deleteButton.innerHTML = ``
-    }
-    const externalLink = cardElement.querySelector('.externalLink') as HTMLAnchorElement
-    hlib.insertNodeAfter(deleteButton, externalLink)
-  }
-
-  function maybeCreateEditor(username: string, cardId: string, targetElement:HTMLElement, editFunctionName: string) {
-    const editorContainer = document.createElement('div')
-    editorContainer.setAttribute('class', 'textEditor')
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      editorContainer.innerHTML = `
-        <div onclick="${editFunctionName}('${cardId}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil', baseIconStyle)}
-        </div>`;
-      targetElement.parentNode!.insertBefore(editorContainer, targetElement);
-      editorContainer.appendChild(targetElement)
-    }
-  }
-  
-  function maybeCreateTextEditor(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    let targetElement = cardElement.querySelector('.annotationText') as HTMLElement;
-    const editFunctionName = 'makeHtmlContentEditable'
-    maybeCreateEditor(username, cardElement.id, targetElement, editFunctionName)
-  }
-
-  function maybeCreateTagEditor(userElement: HTMLElement, cardElement: HTMLElement) {
-    const username = getUserName(userElement)
-    let tagsElement = cardElement.querySelector('.annotationTags') as HTMLElement;
-    const editorContainer = document.createElement('div')
-    editorContainer.setAttribute('class', 'tagEditor')
-    if (subjectUserTokens.hasOwnProperty(username)) {
-      editorContainer.innerHTML = `
-        <div onclick="makeTagsEditable('${cardElement.id}')" class="editOrSaveIcon">
-          ${renderIcon('icon-pencil', baseIconStyle)}
-        </div>`;
-      tagsElement.parentNode!.insertBefore(editorContainer, tagsElement);
-      editorContainer.appendChild(tagsElement)
-    }
-  }  
-}
-
-async function makeHtmlContentEditable(domAnnoId:string) {
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const editor = document.querySelector(`#${domAnnoId} .textEditor`) as HTMLElement
-  editor.style.setProperty('margin-top', '16px')
-  editor.style.setProperty('margin-bottom', '16px')
-  editor.style.setProperty('background-color', '#f1eeea')
-  editor.setAttribute('contentEditable','true')
-  const textElement = editor.querySelector('.annotationText') as HTMLElement
-  const r = await hlib.getAnnotation(annoId, hlib.getToken())
-  const text = JSON.parse(r.response).text
-  textElement.innerText = text
-  const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
-  iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
-  iconContainer.onclick = saveHtmlFromContentEditable
-  const card = hlib.getById(domAnnoId) as HTMLElement
-  const icon = card.querySelector('.tagEditor .editOrSaveIcon') as HTMLElement
-  icon.style.display = 'block'
-}
-
-async function saveHtmlFromContentEditable(e:Event) {
-  const domAnnoId = this.closest('.annotationCard').getAttribute('id')
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const userElement = this.closest('.annotationCard').querySelector('.user')
-  const username = userElement.innerText.trim() 
-  const body = this.closest('.annotationBody')
-  const annotationText = body.querySelector('.annotationText')
-  let text = annotationText.innerText
-  const editor = this.closest('.textEditor') as HTMLElement
-  editor.removeAttribute('contentEditable') // using `noImplicitThis` setting to silence ts complaint
-  editor.style.removeProperty('background-color')
-  this.innerHTML = renderIcon('icon-pencil', baseIconStyle)
-  const icon = editor.querySelector('.icon-pencil') as HTMLElement
-  icon.style.setProperty('margin-top', '0')
-  this.onclick = wrappedMakeHtmlContentEditable
-  const payload = JSON.stringify( { text: text } )
-  const token = subjectUserTokens[username]
-  const r = await hlib.updateAnnotation(annoId, token, payload)
-  let updatedText = JSON.parse(r.response).text
-  if ( updatedText !== text) {
-    alert (`unable to update, ${r.response}`)
-  }
-  
-  convertToHtml()
-  
-  function wrappedMakeHtmlContentEditable() {
-    return makeHtmlContentEditable(domAnnoId)
-  }
-
-  function convertToHtml() {
-    const converter = new showdown.Converter();
-    const html = converter.makeHtml(text);
-    annotationText.innerHTML = html;
-  }
-}
-
-function appendTagAdder(domAnnoId: string) {
-  const tagEditor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
-  const adder = document.createElement('div')
-  adder.setAttribute('class', 'tagAdder')
-  adder.setAttribute('title', 'add a tag')
-  adder.innerHTML = ' + '
-  adder.onclick = addTag
-  tagEditor.appendChild(adder)
-}
-
-function addTag(e: Event) {
-  const adder = e.target as HTMLElement
-  const tagEditor = adder.closest('.tagEditor') as HTMLElement
-  const tags = tagEditor.querySelector('.annotationTags') as HTMLElement
-  const newInput = document.createElement('input')
-  newInput.style.marginLeft = '4px'
-  tags.appendChild(newInput)
-}
-
-async function makeTagsEditable(domAnnoId: string) {
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const editor = document.querySelector(`#${domAnnoId} .tagEditor`) as HTMLElement
-  const _controlledTags = hlib.getControlledTagsFromLocalStorage()
-  const useControlledTags = _controlledTags !== hlib.defaultControlledTags
-  const r = await hlib.getAnnotation(annoId, hlib.getToken())
-  const existingTags = JSON.parse(r.response).tags
-  const firstTag:string = existingTags.length ? existingTags[0] : ''
-  const tagsElement = editor.querySelector('.annotationTags') as HTMLElement
-  appendTagAdder(domAnnoId)
-  const anchors = tagsElement.querySelectorAll('a') as NodeListOf<HTMLAnchorElement>
-  if (useControlledTags) {
-    const select = createPicklist(firstTag, _controlledTags)
-    insertPicklist(select)
-  } 
-  const start = useControlledTags ? 1 : 0  // if controlled, skip first
-  for (let i = start; i < anchors.length; i++) {
-    let input = document.createElement('input') as HTMLInputElement
-    input.value = anchors[i].innerText
-    const anchor = anchors[i] as HTMLAnchorElement
-    anchor.parentNode!.replaceChild(input, anchors[i])
-  }
-  const iconContainer = editor.querySelector('.editOrSaveIcon') as HTMLElement
-  iconContainer.innerHTML = renderIcon('icon-floppy', baseIconStyle)
-  iconContainer.onclick = saveTags
-
-  function insertPicklist(select: HTMLSelectElement) {
-    if (anchors.length) {
-      const firstAnchor = anchors[0] as HTMLAnchorElement
-      firstAnchor.parentNode!.replaceChild(select, firstAnchor)
-    }
-    else {
-      tagsElement.appendChild(select)
-    }
-  }
-
-  function createPicklist(firstTag:string, _controlledTags:string) {
-    const controlledTags:string[] = _controlledTags.split(',')
-    const select = document.createElement('select') as HTMLSelectElement
-    for (let i = 0; i < controlledTags.length; i++) {
-      let controlledTag = controlledTags[i]
-      let option = document.createElement('option') as HTMLOptionElement
-      controlledTag = controlledTag.trim()
-      option.value = controlledTag
-      option.innerText = controlledTag;
-      if (firstTag === controlledTag) {
-        option.setAttribute('selected', 'true')
-      }
-      select.options.add(option)
-    }
-    return select
-  }
-}
-
-async function saveTags(e:Event) {
-  const card = this.closest('.annotationCard') as HTMLElement
-  const adder = card.querySelector('.tagAdder') as HTMLElement
-  adder.remove()
-  const domAnnoId = card.getAttribute('id') as string
-  const annoId = annoIdFromDomAnnoId(domAnnoId)
-  const userElement = this.closest('.annotationCard').querySelector('.user')
-  const username = userElement.innerText.trim() 
-  const body = this.closest('.annotationBody')
-  const select = body.querySelector('.annotationTags select') as HTMLSelectElement
-  const newTags = [] as string[]
-  if (select) {
-    const selected = select[select.selectedIndex] as HTMLOptionElement
-    newTags.push(selected.value)
-  }
-  const inputs = body.querySelectorAll('input') as NodeListOf<HTMLInputElement>
-  inputs.forEach(input => {
-    if (input.value) {
-      newTags.push(input.value)
-    }
-  })
-  this.innerHTML = renderIcon('icon-pencil', 'style="display:inline;height:12px;fill:#2c1409b5"')
-  this.onclick = wrappedMakeTagsEditable
-  const payload = JSON.stringify( { tags: newTags } )
-  const token = subjectUserTokens[username]
-  const r2 = await hlib.updateAnnotation(annoId, token, payload)
-  let updatedTags = JSON.parse(r2.response).tags
-  if ( JSON.stringify(updatedTags) !== JSON.stringify(newTags) ) {
-    alert (`unable to update, ${r2.response}`)
-  }
-  body.querySelector('.annotationTags').innerHTML = hlib.formatTags(newTags)
-
-  function wrappedMakeTagsEditable() {
-    return makeTagsEditable(domAnnoId)
-  }
-}
-
 
 function renderIcon(iconClass:string, style?: string) {
   const _style = style ? style : `style="display:block"`

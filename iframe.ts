@@ -10,10 +10,8 @@ const format = params.format
 delete params.format
 
 const iconColor = '#2c1409b5'
-const baseIconStyle = `style="fill:${iconColor}"`
 const exportControlStyle = `style="display:inline; width:1.8em; height:1.8em; margin-left:1em; fill:${iconColor}"`
 const externalLinkStyle = `style="display:inline; width:.6em; height:.6em; margin-left:2px;margin-top:3px; fill:${iconColor}"`
-const deleteButtonStyle = `style="display:inline; width:8px; height:8px; fill:${iconColor}; margin-left:2px"`
 
 let htmlBuffer = ''
 
@@ -35,8 +33,8 @@ Object.keys(params).forEach(function (key) {
   if (params[key] === '') {
     delete params[key]
   }
-  if (params['group'] && params['group'] === 'all') {
-    delete params['group']
+  if (params.group && params.group === 'all') {
+    delete params.group
   }
 })
 
@@ -48,7 +46,7 @@ hlib.search(params, 'progress')
     processSearchResults(data[0], data[1])
   })
   .catch( _ => {
-    alert('Cannot search for those parameters')
+    alert(`Cannot search for those parameters: ${JSON.stringify(params)}`)
   })
 
 function showParams() {
@@ -168,7 +166,6 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
           annosForUrl.push(annoOrReply)
           adjustAnnoOrReplyCount(annoOrReplyCounterId.annoCount, counterDirection.up)
         }
-
       }
     })
     let all = organizeReplies(annosForUrl, repliesForUrl)
@@ -207,8 +204,7 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     })
     
     const promises = [] as Promise<hlib.httpResponse>[]
-    for (let i = 0; i < refIds.length; i++) {
-      const refId = refIds[i]
+    for (let refId of refIds) {
       if (allIds.indexOf(refId) < 0) {
         promises.push(hlib.getAnnotation(refId, hlib.getToken()))
       }

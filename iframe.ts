@@ -174,7 +174,13 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
       if (format === 'html') {
         const externalLinkIcon = renderIcon('icon-external-link', externalLinkStyle)
         const externalLink = `<a target="_standalone" href="https://hypothes.is/a/${anno.id}" title="view/edit/reply">${externalLinkIcon}</a>`
-        let cardsHTML = hlib.showAnnotation(anno, level, '', externalLink)
+        let cardsHTML = hlib.showAnnotation(
+          anno,
+          level,
+          {
+            externalLink: externalLink,
+            addQuoteContext: hlib.getSettings().addQuoteContext === 'true'
+          })
         cardsHTMLBuffer += cardsHTML
       }
       else if (format === 'csv') {

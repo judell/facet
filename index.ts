@@ -45,6 +45,8 @@ hlib.createApiTokenInputForm(hlib.getById('tokenContainer'))
 
 hlib.createExactTagSearchCheckbox(hlib.getById('exactTagSearchContainer'))
 
+hlib.createAddQuoteContextCheckbox(hlib.getById('addQuoteContextContainer'))
+
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
 
 function updateSettingsFromUrl() {

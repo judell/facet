@@ -9,6 +9,9 @@ const controlsContainer = hlib.getById('controlsContainer') as HTMLElement
 const format = params.format
 delete params.format
 
+const sortBy = params.sortBy
+delete params.sortBy
+
 const iconColor = '#2c1409b5'
 const exportControlStyle = `style="display:inline; width:1.8em; height:1.8em; margin-left:1em; fill:${iconColor}"`
 const externalLinkStyle = `style="display:inline; width:.6em; height:.6em; margin-left:2px;margin-top:3px; fill:${iconColor}"`
@@ -272,7 +275,12 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
     function reverseByUpdate(a:hlib.annotation, b:hlib.annotation) {
       return new Date(b.updated).getTime() - new Date(a.updated).getTime()
     }
-    annosForUrl.sort(reverseByUpdate)
+    function byLocation(a:hlib.annotation, b:hlib.annotation) {
+      const aStart = a.start ? a.start : 9999999999
+      const bStart = b.start ? b.start : -9999999999
+      return aStart - bStart
+    }
+    annosForUrl.sort(sortBy === 'recency' ? reverseByUpdate: byLocation)
     const _annos = [] as hlib.annotation[]
     annosForUrl.forEach(function (annoForUrl) {
       _annos.push(annoForUrl)

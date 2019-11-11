@@ -81,6 +81,9 @@ function search (format:string) {
   params.groupName = hlib.getSelectedGroupName('groupsList')
   const maxInput = document.querySelector('#maxForm') as HTMLInputElement
   params.max = maxInput.value ? maxInput.value : hlib.getDefaultSettings().max
+  const sortByElement = hlib.getById('sortBy') as HTMLSelectElement
+  const sortByOption = sortByElement[sortByElement.selectedIndex] as HTMLOptionElement
+  params.sortBy = sortByOption.value
   document.title = 'Hypothesis activity for the query ' + JSON.stringify(params)
   params = encodeURIComponent(JSON.stringify(params))
   const iframeUrl = `iframe.html?params=${params}`
@@ -114,3 +117,7 @@ activeFields.forEach(field => {
     getHTML()
   })
 })
+
+hlib.getById('sortBy').onchange = function() {
+  getHTML()
+}

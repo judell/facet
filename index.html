@@ -148,6 +148,13 @@
           </div>
           <div class="settings">
             <div class="formField" id="maxContainer"></div>
+            <div class="formField">
+              <span class="formMessage">sort top-level annotations by</span>
+              <select id="sortBy">
+                <option>recency</option>
+                <option>document location</option>
+              </select>
+            </div>
             <div class="formField" id="expandedContainer"></div>
             <div class="formField" id="searchRepliesContainer"></div>
             <div class="formField" id="exactTagSearchContainer"></div>
@@ -179,7 +186,7 @@
   <p class="help">
       Click HTML, CSV, or JSON to search for matching Hypothesis annotations and display them
       in one of those formats. 
-      
+
       Fill in one or more <i>facets</i> to filter results. The facets are
       <b>username</b>, <b>group</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. 
       

@@ -1,6 +1,6 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any'] as string[]
+const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any', 'max'] as string[]
 const settings = ['subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch'] as string[]
 
 if ( ! localStorage.getItem('h_settings') ) {
@@ -80,7 +80,7 @@ function search (format:string) {
   params.group = hlib.getSelectedGroup('groupsList')
   params.groupName = hlib.getSelectedGroupName('groupsList')
   const maxInput = document.querySelector('#maxForm') as HTMLInputElement
-  params.max = maxInput.value ? maxInput.value : hlib.getDefaultSettings().max
+  params.max = maxInput.value ? maxInput.value : hlib.getSettings().max
   const sortByElement = hlib.getById('sortBy') as HTMLSelectElement
   const sortByOption = sortByElement[sortByElement.selectedIndex] as HTMLOptionElement
   params.sortBy = sortByOption.value

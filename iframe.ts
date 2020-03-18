@@ -44,6 +44,7 @@ Object.keys(params).forEach(function (key) {
 showParams()
 
 hlib.getById('progress').innerText = 'fetching annotations '
+
 hlib.search(params, 'progress')
   .then( data => {
     processSearchResults(data[0], data[1])

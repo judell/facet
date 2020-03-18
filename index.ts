@@ -1,6 +1,6 @@
 import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
 
-const facets = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any', 'max'] as string[]
+const syncedParams = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any', 'max'] as string[]
 const settings = ['subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch'] as string[]
 
 if ( ! localStorage.getItem('h_settings') ) {
@@ -50,7 +50,7 @@ hlib.createAddQuoteContextCheckbox(hlib.getById('addQuoteContextContainer'))
 hlib.createExpandedCheckbox(hlib.getById('expandedContainer'))
 
 function updateSettingsFromUrl() {
-  const params = facets.concat(settings)
+  const params = syncedParams.concat(settings)
   params.forEach(param => {
     if (hlib.gup(param) !== '') {
       const value = decodeURIComponent(hlib.gup(param))
@@ -106,7 +106,7 @@ function dropHandler(e:DragEvent) {
   }, 0)
 }
 
-const activeFields = facets.filter(x => {return x !== 'group'})
+const activeFields = syncedParams.filter(x => {return x !== 'group'})
 
 activeFields.forEach(field => {
   const fieldElement = hlib.getById(`${field}Container`) as HTMLInputElement

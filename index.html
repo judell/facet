@@ -38,14 +38,14 @@
     #iframeContainer {
       width: 100%;
     }
-    
+
     #iframe {
       width: 100%;
       height: 100%;
       border-style: none;
       margin-left: -20px;
     }
-   
+
     #buttonsContainer {
       display: flex;
       flex-direction: row;
@@ -79,7 +79,7 @@
       font-size: smaller;
       font-weight: normal;
     }
-    
+
     .help {
       font-size: smaller;
       margin-top:12px;
@@ -118,7 +118,7 @@
 <body>
 
   <div id="svgDefs"></div>
-  
+
   <div id="container">
 
     <div id="leftbarContainer">
@@ -126,7 +126,7 @@
       <div id="buttonsContainer">
         <div>
           <button id="buttonHTML" title="view or download search results as HTML" onclick="getHTML()">HTML</button>
-        </div>  
+        </div>
          <div>
           <button title="view or download search results as CSV" onclick="getCSV()">CSV</button>
          </div>
@@ -161,22 +161,22 @@
             <div class="formField" id="addQuoteContextContainer"></div>
             <div is="subject-user-tokens-editor" class="formField" state="viewing">
               <div class="formLabel"></div>
-              <span is="edit-or-save-icon"></span>              
+              <span is="edit-or-save-icon"></span>
               <div class="subjectUserTokensDisplay"></div>
             </div>
             <div is="controlled-tags-editor" class="formField" state="viewing">
               <div class="formLabel"></div>
-              <span is="edit-or-save-icon"></span>              
+              <span is="edit-or-save-icon"></span>
               <div class="controlledTagsDisplay"></div>
             </div>
             <div class="formField" id="tokenContainer"></div>
             <div class="tokenReset"><a title="click to reset">reset API token</a></div>
           </div>
-      
+
       </div>
 
     </div>
-    
+
     <div id="iframeContainer">
       <iframe id="iframe" src=""></iframe>
     </div>
@@ -191,20 +191,20 @@
 
       Fill in one or more <i>facets</i> to filter results. The facets are
       <b>username</b>, <b>group</b>, <b>url</b> (or <b>wildcard_uri</b>), <b>tag</b>, and <b>any</b>. 
-      
-      If you need more than 50 results, set <b>max</b> to a larger number. 
-      
+
+      If you need more than 50 results, set <b>max</b> to a larger number.
+
       If you specify no facets other than the default group All, you'll get recent Hypothesis 
       annotations and replies in any group you're authorized to see.
 
-      Click <svg style="display:inline;height:12px;width:12px;cursor:default" class="icon-external-link"><use xlink:href="#icon-external-link"></use></svg> to launch the Hypothesis thread viewer/editor. 
+      Click <svg style="display:inline;height:12px;width:12px;cursor:default" class="icon-external-link"><use xlink:href="#icon-external-link"></use></svg> to launch the Hypothesis thread viewer/editor.
 
       Use <i>exactTagSearch</i> to match tags exactly.
 
       Use <i>addQuoteContext</i> to show the prefix and suffix captured with each highlight.
 
-      Results are grouped by URL, ordered by most-recently-updated annotation for each URL, and displayed as threads. 
-      
+      Results are grouped by URL, ordered by most-recently-updated annotation for each URL, and displayed as threads.
+
       Use <i>subject user tokens</i> to enable in-place editing of annotations by users who 
       have shared their tokens with you, and <i>controlled tags</i> to constrain the choices for the first 
       tag belonging to each in-situ-editable annotation. 
@@ -215,7 +215,7 @@
 
       More <a href="https://jonudell.info/h/tools.html">Hypothesis tools</a>.
     </p>
-  
+
   <script src="./index.js"></script>
 
   <script>

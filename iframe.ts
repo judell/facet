@@ -185,6 +185,10 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
             externalLink: externalLink,
             addQuoteContext: hlib.getSettings().addQuoteContext === 'true'
           })
+        if (params.any) {
+          const regex = new RegExp(params.any, 'g')
+          cardsHTML = cardsHTML.replace(regex, `<span class="searchHit">${params.any}</span>`)
+        }
         cardsHTMLBuffer += cardsHTML
       }
       else if (format === 'csv') {

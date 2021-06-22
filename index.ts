@@ -1,4 +1,4 @@
-import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
+import * as hlib from '../hlib/hlib' // this will be commented out in the shipping bundle
 
 const syncedParams = ['user', 'group', 'url', 'wildcard_uri', 'tag', 'any', 'max'] as string[]
 const settings = ['subjectUserTokens', 'expanded', 'searchReplies', 'exactTagSearch'] as string[]
@@ -94,7 +94,7 @@ function dropHandler(e:DragEvent) {
   const target = e.target as HTMLInputElement
   target.focus()
   target.click()
-  setTimeout( _ => {
+  setTimeout( () => {
     if (target.id === 'urlForm' || target.id === 'wildcard_uriForm') {
       if (target.id === 'wildcard_uriForm' && ! target.value.endsWith('/*') ) {
         target.value += '/*'

@@ -1,4 +1,4 @@
-import * as hlib from '../../hlib/hlib' // this will be commented out in the shipping bundle
+import * as hlib from '../hlib/hlib' // this will be commented out in the shipping bundle
 
 let params:any = decodeURIComponent(hlib.gup('params'))
 params = JSON.parse(params)
@@ -150,15 +150,16 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
 
   async function renderCardsForUrl(url: string) {
     cardCounter++
-    const annosForUrl: hlib.annotation[] = gatheredResults[url].annos
-    const repliesForUrl: hlib.annotation[] = gatheredResults[url].replies
+    const resultsForUrl = gatheredResults.get(url) !
+    const annosForUrl: hlib.annotation[] = resultsForUrl.annos
+    const repliesForUrl: hlib.annotation[] = resultsForUrl.replies
     const perUrlCount = annosForUrl.length + repliesForUrl.length
     if (format === 'html') {
-      htmlBuffer += showUrlResults(cardCounter, 'widget', url, perUrlCount, gatheredResults[url].title)
+      htmlBuffer += showUrlResults(cardCounter, 'widget', url, perUrlCount, resultsForUrl.title)
     }
     let cardsHTMLBuffer = ''
     let promises = missingReplyPromises(annosForUrl.concat(repliesForUrl))
-    promises = promises.map(p => p.catch(() => undefined))
+    promises = promises.map(p => p.catch( e => e ))
     let missingAnnoOrReplyResults:hlib.httpResponse[] = await Promise.all(promises)
     missingAnnoOrReplyResults.forEach(result => {
       if (result && result.status == 200 ) { 
@@ -259,9 +260,11 @@ async function processSearchResults (annoRows:any[], replyRows:any[]) {
   
   function reverseChronUrls (results: hlib.gatheredResults) {
     function reverseByUpdate(a:string, b:string) {
-      return new Date(results[b].updated).getTime() - new Date(results[a].updated).getTime()
+      const resultA = results.get(a) !
+      const resultB = results.get(b) !
+      return new Date(resultB.updated).getTime() - new Date(resultA.updated).getTime()
     }
-    const urls = Object.keys(results)
+    const urls = Array.from(results.keys())
     urls.sort(reverseByUpdate)
     return urls
   }
@@ -396,7 +399,7 @@ function deleteAnnotation(domAnnoId: string) {
   const card = hlib.getById(domAnnoId) as HTMLElement
   const userElement = card.querySelector('.user') as HTMLElement
   const username = getUserName(userElement)
-  const token = subjectUserTokens[username]
+  const token = subjectUserTokens.get(username) || ''
   async function _delete() {
     const annoId = annoIdFromDomAnnoId(domAnnoId)
     const r = await hlib.deleteAnnotation(annoId, token)
